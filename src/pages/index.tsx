@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import styles from './index.module.scss'
+import styles from '../index.module.scss'
 import Link from 'next/link'
 
 export const Home = (): JSX.Element => (

@@ -3,7 +3,7 @@ import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import path from 'path'
 import fs from 'fs-extra'
 import Link from 'next/link'
-import style from './index.module.scss'
+import style from '../../articles.module.scss'
 import Footer from '../../footer'
 import sort_by from '../../sort_by'
 
