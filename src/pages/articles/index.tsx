@@ -10,6 +10,9 @@ import sort_by from '../../sort_by'
 const BlogList: InferGetStaticPropsType<typeof getStaticProps> = ({ pages }) => {
   return (
     <div className={style.page}>
+      <nav>
+        <Link href="/">Home</Link>
+      </nav>
       <header>
         <h1>Articles</h1>
       </header>
@@ -19,6 +22,7 @@ const BlogList: InferGetStaticPropsType<typeof getStaticProps> = ({ pages }) => 
             <Link href={`/articles/${name}`}>{metadata.title}</Link>
             {metadata.author ? ` - ${metadata.author}` : ''}
             {metadata.revision ? <span className={style.revision}>{`v${metadata.revision}`}</span> : ''}
+            {metadata.abstract ? `: ${metadata.abstract}` : ''}
           </p>
         ))}
       </main>

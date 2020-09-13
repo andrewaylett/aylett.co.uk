@@ -26,14 +26,15 @@ const Revisions = ({ revision, revised, expires }) => (
 const components = {
   wrapper: ({ children, metadata }) => (
     <div className="mdx">
-      <header>
-        <h1>{metadata.title}</h1>
-        <Revisions {...metadata} />
-        {metadata.author ? <p className="author">{metadata.author}</p> : ''}
-      </header>
       <nav>
         <Link href="/">Home</Link> | <Link href="/articles">Articles</Link>
       </nav>
+      <header>
+        <h1>{metadata.title}</h1>
+        {metadata.abstract ? metadata.abstract : ''}
+        <Revisions {...metadata} />
+        {metadata.author ? <p className="author">{metadata.author}</p> : ''}
+      </header>
       <main>{children}</main>
       <Footer />
     </div>

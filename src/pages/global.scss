@@ -21,3 +21,7 @@ header h1 {
 .revisions span + span::before {
     content: ' | ';
 }
+
+nav {
+    padding-top: 1ex;
+}
