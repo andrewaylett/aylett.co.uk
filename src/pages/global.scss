@@ -10,7 +10,7 @@ html, body {
 }
 
 div.mdx {
-    max-width: 50em;
+    max-width: 40em;
     margin: auto;
     padding: 1ex;
     font-variant-numeric: oldstyle-nums;
@@ -25,10 +25,21 @@ header h1 {
     font-size: 3em;
 }
 
-.revisions span + span::before {
-    content: ' | ';
+.revisions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 1ex;
 }
 
 nav {
     padding-top: 1ex;
+}
+
+.meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: space-between;
+    margin-top: 1ex;
 }

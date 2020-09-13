@@ -13,11 +13,11 @@ const Optional = ({ text, formatter: formatted }) => <>{text ? <span>{formatted}
 const Revisions = ({ revision, revised, expires }) => (
   <>
     {revision || revised || expires ? (
-      <p className="revisions">
-        <Optional text={revision} formatter={`Version ${revision}`} />
-        <Optional text={revised} formatter={`Last Revised: ${revised}`} />
-        <Optional text={expires} formatter={`Expires: ${expires}`} />
-      </p>
+      <div className="revisions">
+        <Optional text={revision} formatter={`Version: ${revision}`} />
+        <Optional text={revised} formatter={`Last Revised: ${revised}`} />
+        <Optional text={expires} formatter={`Expires: ${expires}`} />
+      </div>
     ) : (
       ''
     )}
@@ -36,11 +36,13 @@ const components = {
       <header>
         <h1>{metadata.title}</h1>
         {metadata.abstract ? metadata.abstract : ''}
-        <Revisions {...metadata} />
-        {metadata.author ? <p className="author">{metadata.author}</p> : ''}
+        <div className="meta">
+          {metadata.author ? <div className="author">Author: {metadata.author}</div> : ''}
+          <Revisions {...metadata} />
+        </div>
       </header>
       <main>{children}</main>
-      <Footer />
+      <Footer author={metadata.author} copyright={metadata.copyright || metadata.revised.split('/')[0]} />
     </div>
   ),
 }

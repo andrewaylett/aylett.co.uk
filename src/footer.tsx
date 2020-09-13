@@ -1,5 +1,10 @@
 import React from 'react'
+import { getYear } from 'date-fns'
 
-const Footer = () => <footer style={{ paddingTop: '1em' }}>Copyright © Andrew Aylett, 2020</footer>
+const Footer = ({ author, copyright }) => (
+  <footer style={{ paddingTop: '1em' }}>
+    Copyright © {author || 'Andrew Aylett'}, {copyright || getYear(Date.now())}
+  </footer>
+)
 
 export default Footer
