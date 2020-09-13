@@ -30,6 +30,9 @@ header h1 {
     flex-direction: row;
     flex-wrap: wrap;
     column-gap: 1ex;
+    a {
+        color: inherit;
+    }
 }
 
 nav {

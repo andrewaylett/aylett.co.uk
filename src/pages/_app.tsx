@@ -7,15 +7,16 @@ import { MDXProvider } from '@mdx-js/react'
 import Link from 'next/link'
 import Footer from '../footer'
 import Head from 'next/head'
+import { github_url } from '../github'
 
 const Optional = ({ text, formatter: formatted }) => <>{text ? <span>{formatted}</span> : null}</>
 
-const Revisions = ({ revision, revised, expires }) => (
+const Revisions = ({ revision, revised, expires, url }) => (
   <>
     {revision || revised || expires ? (
       <div className="revisions">
         <Optional text={revision} formatter={`Version: ${revision}`} />
-        <Optional text={revised} formatter={`Last Revised: ${revised}`} />
+        <Optional text={revised} formatter={<a href={github_url(url)}>Last Revised: {revised}</a>} />
         <Optional text={expires} formatter={`Expires: ${expires}`} />
       </div>
     ) : (
@@ -24,7 +25,7 @@ const Revisions = ({ revision, revised, expires }) => (
   </>
 )
 
-const components = {
+const components = (url) => ({
   wrapper: ({ children, metadata }) => (
     <div className="mdx">
       <Head>
@@ -38,17 +39,17 @@ const components = {
         {metadata.abstract ? metadata.abstract : ''}
         <div className="meta">
           {metadata.author ? <div className="author">Author: {metadata.author}</div> : ''}
-          <Revisions {...metadata} />
+          <Revisions url={url} {...metadata} />
         </div>
       </header>
       <main>{children}</main>
       <Footer author={metadata.author} copyright={metadata.copyright || metadata.revised.split('/')[0]} />
     </div>
   ),
-}
+})
 
 const WrappedApp: React.VoidFunctionComponent<AppProps> = (props, context) => (
-  <MDXProvider components={components}>
+  <MDXProvider components={components(props.router.asPath)}>
     <App {...props} context={context} />
   </MDXProvider>
 )
