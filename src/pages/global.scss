@@ -1,7 +1,7 @@
 html, body {
     padding: 0;
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    font-family: Calibri, Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
@@ -12,6 +12,13 @@ html, body {
 div.mdx {
     max-width: 50em;
     margin: auto;
+    padding: 1ex;
+    font-variant-numeric: oldstyle-nums;
+}
+
+code {
+    font-variant-numeric: tabular-nums;
+    font-family: "JetBrains Mono", Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, monospace
 }
 
 header h1 {

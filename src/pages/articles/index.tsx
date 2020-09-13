@@ -6,10 +6,14 @@ import Link from 'next/link'
 import style from '../../articles.module.scss'
 import Footer from '../../footer'
 import sort_by from '../../sort_by'
+import Head from 'next/head'
 
 const BlogList: InferGetStaticPropsType<typeof getStaticProps> = ({ pages }) => {
   return (
     <div className={style.page}>
+      <Head>
+        <title>Articles - aylett.co.uk</title>
+      </Head>
       <nav>
         <Link href="/">Home</Link>
       </nav>

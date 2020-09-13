@@ -6,6 +6,7 @@ import { AppProps } from 'next/dist/pages/_app'
 import { MDXProvider } from '@mdx-js/react'
 import Link from 'next/link'
 import Footer from '../footer'
+import Head from 'next/head'
 
 const Optional = ({ text, formatter: formatted }) => <>{text ? <span>{formatted}</span> : null}</>
 
@@ -26,6 +27,9 @@ const Revisions = ({ revision, revised, expires }) => (
 const components = {
   wrapper: ({ children, metadata }) => (
     <div className="mdx">
+      <Head>
+        <title>{metadata.title} - aylett.co.uk</title>
+      </Head>
       <nav>
         <Link href="/">Home</Link> | <Link href="/articles">Articles</Link>
       </nav>
