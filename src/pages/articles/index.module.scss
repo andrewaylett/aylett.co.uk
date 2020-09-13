@@ -1,0 +1,16 @@
+.page {
+    max-width: 50em;
+    margin: auto;
+}
+
+.revision {
+    font-size: smaller;
+}
+
+.revision::before {
+    content: ' (';
+}
+
+.revision::after {
+    content: ')';
+}

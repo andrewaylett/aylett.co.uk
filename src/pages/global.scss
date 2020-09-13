@@ -9,4 +9,19 @@ html, body {
     box-sizing: border-box;
 }
 
+div.mdx {
+    max-width: 50em;
+    margin: auto;
+}
 
+header h1 {
+    font-size: 3em;
+}
+
+.revisions span + span::before {
+    content: ' | ';
+}
+
+nav {
+    padding-top: 1ex;
+}

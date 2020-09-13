@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import styles from './index.module.scss'
+import Link from 'next/link'
 
 export const Home = (): JSX.Element => (
   <div className={styles.container}>
@@ -12,6 +13,9 @@ export const Home = (): JSX.Element => (
       <h1 className={styles.title}>Welcome to aylett.co.uk</h1>
 
       <p className={styles.description}>Insert '90s "site under construction" gif here.</p>
+      <p className={styles.description}>
+        <Link href="/articles">Articles</Link>
+      </p>
     </main>
 
     <footer>
