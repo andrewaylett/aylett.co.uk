@@ -15,9 +15,9 @@ const Revisions = ({ revision, revised, expires, url }) => (
   <>
     {revision || revised || expires ? (
       <div className="revisions">
-        <Optional text={revision} formatter={`Version: ${revision}`} />
-        <Optional text={revised} formatter={<a href={github_url(url)}>Last Revised: {revised}</a>} />
-        <Optional text={expires} formatter={`Expires: ${expires}`} />
+        <Optional text={revision} formatter={`Version:\u00A0${revision}`} />
+        <Optional text={revised} formatter={<a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>} />
+        <Optional text={expires} formatter={`Expires:\u00A0${expires}`} />
       </div>
     ) : (
       ''

@@ -13,7 +13,7 @@ export const Home = (): JSX.Element => (
     <main>
       <h1 className={styles.title}>Welcome to aylett.co.uk</h1>
 
-      <p className={styles.description}>Insert '90s "site under construction" gif here.</p>
+      <p className={styles.description}>Insert &apos;90s &ldquo;site under construction&rdquo; gif here.</p>
       <p className={styles.description}>
         <Link href="/articles">Articles</Link>
       </p>

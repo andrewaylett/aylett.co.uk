@@ -39,7 +39,7 @@ export default BlogList
 
 export const getStaticProps: GetStaticProps = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles')
-  let items = await fs.readdir(ARTICLES_PATH)
+  const items = await fs.readdir(ARTICLES_PATH)
   const arr = []
   for (let i = 0; i < items.length; i++) {
     const filePath = path.join(ARTICLES_PATH, items[i])
