@@ -3,21 +3,30 @@ import 'normalize.css'
 import './global.scss'
 import React from 'react'
 import { AppProps } from 'next/dist/pages/_app'
-import { MDXProvider } from '@mdx-js/react'
+import { MDXProvider, MDXProviderComponentsProp } from '@mdx-js/react'
 import Link from 'next/link'
 import Footer from '../footer'
 import Head from 'next/head'
 import { github_url } from '../github'
 
-const Optional = ({ text, formatter: formatted }) => <>{text ? <span>{formatted}</span> : null}</>
+const Optional: React.FunctionComponent<{ text: string }> = ({ text, children }) => (
+  <>{text ? <span>{children}</span> : null}</>
+)
 
-const Revisions = ({ revision, revised, expires, url }) => (
+const Revisions: React.VoidFunctionComponent<{ revision: string; revised: string; expires: string; url: string }> = ({
+  revision,
+  revised,
+  expires,
+  url,
+}) => (
   <>
     {revision || revised || expires ? (
       <div className="revisions">
-        <Optional text={revision} formatter={`Version:\u00A0${revision}`} />
-        <Optional text={revised} formatter={<a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>} />
-        <Optional text={expires} formatter={`Expires:\u00A0${expires}`} />
+        <Optional text={revision}>Version:&nbsp;{revision}</Optional>
+        <Optional text={revised}>
+          <a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>
+        </Optional>
+        <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
       </div>
     ) : (
       ''
@@ -25,7 +34,7 @@ const Revisions = ({ revision, revised, expires, url }) => (
   </>
 )
 
-const components = (url) => ({
+const components: (url: string) => MDXProviderComponentsProp = (url) => ({
   wrapper: ({ children, metadata }) => (
     <div className="mdx">
       <Head>

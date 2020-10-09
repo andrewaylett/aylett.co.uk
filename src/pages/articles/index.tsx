@@ -8,7 +8,7 @@ import Footer from '../../footer'
 import sort_by from '../../sort_by'
 import Head from 'next/head'
 
-const BlogList: InferGetStaticPropsType<typeof getStaticProps> = ({ pages }) => {
+const BlogList: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = ({ pages }) => {
   return (
     <div className={style.page}>
       <Head>
@@ -37,7 +37,7 @@ const BlogList: InferGetStaticPropsType<typeof getStaticProps> = ({ pages }) => 
 
 export default BlogList
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<{ pages: { name: string; metadata: any }[] }> = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles')
   const items = await fs.readdir(ARTICLES_PATH)
   const arr = []
