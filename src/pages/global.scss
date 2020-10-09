@@ -10,10 +10,17 @@ html, body {
 }
 
 div.mdx {
-    max-width: 40em;
-    margin: auto;
     padding: 1ex;
     font-variant-numeric: oldstyle-nums;
+    display: grid;
+    grid-template-columns: 1fr min(65ch, 100%) 1fr;
+}
+div.mdx > * {
+    grid-column: 2;
+}
+.full-bleed {
+    width: 100%;
+    grid-column: 1 / 4;
 }
 
 code {
