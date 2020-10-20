@@ -1,12 +1,12 @@
 import React from 'react'
-import { GetStaticProps, InferGetStaticPropsType } from 'next'
-import path from 'path'
-import fs from 'fs-extra'
+import { InferGetStaticPropsType } from 'next'
 import Link from 'next/link'
 import style from '../../articles.module.scss'
 import Footer from '../../footer'
-import sort_by from '../../sort_by'
 import Head from 'next/head'
+import { getStaticProps } from '../../ssr/articles'
+
+export { getStaticProps } from '../../ssr/articles'
 
 const BlogList: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = ({ pages }) => {
   return (
@@ -36,26 +36,3 @@ const BlogList: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
 }
 
 export default BlogList
-
-export const getStaticProps: GetStaticProps<{ pages: { name: string; metadata: any }[] }> = async () => {
-  const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles')
-  const items = await fs.readdir(ARTICLES_PATH)
-  const arr = []
-  for (let i = 0; i < items.length; i++) {
-    const filePath = path.join(ARTICLES_PATH, items[i])
-    const { ext, name } = path.parse(filePath)
-    // Only process markdown/mdx files that are not index.tsx pages
-    if (ext.startsWith('.md') && name !== 'index') {
-      const module = await import(`./${items[i]}`)
-      arr.push({ name, metadata: module.metadata })
-    }
-  }
-
-  sort_by(arr, (entry) => entry.metadata.title)
-
-  return {
-    props: {
-      pages: arr,
-    },
-  }
-}
