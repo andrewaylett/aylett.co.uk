@@ -2,10 +2,10 @@ import { GetStaticProps } from 'next'
 import path from 'path'
 import fs from 'fs-extra'
 import sort_by from '../sort_by'
-import { Page, PageMetadata } from '../types'
+import { ArticlesProps, Page, PageMetadata } from '../types'
 import { PathReporter } from 'io-ts/PathReporter'
 
-export const getStaticProps: GetStaticProps<{ pages: Page[] }> = async () => {
+export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles')
   const items = await fs.readdir(ARTICLES_PATH)
   const promises: Promise<Page[]>[] = items.map(async (item) => {

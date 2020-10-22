@@ -1,4 +1,6 @@
+import { getPropTypes, Options, PropTypeable } from 'prop-types-ts'
 import * as t from 'io-ts'
+import React, { WeakValidationMap } from 'react'
 
 const dateStringRegex = /^\d{4}\/\d{2}\/\d{2}$/
 
@@ -44,3 +46,20 @@ export const Page = t.interface(
   'Page'
 )
 export type Page = t.TypeOf<typeof Page>
+
+export const fc_props = <T extends PropTypeable>(
+  Component: React.FC<t.TypeOf<T>>,
+  type: T,
+  options?: Options
+): React.FC<t.TypeOf<T>> => {
+  if (process.env.NODE_ENV !== 'production') {
+    const propsTypes = getPropTypes(type, options)
+    Component.propTypes = (propsTypes as unknown) as WeakValidationMap<T>
+    Component.displayName = type.name.replace('Props', '')
+    return Component
+  }
+  return Component
+}
+
+export const ArticlesProps = t.interface({ pages: t.array(Page) }, 'ArticlesProps')
+export type ArticlesProps = t.TypeOf<typeof ArticlesProps>
