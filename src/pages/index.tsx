@@ -3,7 +3,8 @@ import styles from '../index.module.scss'
 import Link from 'next/link'
 import React from 'react'
 
-export const Home = (): JSX.Element => (
+// noinspection HtmlUnknownTarget
+export const Home: React.VoidFunctionComponent = () => (
   <div className={styles.container}>
     <Head>
       <title>aylett.co.uk</title>

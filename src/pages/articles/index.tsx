@@ -5,10 +5,11 @@ import style from '../../articles.module.scss'
 import Footer from '../../footer'
 import Head from 'next/head'
 import { getStaticProps } from '../../ssr/articles'
+import { ArticlesProps, fc_props } from '../../types'
 
 export { getStaticProps } from '../../ssr/articles'
 
-const BlogList: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = ({ pages }) => {
+const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = fc_props(({ pages }) => {
   return (
     <div className={style.page}>
       <Head>
@@ -33,6 +34,6 @@ const BlogList: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
       <Footer />
     </div>
   )
-}
+}, ArticlesProps)
 
-export default BlogList
+export default Articles

@@ -8,32 +8,33 @@ import Link from 'next/link'
 import Footer from '../footer'
 import Head from 'next/head'
 import { github_url } from '../github'
-import { PageMetadata } from '../types'
+import { fc_props, PageMetadata } from '../types'
 import { PathReporter } from 'io-ts/PathReporter'
+import * as t from 'io-ts'
 
-const Optional: React.FunctionComponent<{ text?: string }> = ({ text, children }) => (
-  <>{text ? <span>{children}</span> : null}</>
-)
+const OptionalProps = t.partial({ text: t.string }, 'OptionalProps')
 
-const Revisions: React.VoidFunctionComponent<PageMetadata & { url: string }> = ({
-  revision,
-  revised,
-  expires,
-  url,
-}) => (
-  <>
-    {revision || revised || expires ? (
-      <div className="revisions">
-        <Optional text={revision}>Version:&nbsp;{revision}</Optional>
-        <Optional text={revised}>
-          <a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>
-        </Optional>
-        <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
-      </div>
-    ) : (
-      ''
-    )}
-  </>
+const Optional = fc_props(({ text, children }) => <>{text ? <span>{children}</span> : null}</>, OptionalProps)
+
+const RevisionsProps = t.intersection([PageMetadata, t.interface({ url: t.string })], 'RevisionsProps')
+
+const Revisions = fc_props(
+  ({ revision, revised, expires, url }) => (
+    <>
+      {revision || revised || expires ? (
+        <div className="revisions">
+          <Optional text={revision}>Version:&nbsp;{revision}</Optional>
+          <Optional text={revised}>
+            <a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>
+          </Optional>
+          <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
+        </div>
+      ) : (
+        ''
+      )}
+    </>
+  ),
+  RevisionsProps
 )
 
 type WrapperProps = React.PropsWithChildren<{ metadata: PageMetadata }>
