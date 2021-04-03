@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<clientConfig version="1.1" xmlns="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd">
+    <emailProvider id="aylett.co.uk">
+        <domain>aylett.co.uk</domain>
+        <displayName>Aylett.co.uk Mail</displayName>
+        <displayShortName>Aylett.co.uk Mail</displayShortName>
+        <incomingServer type="imap">
+            <hostname>atlas.aylett.co.uk</hostname>
+            <port>143</port>
+            <socketType>STARTTLS</socketType>
+            <username>%EMAILLOCALPART%</username>
+            <authentication>password-cleartext</authentication>
+        </incomingServer>
+        <incomingServer type="imap">
+            <hostname>atlas.aylett.co.uk</hostname>
+            <port>993</port>
+            <socketType>SSL</socketType>
+            <username>%EMAILLOCALPART%</username>
+            <authentication>password-cleartext</authentication>
+        </incomingServer>
+        <outgoingServer>
+            <hostname>atlas.aylett.co.uk</hostname>
+            <port>587</port>
+            <socketType>STARTTLS</socketType>
+            <username>%EMAILLOCALPART%</username>
+            <authentication>password-cleartext</authentication>
+        </outgoingServer>
+        <outgoingServer>
+            <hostname>atlas.aylett.co.uk</hostname>
+            <port>465</port>
+            <socketType>SSL</socketType>
+            <username>%EMAILLOCALPART%</username>
+            <authentication>password-cleartext</authentication>
+        </outgoingServer>
+    </emailProvider>
+</clientConfig>
