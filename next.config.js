@@ -1,38 +1,43 @@
-const detectFrontmatter = require('remark-frontmatter')
-const visit = require('unist-util-visit')
-const remove = require('unist-util-remove')
-const yaml = require('yaml')
+const detectFrontmatter = require('remark-frontmatter');
+// eslint-disable-next-line import/order
+const yaml = require('yaml');
 
-const extractFrontmatter = () => (tree, file) => {
+const visitP = import('unist-util-visit');
+const removeP = import('unist-util-remove');
+
+const extractFrontmatter = () => async (tree, file) => {
+    const { visit } = await visitP;
+    const { remove } = await removeP;
     visit(tree, 'yaml', (node) => {
-        file.data.frontmatter = Object.assign(
-            {
-                title: file.stem,
-            },
-            yaml.parse(node.value)
-        )
-    })
-    remove(tree, 'yaml')
-}
+        // eslint-disable-next-line no-param-reassign
+        file.data.frontmatter = {
+            title: file.stem,
+            ...yaml.parse(node.value),
+        };
+    });
+    remove(tree, 'yaml');
+};
 
 const withMDX = require('@next/mdx')({
     options: {
         remarkPlugins: [detectFrontmatter, extractFrontmatter],
     },
-})
+});
+
 module.exports = withMDX({
     webpack(config, { dev }) {
         if (!dev) {
-            config.devtool = 'source-map'
-            for (const plugin of config.plugins) {
-                if (plugin['constructor']['name'] === 'UglifyJsPlugin') {
-                    plugin.options.sourceMap = true
-                    break
+            // eslint-disable-next-line no-param-reassign
+            config.devtool = 'source-map';
+            config.plugins.forEach((plugin) => {
+                if (plugin.constructor.name === 'UglifyJsPlugin') {
+                    // eslint-disable-next-line no-param-reassign
+                    plugin.options.sourceMap = true;
                 }
-            }
+            });
         }
-        return config
+        return config;
     },
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-})
+});

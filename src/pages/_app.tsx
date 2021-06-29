@@ -1,31 +1,32 @@
-import App from 'next/app'
-import 'normalize.css'
-import './global.scss'
-import React from 'react'
-import { AppProps } from 'next/dist/pages/_app'
-import { MDXProvider, MDXProviderComponentsProp } from '@mdx-js/react'
-import Link from 'next/link'
-import Footer from '../footer'
-import Head from 'next/head'
-import { github_url } from '../github'
-import { fc_props, PageMetadata } from '../types'
-import { PathReporter } from 'io-ts/PathReporter'
-import * as t from 'io-ts'
+import App from 'next/app';
+import 'normalize.css';
+import './global.scss';
+import React from 'react';
+import { AppProps } from 'next/dist/pages/_app';
+import { MDXProvider, MDXProviderComponentsProp } from '@mdx-js/react';
+import Link from 'next/link';
+import Head from 'next/head';
+import { PathReporter } from 'io-ts/PathReporter';
+import * as t from 'io-ts';
 
-const OptionalProps = t.partial({ text: t.string }, 'OptionalProps')
+import Footer from '../footer';
+import { GITHUB_URL } from '../github';
+import { fcProps, PageMetadata } from '../types';
 
-const Optional = fc_props(({ text, children }) => <>{text ? <span>{children}</span> : null}</>, OptionalProps)
+const OptionalProps = t.partial({ text: t.string }, 'OptionalProps');
 
-const RevisionsProps = t.intersection([PageMetadata, t.interface({ url: t.string })], 'RevisionsProps')
+const Optional = fcProps(({ text, children }) => <>{text ? <span>{children}</span> : null}</>, OptionalProps);
 
-const Revisions = fc_props(
+const RevisionsProps = t.intersection([PageMetadata, t.interface({ url: t.string })], 'RevisionsProps');
+
+const Revisions = fcProps(
   ({ revision, revised, expires, url }) => (
     <>
       {revision || revised || expires ? (
         <div className="revisions">
           <Optional text={revision}>Version:&nbsp;{revision}</Optional>
           <Optional text={revised}>
-            <a href={github_url(url)}>Last Revised:&nbsp;{revised}</a>
+            <a href={GITHUB_URL(url)}>Last Revised:&nbsp;{revised}</a>
           </Optional>
           <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
         </div>
@@ -35,18 +36,18 @@ const Revisions = fc_props(
     </>
   ),
   RevisionsProps
-)
+);
 
-type WrapperProps = React.PropsWithChildren<{ metadata: PageMetadata }>
+type WrapperProps = React.PropsWithChildren<{ metadata: PageMetadata }>;
 
 const components: (url: string) => MDXProviderComponentsProp = (url) => ({
   wrapper: (props: WrapperProps) => {
-    const { children, metadata: hopefullyMetadata } = props
-    const decoded = PageMetadata.decode(hopefullyMetadata)
+    const { children, metadata: hopefullyMetadata } = props;
+    const decoded = PageMetadata.decode(hopefullyMetadata);
     if (decoded._tag !== 'Right') {
-      throw PathReporter.report(decoded)
+      throw PathReporter.report(decoded);
     }
-    const metadata = decoded.right
+    const metadata = decoded.right;
     return (
       <div className="mdx">
         <Head>
@@ -66,15 +67,15 @@ const components: (url: string) => MDXProviderComponentsProp = (url) => ({
         <main>{children}</main>
         <Footer author={metadata.author} copyright={metadata.copyright || metadata.revised.split('/')[0]} />
       </div>
-    )
+    );
   },
-})
+});
 
 const WrappedApp: React.VoidFunctionComponent<AppProps> = (props, context) => (
   <MDXProvider components={components(props.router.asPath)}>
     <App {...props} context={context} />
   </MDXProvider>
-)
+);
 
 // noinspection JSUnusedGlobalSymbols
-export default WrappedApp
+export default WrappedApp;

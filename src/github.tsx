@@ -1,2 +1,2 @@
-export const github_url = (page_name: string): string =>
-  `https://github.com/andrewaylett/aylett.co.uk/commits/main/src/pages${page_name}.mdx`
+export const GITHUB_URL = (pageName: string): string =>
+  `https://github.com/andrewaylett/aylett.co.uk/commits/main/src/pages${pageName}.mdx`;

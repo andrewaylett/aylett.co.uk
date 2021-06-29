@@ -1,16 +1,17 @@
-import React from 'react'
-import { InferGetStaticPropsType } from 'next'
-import Link from 'next/link'
-import style from '../../articles.module.scss'
-import Footer from '../../footer'
-import Head from 'next/head'
-import { getStaticProps } from '../../ssr/articles'
-import { ArticlesProps, fc_props } from '../../types'
+import React from 'react';
+import { InferGetStaticPropsType } from 'next';
+import Link from 'next/link';
+import Head from 'next/head';
 
-export { getStaticProps } from '../../ssr/articles'
+import style from '../../articles.module.scss';
+import Footer from '../../footer';
+import { getStaticProps } from '../../ssr/articles';
+import { ArticlesProps, fcProps } from '../../types';
 
-const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = fc_props(({ pages }) => {
-  return (
+export { getStaticProps } from '../../ssr/articles';
+
+const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = fcProps(
+  ({ pages }) => (
     <div className={style.page}>
       <Head>
         <title>Articles - aylett.co.uk</title>
@@ -33,7 +34,8 @@ const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
       </main>
       <Footer />
     </div>
-  )
-}, ArticlesProps)
+  ),
+  ArticlesProps
+);
 
-export default Articles
+export default Articles;

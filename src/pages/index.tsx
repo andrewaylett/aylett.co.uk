@@ -1,7 +1,8 @@
-import Head from 'next/head'
-import styles from '../index.module.scss'
-import Link from 'next/link'
-import React from 'react'
+import Head from 'next/head';
+import Link from 'next/link';
+import React from 'react';
+
+import styles from '../index.module.scss';
 
 // noinspection HtmlUnknownTarget
 export const Home: React.VoidFunctionComponent = () => (
@@ -26,6 +27,6 @@ export const Home: React.VoidFunctionComponent = () => (
       </a>
     </footer>
   </div>
-)
+);
 
-export default Home
+export default Home;
