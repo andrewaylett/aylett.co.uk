@@ -1,6 +1,7 @@
 const detectFrontmatter = require('remark-frontmatter');
-// eslint-disable-next-line import/order
 const yaml = require('yaml');
+// eslint-disable-next-line import/order
+const { withPlausibleProxy } = require('next-plausible');
 
 const visitP = import('unist-util-visit');
 const removeP = import('unist-util-remove');
@@ -24,20 +25,22 @@ const withMDX = require('@next/mdx')({
     },
 });
 
-module.exports = withMDX({
-    webpack(config, { dev }) {
-        if (!dev) {
-            // eslint-disable-next-line no-param-reassign
-            config.devtool = 'source-map';
-            config.plugins.forEach((plugin) => {
-                if (plugin.constructor.name === 'UglifyJsPlugin') {
-                    // eslint-disable-next-line no-param-reassign
-                    plugin.options.sourceMap = true;
-                }
-            });
-        }
-        return config;
-    },
-    reactStrictMode: true,
-    pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-});
+module.exports = withPlausibleProxy()(
+    withMDX({
+        webpack(config, { dev }) {
+            if (!dev) {
+                // eslint-disable-next-line no-param-reassign
+                config.devtool = 'source-map';
+                config.plugins.forEach((plugin) => {
+                    if (plugin.constructor.name === 'UglifyJsPlugin') {
+                        // eslint-disable-next-line no-param-reassign
+                        plugin.options.sourceMap = true;
+                    }
+                });
+            }
+            return config;
+        },
+        reactStrictMode: true,
+        pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+    })
+);

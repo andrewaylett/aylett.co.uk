@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { PathReporter } from 'io-ts/PathReporter';
 import * as t from 'io-ts';
+import PlausibleProvider from 'next-plausible';
 
 import Footer from '../footer';
 import { GITHUB_URL } from '../github';
@@ -72,9 +73,11 @@ const components: (url: string) => MDXProviderComponentsProp = (url) => ({
 });
 
 const WrappedApp: React.VoidFunctionComponent<AppProps> = (props, context) => (
-  <MDXProvider components={components(props.router.asPath)}>
-    <App {...props} context={context} />
-  </MDXProvider>
+  <PlausibleProvider domain="aylett.co.uk">
+    <MDXProvider components={components(props.router.asPath)}>
+      <App {...props} context={context} />
+    </MDXProvider>
+  </PlausibleProvider>
 );
 
 // noinspection JSUnusedGlobalSymbols
