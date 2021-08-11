@@ -14,5 +14,7 @@
     "enabled": true,
     "automerge": true,
     "automergeType": "branch"
-  }
+  },
+  "prConcurrentLimit": 2,
+  "branchConcurrentLimit": 4
 }
