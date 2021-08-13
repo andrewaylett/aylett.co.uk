@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@mdx-js/loader": "1.6.22",
-    "@next/mdx": "11.0.1",
+    "@next/mdx": "11.1.0",
     "@types/mdx-js__react": "1.5.4",
     "date-fns": "2.23.0",
     "fp-ts": "2.11.1",
@@ -58,7 +58,7 @@
     "@typescript-eslint/parser": "4.29.1",
     "babel-jest": "27.0.6",
     "eslint": "7.32.0",
-    "eslint-config-next": "11.0.1",
+    "eslint-config-next": "11.1.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-config-skyscanner": "9.0.1",
     "eslint-import-resolver-typescript": "2.4.0",
