@@ -36,7 +36,7 @@
     "front-matter": "4.0.2",
     "fs-extra": "10.0.0",
     "io-ts": "2.2.16",
-    "next": "11.0.1",
+    "next": "11.1.0",
     "next-plausible": "2.1.0",
     "normalize.css": "8.0.1",
     "prop-types-ts": "0.7.4",
