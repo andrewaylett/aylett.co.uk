@@ -27,7 +27,10 @@ const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
           <p key={name}>
             <Link href={`/articles/${name}`}>{metadata.title}</Link>
             {metadata.author ? ` - ${metadata.author}` : ''}
-            {metadata.revision ? <span className={style.revision}>{`v${metadata.revision}`}</span> : ''}
+            <span className={style.revision}>
+              {metadata.revision ? `v${metadata.revision}, ` : ''}
+              {metadata.revised.split('/')[0]}
+            </span>
             {metadata.abstract ? `: ${metadata.abstract}` : ''}
           </p>
         ))}
