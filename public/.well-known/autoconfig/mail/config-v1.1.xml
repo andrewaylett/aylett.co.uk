@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<clientConfig version="1.1" xmlns="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd">
+<clientConfig version="1.1" xmlns="https://www.aylett.co.uk/schema/clientConfig-1.1.xsd">
     <emailProvider id="aylett.co.uk">
         <domain>aylett.co.uk</domain>
         <displayName>Aylett.co.uk Mail</displayName>
