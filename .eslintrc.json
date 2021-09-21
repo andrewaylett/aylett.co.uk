@@ -72,7 +72,8 @@
         ]
       }
     ],
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "valid-jsdoc": "off"
   },
   "settings": {
     "react": {
