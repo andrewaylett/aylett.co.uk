@@ -1,7 +1,6 @@
 // @ts-check
 
-const utils = import('next/dist/server/lib/utils');
-
+const { printAndExit } = require('next/dist/server/lib/utils');
 const remarkFrontmatter = require('remark-frontmatter');
 const yaml = require('yaml');
 // eslint-disable-next-line import/order
@@ -14,12 +13,9 @@ const removeP = import('unist-util-remove');
 let visit;
 /** @type {typeof import('unist-util-remove').remove} */
 let remove;
-/** @type {typeof import('next/dist/server/lib/utils').printAndExit} */
-let printAndExit;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const resolve = async () => {
-    printAndExit = (await utils).printAndExit;
     visit = (await visitP).visit;
     remove = (await removeP).remove;
 };
@@ -79,7 +75,7 @@ module.exports = withPlausibleProxy()(
             async headers() {
                 return [
                     {
-                        source: '/*',
+                        source: '/(.*)*',
                         headers: [
                             {
                                 key: 'X-XSS-Protection',
