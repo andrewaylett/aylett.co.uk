@@ -30,7 +30,7 @@ repos:
   hooks:
   - id: yamlfmt
     args: [--mapping, '2', --sequence, '2', --offset, '0']
-- repo: https://github.com/andrewaylett/pre-commit-hooks
-  rev: v1.0      # or specific tag
-  hooks:
-  - id: npm-test
+#- repo: https://github.com/andrewaylett/pre-commit-hooks
+#  rev: v1.0      # or specific tag
+#  hooks:
+#  - id: npm-test
