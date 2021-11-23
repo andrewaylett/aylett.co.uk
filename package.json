@@ -43,7 +43,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "sass": "1.43.4",
-    "unified": "10.1.0",
+    "unified": "10.1.1",
     "unist-util-remove": "3.1.0"
   },
   "devDependencies": {
