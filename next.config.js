@@ -54,77 +54,66 @@ const withMDX = require('@next/mdx')({
 module.exports = withPlausibleProxy()(
     withMDX(
         /** @type {NextConfig} */ {
-            webpack(/** @type {import('webpack/types').Configuration} */ config, { dev }) {
-                if (!dev) {
-                    // eslint-disable-next-line no-param-reassign
-                    config.devtool = 'source-map';
-                    (config.plugins || []).forEach((plugin) => {
-                        if (plugin.constructor.name === 'UglifyJsPlugin') {
-                            if ('options' in plugin) {
-                                // eslint-disable-next-line no-param-reassign
-                                plugin.options.sourceMap = true;
-                            }
-                        }
-                    });
-                }
-                return config;
-            },
+            swcMinify: true,
             reactStrictMode: true,
             pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
             productionBrowserSourceMaps: true,
             async headers() {
+                const headers = [
+                    {
+                        key: 'X-XSS-Protection',
+                        value: '1; mode=block',
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'DENY',
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin',
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff',
+                    },
+                    {
+                        key: 'Report-To',
+                        value: [
+                            '{"group":"default"',
+                            '"max_age":31536000',
+                            '"endpoints":[{"url":"https://aylett.report-uri.com/a/d/g"}]',
+                            '"include_subdomains":true}',
+                        ].join(','),
+                    },
+                    {
+                        key: 'NEL',
+                        value: '{"report_to":"default","max_age":31536000,"include_subdomains":true}',
+                    },
+                ];
+                if (process.env.NODE_ENV === 'production') {
+                    headers.push({
+                        key: 'Content-Security-Policy',
+                        value: [
+                            "default-src 'self'",
+                            "script-src-elem 'self' 'unsafe-inline'",
+                            "font-src 'none'",
+                            "object-src 'none'",
+                            "child-src 'none'",
+                            "worker-src 'self'",
+                            "frame-ancestors 'none'",
+                            "form-action 'self'",
+                            'upgrade-insecure-requests',
+                            'block-all-mixed-content',
+                            'disown-opener',
+                            "base-uri 'self'",
+                            'report-uri https://aylett.report-uri.com/r/d/csp/wizard',
+                        ].join('; '),
+                    });
+                }
                 return [
                     {
                         source: '/(.*)*',
-                        headers: [
-                            {
-                                key: 'X-XSS-Protection',
-                                value: '1; mode=block',
-                            },
-                            {
-                                key: 'X-Frame-Options',
-                                value: 'DENY',
-                            },
-                            {
-                                key: 'Referrer-Policy',
-                                value: 'strict-origin-when-cross-origin',
-                            },
-                            {
-                                key: 'X-Content-Type-Options',
-                                value: 'nosniff',
-                            },
-                            {
-                                key: 'Content-Security-Policy',
-                                value: [
-                                    "default-src 'self'",
-                                    "script-src-elem 'self' 'unsafe-inline'",
-                                    "font-src 'none'",
-                                    "object-src 'none'",
-                                    "child-src 'none'",
-                                    "worker-src 'self'",
-                                    "frame-ancestors 'none'",
-                                    "form-action 'self'",
-                                    'upgrade-insecure-requests',
-                                    'block-all-mixed-content',
-                                    'disown-opener',
-                                    "base-uri 'self'",
-                                    'report-uri https://aylett.report-uri.com/r/d/csp/wizard',
-                                ].join('; '),
-                            },
-                            {
-                                key: 'Report-To',
-                                value: [
-                                    '{"group":"default"',
-                                    '"max_age":31536000',
-                                    '"endpoints":[{"url":"https://aylett.report-uri.com/a/d/g"}]',
-                                    '"include_subdomains":true}',
-                                ].join(','),
-                            },
-                            {
-                                key: 'NEL',
-                                value: '{"report_to":"default","max_age":31536000,"include_subdomains":true}',
-                            },
-                        ],
+                        headers,
                     },
                 ];
             },

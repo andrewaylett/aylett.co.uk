@@ -11,6 +11,7 @@ const FooterProps = t.partial(
   },
   'FooterProps'
 );
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type FooterProps = t.TypeOf<typeof FooterProps>;
 
 const Footer: React.FunctionComponent<FooterProps> = fcProps(

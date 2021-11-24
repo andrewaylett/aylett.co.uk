@@ -13,6 +13,7 @@ export const DateString = t.brand(
   (value): value is t.Branded<string, DateStringBrand> => dateStringRegex.test(value),
   'DateString'
 );
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type DateString = t.TypeOf<typeof DateString>;
 
 const PageMetadataRequired = t.type({
@@ -36,6 +37,7 @@ const PageMetadataOptional = t.partial({
 });
 
 export const PageMetadata = t.intersection([PageMetadataRequired, PageMetadataOptional], 'PageMetadata');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type PageMetadata = t.TypeOf<typeof PageMetadata>;
 
 export const Page = t.interface(
@@ -45,6 +47,7 @@ export const Page = t.interface(
   },
   'Page'
 );
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type Page = t.TypeOf<typeof Page>;
 
 export const fcProps = <T extends PropTypeable>(
@@ -64,4 +67,5 @@ export const fcProps = <T extends PropTypeable>(
 };
 
 export const ArticlesProps = t.interface({ pages: t.array(Page) }, 'ArticlesProps');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type ArticlesProps = t.TypeOf<typeof ArticlesProps>;
