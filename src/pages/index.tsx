@@ -23,6 +23,7 @@ export const Home: React.VoidFunctionComponent = () => (
 
     <footer>
       <a href="/_logs" target="_blank" rel="noopener noreferrer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
       </a>
     </footer>

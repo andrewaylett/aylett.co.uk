@@ -10,7 +10,7 @@ import { ArticlesProps, Page, PageMetadata } from '../types';
 export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles');
   const items = await fs.readdir(ARTICLES_PATH);
-  const promises: Promise<Page[]>[] = items.map(async (item) => {
+  const promises: Array<Promise<Page[]>> = items.map(async (item) => {
     const filePath = path.join(ARTICLES_PATH, item);
     const { ext, name } = path.parse(filePath);
     // Only process markdown/mdx files that are not index.tsx pages
