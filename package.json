@@ -52,7 +52,7 @@
     "@swc/jest": "0.2.15",
     "@testing-library/react": "12.1.2",
     "@types/fs-extra": "9.0.13",
-    "@types/jest": "27.0.3",
+    "@types/jest": "27.4.0",
     "@types/node": "16.11.17",
     "@types/react": "17.0.38",
     "@typescript-eslint/eslint-plugin": "5.8.1",
