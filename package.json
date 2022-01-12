@@ -49,7 +49,7 @@
   "devDependencies": {
     "@jest/globals": "27.4.6",
     "@next/eslint-plugin-next": "12.0.7",
-    "@swc/jest": "0.2.15",
+    "@swc/jest": "0.2.16",
     "@testing-library/react": "12.1.2",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "27.4.0",
