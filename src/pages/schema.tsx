@@ -29,7 +29,7 @@ export const Home: React.VoidFunctionComponent = () => (
           </li>
           <li>
             <a href="/schema/drone-0.8.json">
-              Schema for <pre>.drone.yml</pre> files targeting Drone 0.8
+              Schema for <code>.drone.yml</code> files targeting Drone 0.8
             </a>
           </li>
         </ol>

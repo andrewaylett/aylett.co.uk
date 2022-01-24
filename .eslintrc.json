@@ -68,6 +68,7 @@
       {
         "devDependencies": [
           "test/**",
+          "types/**",
           "next.config.js",
           "jest.config.js"
         ]
