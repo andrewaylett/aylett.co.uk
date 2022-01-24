@@ -1,0 +1,74 @@
+export const metadata = {
+    title: "Extending Jest's Expect",
+    author: "Andrew Aylett",
+    revision: "1.0",
+    revised: '2022/01/24',
+    expires: '2023/01/24',
+    abstract: 'Getting Typescript types correct'
+}
+
+Jest is a test framework for Javascript.
+Unfortunately, some of the APIs aren't _really_ compatible with Typescript.
+The biggest anomaly is the mechanism for adding extra matchers: there's an API for adding them, and the occasional instruction dotted around the 'net for augmenting the type, but I've yet to find a decent tutorial.
+
+The documentation assumes you're using Jest in ambient mode, rather than importing the framework in your test code.
+That's all well and good, but I don't like it.
+Maybe I'm making a rod for my own back, but I much prefer to import everything and not have to worry about any tooling needing to know that there's magic going on.
+
+So what one winds up with is something like this:
+
+```ts
+import { expect, describe, it } from '@jest/globals';
+
+describe("Blah", () => {
+  it("Blah", () => {
+    expect('o').toDoSomethingCustom();
+  });
+});
+```
+
+Missing here is actually defining the something custom that we're adding.
+Jest _does_ have the ability to run a script as part of its initialisation, but again: magic.
+
+What we need is our _own_ `expect`.
+And that's actually pretty easy to get.
+We just have to define it somewhere, and import it into our tests.
+The really nice thing being that unless we use our custom matchers, TS won't care which we use.
+And if we try to use our custom matchers on the "real" expect then we'll get a type error.
+
+```ts
+import originalExpect from 'expect';
+
+const customMatchers: Parameters<typeof originalExpect.extend>[0] = {
+  toBeAnyString(received) {
+    const pass = typeof received === 'string';
+    if (pass) {
+      return {
+        message: () => `expected ${received} not to be a string`,
+        pass: true,
+      };
+    }
+    return {
+      message: () => `${received} was a string`,
+      pass: false,
+    };
+  },
+};
+
+originalExpect.extend(customMatchers);
+
+interface ExtendedMatchers<R, T> extends originalExpect.Matchers<R, T> {
+  toBeAnyString(): R;
+}
+
+export interface Expect<State extends originalExpect.MatcherState = originalExpect.MatcherState>
+  extends originalExpect.Matchers<State> {
+  <T = unknown>(actual: T): ExtendedMatchers<void, T>;
+}
+
+export const expect: Expect = originalExpect as any;
+```
+
+This is mostly a copy and paste of [code from tests for this website](https://github.com/andrewaylett/aylett.co.uk/blob/72638123d74718f56ecb808a83792fefaac025ec/test/types.ts).
+
+Then import and use your own custom `expect`.
