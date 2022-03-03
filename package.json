@@ -60,7 +60,7 @@
     "@typescript-eslint/parser": "5.9.1",
     "eslint": "8.10.0",
     "eslint-config-next": "12.0.10",
-    "eslint-config-prettier": "8.3.0",
+    "eslint-config-prettier": "8.5.0",
     "eslint-config-skyscanner": "10.3.0",
     "eslint-import-resolver-typescript": "2.5.0",
     "eslint-plugin-compat": "4.0.2",
