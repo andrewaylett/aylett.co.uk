@@ -68,7 +68,7 @@
     "eslint-plugin-jest": "25.7.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "6.0.0",
-    "eslint-plugin-react": "7.28.0",
+    "eslint-plugin-react": "7.29.3",
     "expect": "27.4.6",
     "husky": "7.0.4",
     "identity-obj-proxy": "3.0.0",
