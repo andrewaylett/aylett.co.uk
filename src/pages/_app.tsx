@@ -70,6 +70,9 @@ const components: (url: string) => MDXProviderComponentsProp = (url) => ({
       </div>
     );
   },
+  h1: ({ children }: WrapperProps) => (
+    <h1 id={children?.toString().replaceAll(/[ ']/g, '_').toLowerCase()}>{children}</h1>
+  ),
 });
 
 const WrappedApp: React.VoidFunctionComponent<AppProps> = (props, context) => (
