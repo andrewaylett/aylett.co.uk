@@ -1,9 +1,11 @@
 import App from 'next/app';
 import 'normalize.css';
 import './global.scss';
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import React from 'react';
-import { AppProps } from 'next/dist/pages/_app';
-import { MDXProvider, MDXProviderComponentsProp } from '@mdx-js/react';
+import type { AppProps } from 'next/dist/pages/_app';
+import type { MDXComponents } from 'mdx/types';
+import { MDXProvider } from '@mdx-js/react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { PathReporter } from 'io-ts/PathReporter';
@@ -41,7 +43,7 @@ const Revisions = fcProps(
 
 type WrapperProps = React.PropsWithChildren<{ metadata: PageMetadata }>;
 
-const components: (url: string) => MDXProviderComponentsProp = (url) => ({
+const components: (url: string) => MDXComponents = (url) => ({
   wrapper: (props: WrapperProps) => {
     const { children, metadata: hopefullyMetadata } = props;
     const decoded = PageMetadata.decode(hopefullyMetadata);
@@ -70,12 +72,12 @@ const components: (url: string) => MDXProviderComponentsProp = (url) => ({
       </div>
     );
   },
-  h1: ({ children }: WrapperProps) => (
+  h1: ({ children }: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
     <h1 id={children?.toString().replaceAll(/[ ']/g, '_').toLowerCase()}>{children}</h1>
   ),
 });
 
-const WrappedApp: React.VoidFunctionComponent<AppProps> = (props, context) => (
+const WrappedApp: React.FunctionComponent<AppProps> = (props, context) => (
   <PlausibleProvider domain="aylett.co.uk">
     <MDXProvider components={components(props.router.asPath)}>
       <App {...props} context={context} />

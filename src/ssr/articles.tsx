@@ -1,11 +1,12 @@
 import path from 'path';
 
-import { GetStaticProps } from 'next';
+import type { GetStaticProps } from 'next';
 import fs from 'fs-extra';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import sortBy from '../sort_by';
-import { ArticlesProps, Page, PageMetadata } from '../types';
+import type { ArticlesProps, Page } from '../types';
+import { PageMetadata } from '../types';
 
 export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles');
@@ -15,8 +16,8 @@ export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
     const { ext, name } = path.parse(filePath);
     // Only process markdown/mdx files that are not index.tsx pages
     if (ext.startsWith('.md') && name !== 'index') {
-      const module = await import(`../pages/articles/${item}`);
-      const maybeMetadata = PageMetadata.decode(module.metadata);
+      const article = await import(`../pages/articles/${item}`);
+      const maybeMetadata = PageMetadata.decode(article.metadata);
       if (maybeMetadata._tag === 'Right') {
         return [{ name, metadata: maybeMetadata.right }];
       }

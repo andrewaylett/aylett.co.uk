@@ -1,10 +1,10 @@
-import { Matchers, MatcherState, Expect as RawExpect, MatchersObject } from 'expect/build/types';
+import type { Matchers, Expect as RawExpect } from 'expect';
 import { isRight } from 'fp-ts/Either';
 import { PathReporter } from 'io-ts/PathReporter';
 import { expect as originalExpect } from '@jest/globals';
 
-const customMatchers: MatchersObject = {
-  toBeRight(received) {
+const customMatchers: Parameters<typeof originalExpect.extend>[0] = {
+  toBeRight(received: any) {
     const pass = isRight(received);
     if (pass) {
       return {
@@ -21,12 +21,12 @@ const customMatchers: MatchersObject = {
 
 originalExpect.extend(customMatchers);
 
-interface ExtendedMatchers<R, T> extends Matchers<R, T> {
+interface ExtendedMatchers<R extends void | Promise<void>> extends Matchers<R> {
   toBeRight(): R;
 }
 
-export interface Expect<State extends MatcherState = MatcherState> extends RawExpect<State> {
-  <T = unknown>(actual: T): ExtendedMatchers<void, T>;
+export interface Expect extends RawExpect {
+  <T = unknown>(actual: T): ExtendedMatchers<void>;
 }
 
 export const expect: Expect = originalExpect as any;

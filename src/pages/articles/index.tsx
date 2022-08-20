@@ -1,11 +1,11 @@
 import React from 'react';
-import { InferGetStaticPropsType } from 'next';
+import type { InferGetStaticPropsType } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
 
 import style from '../../articles.module.scss';
 import Footer from '../../footer';
-import { getStaticProps } from '../../ssr/articles';
+import type { getStaticProps } from '../../ssr/articles';
 import { ArticlesProps, fcProps } from '../../types';
 
 export { getStaticProps } from '../../ssr/articles';

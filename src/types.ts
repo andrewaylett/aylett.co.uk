@@ -1,7 +1,10 @@
-import { getPropTypes, Options, PropTypeable } from 'prop-types-ts';
+import type { Options, PropTypeable } from 'prop-types-ts';
+import { getPropTypes } from 'prop-types-ts';
 import * as t from 'io-ts';
-import { Any, ArrayType, Context, Errors, failure, failures, OutputOf, success, Type, TypeOf, Validation } from 'io-ts';
-import React, { WeakValidationMap } from 'react';
+import type { Any, Context, Errors, OutputOf, TypeOf, Validation } from 'io-ts';
+import { ArrayType, failure, failures, success, Type } from 'io-ts';
+import type { PropsWithChildren, WeakValidationMap } from 'react';
+import type React from 'react';
 import { isRight } from 'fp-ts/Either';
 import { DateTime } from 'luxon';
 
@@ -53,15 +56,13 @@ export const Page = t.interface(
 );
 export type Page = t.TypeOf<typeof Page>;
 
-export const fcProps = <T extends PropTypeable>(
-  Component: React.FC<t.TypeOf<T>>,
-  type: T,
-  options?: Options
-): React.FC<t.TypeOf<T>> => {
+type FCC<T> = React.FC<PropsWithChildren<T>>;
+type FCCt<T extends PropTypeable> = FCC<t.TypeOf<T>>;
+
+export const fcProps = <T extends PropTypeable>(Component: FCCt<T>, type: T, options?: Options): FCCt<T> => {
   if (process.env.NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options);
-    const NewComponent = (...args: Parameters<React.FC<t.TypeOf<T>>>): ReturnType<React.FC<t.TypeOf<T>>> =>
-      Component(...args);
+    const NewComponent = (...args: Parameters<FCCt<T>>): ReturnType<FCCt<T>> => Component(...args);
     NewComponent.propTypes = propsTypes as unknown as WeakValidationMap<T>;
     NewComponent.displayName = type.name.replace('Props', '');
     return NewComponent;

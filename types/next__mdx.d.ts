@@ -1,6 +1,6 @@
 declare module '@next/mdx' {
-  import { NextConfig } from 'next';
-  import { Pluggable, Settings } from 'unified';
+  import type { NextConfig } from 'next';
+  import type { Pluggable, Settings } from 'unified';
 
   interface MDXPluginOptions extends Settings {
     remarkPlugins: Pluggable[];

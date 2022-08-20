@@ -1,14 +1,16 @@
 import Head from 'next/head';
 import React from 'react';
-import { InferGetStaticPropsType } from 'next';
+import type { InferGetStaticPropsType } from 'next';
 import { match } from 'fp-ts/Either';
-import { Errors, failures, TypeOf } from 'io-ts';
+import type { Errors, TypeOf } from 'io-ts';
+import { failures } from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 import { DateTime } from 'luxon';
 
 import styles from '../index.module.scss';
-import { getStaticProps } from '../ssr/tech-team';
-import { TechTeamEpoch, TechTeamOverride, TechTeamRotaProps } from '../types';
+import type { getStaticProps } from '../ssr/tech-team';
+import type { TechTeamEpoch, TechTeamOverride } from '../types';
+import { TechTeamRotaProps } from '../types';
 
 export { getStaticProps } from '../ssr/tech-team';
 
