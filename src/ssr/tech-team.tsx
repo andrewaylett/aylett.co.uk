@@ -1,5 +1,4 @@
 import type { GetStaticProps } from 'next';
-
 import type { TechTeamRotaProps } from '../types';
 
 export const getStaticProps: GetStaticProps<TechTeamRotaProps> = async () => ({

@@ -1,12 +1,13 @@
 import path from 'path';
 
-import type { GetStaticProps } from 'next';
 import fs from 'fs-extra';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import sortBy from '../sort_by';
-import type { ArticlesProps, Page } from '../types';
 import { PageMetadata } from '../types';
+
+import type { ArticlesProps, Page } from '../types';
+import type { GetStaticProps } from 'next';
 
 export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
   const ARTICLES_PATH = path.join(process.cwd(), 'src', 'pages', 'articles');

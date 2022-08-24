@@ -1,7 +1,8 @@
-import type { Matchers, Expect as RawExpect } from 'expect';
 import { isRight } from 'fp-ts/Either';
 import { PathReporter } from 'io-ts/PathReporter';
 import { expect as originalExpect } from '@jest/globals';
+
+import type { Matchers, Expect as RawExpect } from 'expect';
 
 const customMatchers: Parameters<typeof originalExpect.extend>[0] = {
   toBeRight(received: any) {

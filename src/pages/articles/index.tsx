@@ -1,12 +1,15 @@
 import React from 'react';
-import type { InferGetStaticPropsType } from 'next';
+
 import Link from 'next/link';
 import Head from 'next/head';
 
-import style from '../../articles.module.scss';
 import Footer from '../../footer';
-import type { getStaticProps } from '../../ssr/articles';
 import { ArticlesProps, fcProps } from '../../types';
+
+import type { getStaticProps } from '../../ssr/articles';
+import type { InferGetStaticPropsType } from 'next';
+
+import style from '../../articles.module.scss';
 
 export { getStaticProps } from '../../ssr/articles';
 
@@ -23,7 +26,7 @@ const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
         <h1>Articles</h1>
       </header>
       <main>
-        {pages.map(({ name, metadata }) => (
+        {pages.map(({ metadata, name }) => (
           <p key={name}>
             <Link href={`/articles/${name}`}>{metadata.title}</Link>
             {metadata.author ? ` - ${metadata.author}` : ''}

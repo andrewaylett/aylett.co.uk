@@ -1,16 +1,19 @@
-import Head from 'next/head';
 import React from 'react';
-import type { InferGetStaticPropsType } from 'next';
+
+import Head from 'next/head';
 import { match } from 'fp-ts/Either';
-import type { Errors, TypeOf } from 'io-ts';
 import { failures } from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 import { DateTime } from 'luxon';
 
-import styles from '../index.module.scss';
+import { TechTeamRotaProps } from '../types';
+
 import type { getStaticProps } from '../ssr/tech-team';
 import type { TechTeamEpoch, TechTeamOverride } from '../types';
-import { TechTeamRotaProps } from '../types';
+import type { InferGetStaticPropsType } from 'next';
+import type { Errors, TypeOf } from 'io-ts';
+
+import styles from '../index.module.scss';
 
 export { getStaticProps } from '../ssr/tech-team';
 
@@ -27,7 +30,7 @@ const weeksToConsider = (): DateTime[] => {
 };
 
 type PersonProps = { person: string; override: TechTeamOverride | undefined };
-const Person: React.VoidFunctionComponent<PersonProps> = ({ person, override }) => {
+const Person: React.VoidFunctionComponent<PersonProps> = ({ override, person }) => {
   if (override) {
     return (
       <>
@@ -39,7 +42,7 @@ const Person: React.VoidFunctionComponent<PersonProps> = ({ person, override }) 
 };
 
 type WeekRowProps = { week: DateTime; epoch: TechTeamEpoch; overrides: TechTeamOverride[] };
-const WeekRow: React.VoidFunctionComponent<WeekRowProps> = ({ week, epoch, overrides }) => {
+const WeekRow: React.VoidFunctionComponent<WeekRowProps> = ({ epoch, overrides, week }) => {
   const personId = Math.abs(week.diff(epoch.start).as('weeks')) % epoch.people.length;
   const person = epoch.people[personId].name;
   const override = overrides.find((candidate) => candidate.date.equals(week));
@@ -75,7 +78,7 @@ const TeamDescription: React.VoidFunctionComponent<TypeOf<typeof TechTeamRotaPro
   </main>
 );
 
-const InvalidProps: React.VoidFunctionComponent<Errors> = (errors) => (
+const InvalidProps: React.VoidFunctionComponent<Errors> = ({ ...errors }) => (
   <main>
     <h1>Error</h1>
     <p>Invalid props passed from server: {PathReporter.report(failures(errors))}</p>
@@ -91,7 +94,7 @@ const MatchProps: React.VoidFunctionComponent<InferGetStaticPropsType<typeof get
   matcher(TechTeamRotaProps.decode(props));
 
 // noinspection HtmlUnknownTarget
-export const Home: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = (props) => (
+export const Home: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = ({ ...props }) => (
   <div className={styles.container}>
     <Head>
       <title>Niddrie Tech Rota</title>

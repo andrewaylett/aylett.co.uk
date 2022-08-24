@@ -1,12 +1,14 @@
-import type { Options, PropTypeable } from 'prop-types-ts';
-import { getPropTypes } from 'prop-types-ts';
-import * as t from 'io-ts';
-import type { Any, Context, Errors, OutputOf, TypeOf, Validation } from 'io-ts';
-import { ArrayType, failure, failures, success, Type } from 'io-ts';
 import type { PropsWithChildren, WeakValidationMap } from 'react';
 import type React from 'react';
+
+import { ArrayType, failure, failures, success, Type } from 'io-ts';
+import * as t from 'io-ts';
+import { getPropTypes } from 'prop-types-ts';
 import { isRight } from 'fp-ts/Either';
 import { DateTime } from 'luxon';
+
+import type { Any, Context, Errors, OutputOf, TypeOf, Validation } from 'io-ts';
+import type { Options, PropTypeable } from 'prop-types-ts';
 
 const dateStringRegex = /^\d{4}\/\d{2}\/\d{2}$/;
 

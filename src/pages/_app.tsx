@@ -1,10 +1,7 @@
-import App from 'next/app';
-import 'normalize.css';
-import './global.scss';
-import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import React from 'react';
-import type { AppProps } from 'next/dist/pages/_app';
-import type { MDXComponents } from 'mdx/types';
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
+
+import App from 'next/app';
 import { MDXProvider } from '@mdx-js/react';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -16,14 +13,20 @@ import Footer from '../footer';
 import { GITHUB_URL } from '../github';
 import { fcProps, PageMetadata } from '../types';
 
+import type { MDXComponents } from 'mdx/types';
+import type { AppProps } from 'next/dist/pages/_app';
+
+import 'normalize.css';
+import './global.scss';
+
 const OptionalProps = t.partial({ text: t.string }, 'OptionalProps');
 
-const Optional = fcProps(({ text, children }) => <>{text ? <span>{children}</span> : null}</>, OptionalProps);
+const Optional = fcProps(({ children, text }) => <>{text ? <span>{children}</span> : null}</>, OptionalProps);
 
 const RevisionsProps = t.intersection([PageMetadata, t.interface({ url: t.string })], 'RevisionsProps');
 
 const Revisions = fcProps(
-  ({ revision, revised, expires, url }) => (
+  ({ expires, revised, revision, url }) => (
     <>
       {revision || revised || expires ? (
         <div className="revisions">
@@ -77,7 +80,7 @@ const components: (url: string) => MDXComponents = (url) => ({
   ),
 });
 
-const WrappedApp: React.FunctionComponent<AppProps> = (props, context) => (
+const WrappedApp: React.FunctionComponent<AppProps> = ({ ...props }, context) => (
   <PlausibleProvider domain="aylett.co.uk">
     <MDXProvider components={components(props.router.asPath)}>
       <App {...props} context={context} />

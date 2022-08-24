@@ -1,5 +1,7 @@
-import Head from 'next/head';
 import React from 'react';
+
+import Head from 'next/head';
+
 import type { InferGetStaticPropsType } from 'next';
 
 import styles from '../index.module.scss';
