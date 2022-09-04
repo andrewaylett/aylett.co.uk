@@ -40,7 +40,7 @@
     "@next/eslint-plugin-next": "12.2.5",
     "@skyscanner/eslint-config-skyscanner": "12.4.0",
     "@swc/jest": "0.2.22",
-    "@testing-library/react": "13.3.0",
+    "@testing-library/react": "13.4.0",
     "@types/fs-extra": "9.0.13",
     "@types/luxon": "3.0.1",
     "@types/mdx-js__react": "1.5.5",
