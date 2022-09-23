@@ -38,7 +38,7 @@
   "devDependencies": {
     "@jest/globals": "29.0.3",
     "@next/eslint-plugin-next": "12.2.5",
-    "@skyscanner/eslint-config-skyscanner": "12.4.0",
+    "@skyscanner/eslint-config-skyscanner": "12.5.0",
     "@swc/jest": "0.2.22",
     "@testing-library/react": "13.4.0",
     "@types/fs-extra": "9.0.13",
