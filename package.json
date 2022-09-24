@@ -24,7 +24,7 @@
     "front-matter": "4.0.2",
     "fs-extra": "10.1.0",
     "io-ts": "2.2.18",
-    "luxon": "3.0.3",
+    "luxon": "3.0.4",
     "next": "12.2.5",
     "next-plausible": "3.6.3",
     "normalize.css": "8.0.1",
