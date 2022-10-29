@@ -1,11 +1,11 @@
-export const metadata = {
-  title: "Document Expiry",
-  author: "Andrew Aylett",
-  revision: "1.0",
-  revised: '2020/09/13',
-  expires: '2021/09/13',
-  abstract: 'The world changes; is this still relevant?'
-}
+---
+title: "Document Expiry"
+author: "Andrew Aylett"
+revision: "1.0"
+revised: '2020/09/13'
+expires: '2021/09/13'
+abstract: 'The world changes; is this still relevant?'
+---
 
 Articles on this website have an expiry date.  It's something you'll see more often in official archives, but I think it's a useful concept to apply more generally.
 

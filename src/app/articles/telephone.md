@@ -1,11 +1,11 @@
-export const metadata /** {PageMetadata} */ = {
-    title: 'Telephone "Security" Questions',
-    author: 'Andrew Aylett',
-    revision: '1.0',
-    revised: '2012/07/18',
-    expires: '2032/07/18',
-    abstract: 'Who is this "security" for, anyway?'
-}
+---
+title: 'Telephone "Security" Questions'
+author: 'Andrew Aylett'
+revision: '1.0'
+revised: '2012/07/18'
+expires: '2032/07/18'
+abstract: 'Who is this "security" for, anyway?'
+---
 
 We don’t get many people phoning our land-line — just my mother-in-law, marketers willing to flout the TPS and the occasional company trying to get hold of me.  Whenever the latter happens, the conversation always seems to take the same trajectory:
 

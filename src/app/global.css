@@ -3,6 +3,7 @@ html, body {
     margin: 0;
     font-family: Calibri, Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    font-size: clamp(100%, 2vmax, 125%);
 }
 
 * {
@@ -10,14 +11,16 @@ html, body {
 }
 
 div.mdx {
-    padding: 1ex;
+    padding: clamp(.5rem, 1vmin, 2rem);
     font-variant-numeric: oldstyle-nums;
     display: grid;
     grid-template-columns: 1fr min(65ch, 100%) 1fr;
 }
+
 div.mdx > * {
     grid-column: 2;
 }
+
 .full-bleed {
     width: 100%;
     grid-column: 1 / 4;
@@ -37,9 +40,10 @@ header h1 {
     flex-direction: row;
     flex-wrap: wrap;
     column-gap: 1ex;
-    a {
-        color: inherit;
-    }
+}
+
+.revisions a {
+    color: inherit;
 }
 
 nav {

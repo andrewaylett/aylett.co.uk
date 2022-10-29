@@ -1,11 +1,11 @@
-export const metadata = {
-  title: "Privacy",
-  author: "Andrew Aylett",
-  revision: "1.2",
-  revised: '2021/08/09',
-  expires: '2022/08/09',
-  abstract: 'This is not a privacy policy'
-}
+---
+title: "Privacy"
+author: "Andrew Aylett"
+revision: "1.2"
+revised: '2021/08/09'
+expires: '2022/08/09'
+abstract: 'This is not a privacy policy'
+---
 
 Per the subhead, this is not (really) a privacy policy.
 This site doesn't have a cookie banner, because it doesn't set any cookies.

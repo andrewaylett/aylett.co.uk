@@ -6,21 +6,28 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
+    "sourceMap": true,
+    "declarationMap": true,
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "typeRoots": [
       "types"
     ],
-    "incremental": true
+    "incremental": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "exclude": [
     "node_modules",
@@ -32,6 +39,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
-    "**/*.mdx"
+    "**/*.mdx",
+    ".next/types/**/*.ts"
   ]
 }
