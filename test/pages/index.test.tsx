@@ -2,12 +2,12 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
+import * as React from 'react';
 
 import { describe, it, expect } from '@jest/globals';
 
 import { render } from '../testUtils';
-import { Home } from '../../src/pages';
+import Home from '../../src/app/page';
 
 describe('Home page', () => {
   it('matches snapshot', () => {

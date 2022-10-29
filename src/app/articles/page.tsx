@@ -1,20 +1,18 @@
-import React from 'react';
+import * as React from 'react';
 
 import Link from 'next/link';
 import Head from 'next/head';
 
 import Footer from '../../footer';
-import { ArticlesProps, fcProps } from '../../types';
+import { allArticles } from '../../ssr/articles';
 
-import type { getStaticProps } from '../../ssr/articles';
-import type { InferGetStaticPropsType } from 'next';
+import style from '../../articles.module.css';
 
-import style from '../../articles.module.scss';
+import 'server-only';
 
-export { getStaticProps } from '../../ssr/articles';
-
-const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getStaticProps>> = fcProps(
-  ({ pages }) => (
+export default async function Articles() {
+  const pages = await allArticles();
+  return (
     <div className={style.page}>
       <Head>
         <title>Articles - aylett.co.uk</title>
@@ -26,7 +24,7 @@ const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
         <h1>Articles</h1>
       </header>
       <main>
-        {pages.map(({ metadata, name }) => (
+        {pages.map(({ id: name, metadata }) => (
           <p key={name}>
             <Link href={`/articles/${name}`}>{metadata.title}</Link>
             {metadata.author ? ` - ${metadata.author}` : ''}
@@ -38,10 +36,7 @@ const Articles: React.VoidFunctionComponent<InferGetStaticPropsType<typeof getSt
           </p>
         ))}
       </main>
-      <Footer />
+      <Footer author="Andrew Aylett" />
     </div>
-  ),
-  ArticlesProps
-);
-
-export default Articles;
+  );
+}

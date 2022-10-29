@@ -1,11 +1,11 @@
-export const metadata = {
-  title: "Revisionism",
-  author: "Andrew Aylett",
-  revision: "1.1",
-  revised: '2020/09/13',
-  expires: '2021/09/13',
-  abstract: 'Or: why this website isn\'t a blog',
-}
+---
+title: "Revisionism"
+author: "Andrew Aylett"
+revision: "1.1"
+revised: '2020/09/13'
+expires: '2021/09/13'
+abstract: "Or: why this website isn't a blog"
+---
 
 
 This website is a collection of articles, not a blog.  Why?  Well, I've always struggled with a blog, as "starting again" after a break feels like it's going to need something decent to publish.  Blog posts are also inherently bound to their posting date.  While an article may well go out of date, it can be refreshed or expire.  But the nature of a blog post is to assume that if it's old, it's not relevant any more.

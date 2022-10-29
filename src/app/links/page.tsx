@@ -1,19 +1,21 @@
-import React from 'react';
+import * as React from 'react';
 
 import Head from 'next/head';
+import Link from 'next/link';
+import 'server-only';
 
-import type { InferGetStaticPropsType } from 'next';
+import styles from '../../index.module.css';
 
-import styles from '../index.module.scss';
-
-// noinspection HtmlUnknownTarget
-export const Home: React.VoidFunctionComponent<InferGetStaticPropsType<void>> = () => (
+export const Links: React.FunctionComponent = () => (
   <div className={styles.container}>
     <Head>
-      <title>Niddrie Tech Rota</title>
+      <title>Links</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
     <main>
+      <nav>
+        <Link href="/">Home</Link>
+      </nav>
       <h1 className={styles.title}>Links</h1>
 
       <p className={styles.description}>
@@ -23,4 +25,4 @@ export const Home: React.VoidFunctionComponent<InferGetStaticPropsType<void>> = 
   </div>
 );
 
-export default Home;
+export default Links;

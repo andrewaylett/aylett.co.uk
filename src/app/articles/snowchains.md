@@ -1,11 +1,11 @@
-export const metadata /** {PageMetadata} */ = {
-    title: 'Driving With Snow Chains',
-    author: 'Andrew Aylett',
-    revision: '1.0',
-    revised: '2013/01/19',
-    expires: '2033/01/19',
-    abstract: 'Useful if you need them'
-}
+---
+title: 'Driving With Snow Chains'
+author: 'Andrew Aylett'
+revision: '1.0'
+revised: '2013/01/19'
+expires: '2033/01/19'
+abstract: 'Useful if you need them'
+---
 
 It’s been snowing, and as we were planning to see friends who live in the country and Lidl have been selling snow chains for £20, I decided to buy some.  We used them this afternoon, and as it’s the first time I’ve used chains I learned a few things which I thought I’d share.
 

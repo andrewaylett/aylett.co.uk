@@ -1,22 +1,22 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://www.aylett.co.uk/public/schema/drone-0.8.json",
-    "type": "object",
-    "properties": {
-      "clone": {
-        "type": "object"
-      },
-      "pipeline": {
-        "type": "object",
-        "additionalProperties": {
-          "$ref": "#/$defs/pipelineStage"
-        }
-      }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.aylett.co.uk/schema/drone-0.8.json",
+  "type": "object",
+  "properties": {
+    "clone": {
+      "type": "object"
     },
-    "additionalProperties": true,
-    "$defs": {
-      "pipelineStage": {
-        "type": "object"
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/pipelineStage"
       }
     }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "pipelineStage": {
+      "type": "object"
+    }
   }
+}

@@ -1,11 +1,11 @@
-export const metadata /** {import('../../types').PageMetadata} */ = {
-    title: 'Asking Questions Internally',
-    author: 'Andrew Aylett',
-    revision: '1.0.0',
-    revised: '2022/07/18',
-    expires: '2024/07/18',
-    abstract: 'Help your colleagues to help you'
-}
+---
+title: 'Asking Questions Internally'
+author: 'Andrew Aylett'
+revision: '1.0.0'
+revised: '2022/07/18'
+expires: '2024/07/18'
+abstract: 'Help your colleagues to help you'
+---
 
 Most companies uses a lot of different technologies, and it's not reasonable to expect everyone in the company to know everything about all of them.  But when we have problems we need help with, there are a few useful steps we can take to make sure the people helping us can do so effectively.
 There are a few guides around the Internet that give advice on how to ask questions -- I very definitely recommend Jon Skeet's [Stack Overflow Checklist](https://codeblog.jonskeet.uk/2012/11/24/stack-overflow-question-checklist/).  But asking questions internally can sometimes be very different from asking questions in a public forum.  So here are some things you should bear in mind.

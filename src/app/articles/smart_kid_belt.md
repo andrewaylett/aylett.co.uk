@@ -1,11 +1,11 @@
-export const metadata = {
-  title: "Smart Kid Belt",
-  author: "Andrew Aylett",
-  revision: "1.0",
-  revised: '2020/09/05',
-  expires: '2021/09/05',
-  abstract: 'Some thoughts on the "Smart Kid Belt"'
-}
+---
+title: "Smart Kid Belt"
+author: "Andrew Aylett"
+revision: "1.0"
+revised: '2020/09/05'
+expires: '2021/09/05'
+abstract: 'Some thoughts on the "Smart Kid Belt"'
+---
 
 - https://smartkidbelt.com/en/
 - A child restraint that's just a strap to hold the shoulder belt down.

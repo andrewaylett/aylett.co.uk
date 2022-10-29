@@ -1,11 +1,12 @@
-import React from 'react';
+import * as React from 'react';
 
 import Head from 'next/head';
 
-import styles from '../index.module.scss';
+import styles from '../../index.module.css';
 
-// noinspection HtmlUnknownTarget
-export const Home: React.VoidFunctionComponent = () => (
+import 'server-only';
+
+export const Schema: React.FunctionComponent = () => (
   <div className={styles.container}>
     <Head>
       <title>aylett.co.uk schemas</title>
@@ -39,4 +40,4 @@ export const Home: React.VoidFunctionComponent = () => (
   </div>
 );
 
-export default Home;
+export default Schema;
