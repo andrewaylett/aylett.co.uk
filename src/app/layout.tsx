@@ -7,7 +7,8 @@ import PlausibleProvider from 'next-plausible';
 
 import 'server-only';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// noinspection JSUnusedGlobalSymbols
+export default function RootLayout({ children }: { children: React.ReactNode }): React.ReactNode {
   return (
     <html>
       <body>

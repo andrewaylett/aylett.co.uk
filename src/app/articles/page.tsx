@@ -10,7 +10,8 @@ import style from '../../articles.module.css';
 
 import 'server-only';
 
-export default async function Articles() {
+// noinspection JSUnusedGlobalSymbols
+export default async function Articles(): Promise<React.ReactNode> {
   const pages = await allArticles();
   return (
     <div className={style.page}>

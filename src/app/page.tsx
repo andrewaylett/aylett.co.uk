@@ -7,7 +7,8 @@ import styles from '../index.module.css';
 
 import 'server-only';
 
-export default function Home() {
+// noinspection JSUnusedGlobalSymbols
+export default function Home(): React.ReactNode {
   return (
     <div className={styles.container}>
       <Head>
