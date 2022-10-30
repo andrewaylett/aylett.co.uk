@@ -12,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
   return (
     <html>
       <body>
-        <PlausibleProvider domain="aylett.co.uk">{children}</PlausibleProvider>
+        <PlausibleProvider domain="aylett.co.uk" customDomain="https://www.aylett.co.uk">
+          {children}
+        </PlausibleProvider>
       </body>
     </html>
   );
