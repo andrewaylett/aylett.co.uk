@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import Head from 'next/head';
 import Link from 'next/link';
 
 import styles from '../index.module.css';
@@ -11,11 +10,6 @@ import 'server-only';
 export default function Home(): React.ReactNode {
   return (
     <div className={styles.container}>
-      <Head>
-        <title>aylett.co.uk</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main>
         <h1 className={styles.title}>Welcome to aylett.co.uk</h1>
 

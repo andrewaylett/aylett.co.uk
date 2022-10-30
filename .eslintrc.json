@@ -9,11 +9,12 @@
       "files": ["./*.js", "test/__mocks__/**.js"],
       "env": {
         "node": true
-      },
-      "rules": {
-        "@typescript-eslint/no-var-requires": 0,
-        "no-html-link-for-pages": 0
       }
     }
-  ]
+  ],
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0,
+    "no-html-link-for-pages": 0,
+    "@next/next/no-head-element": 0
+  }
 }

@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import Link from 'next/link';
-import Head from 'next/head';
 
 import Footer from '../../footer';
 import { allArticles } from '../../ssr/articles';
@@ -15,9 +14,6 @@ export default async function Articles(): Promise<React.ReactNode> {
   const pages = await allArticles();
   return (
     <div className={style.page}>
-      <Head>
-        <title>Articles - aylett.co.uk</title>
-      </Head>
       <nav>
         <Link href="/">Home</Link>
       </nav>
