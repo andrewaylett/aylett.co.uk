@@ -75,5 +75,13 @@ module.exports = withPlausibleProxy()(
                 },
             ];
         },
+        async rewrites() {
+            return [
+                {
+                    source: '/api/event',
+                    destination: 'https://plausible.io/api/event',
+                },
+            ];
+        },
     }
 );
