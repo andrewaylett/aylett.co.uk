@@ -40,13 +40,15 @@ const Revisions = ({
   </>
 );
 
-export default async function Article({ params }: { params: { id: string } }) {
+// noinspection JSUnusedGlobalSymbols
+export default async function Article({ params }: { params: { id: string } }): Promise<React.ReactNode> {
   const pages = await allArticles();
 
   const page = pages.find((page) => page.id === params.id);
 
   if (!page) {
-    return notFound();
+    notFound();
+    throw new Error();
   }
 
   const { content, metadata } = page;

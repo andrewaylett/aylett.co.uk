@@ -11,7 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "sourceMap": true,
-    "declarationMap": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "isolatedModules": true,
