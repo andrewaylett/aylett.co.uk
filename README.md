@@ -4,13 +4,10 @@ This is the source for the website hosted at https://www.aylett.co.uk/.
 
 It uses Typescript and Next.js, and deploys automatically to Vercel.
 
-As is common with Next.js applications, most of the code will be run both on
-the client and on the server.
-Code in the `src/ssr` directory will be linted as running in Node only;
-please don't try to rely on it on the client.
+We use React 18 SSR to try to avoid needing to load code on the client.
 
-Articles placed in `src/pages/articles` with a `.mdx` extension will be
+Articles placed in `src/app/articles` with a `.md` extension will be
 picked up automatically.
-Please make sure to export a field called `metadata` with a type of
-`PageMetadata` so that the rendering and listing code knows what to render
- and list.
+Please make sure to include a YAML block at the top of the document so that the
+rendering and listing code knows what to render and list.
+We default to a title matching the file name and Andrew being the author.
