@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import Head from 'next/head';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -9,6 +8,18 @@ import Footer from '../../../footer';
 import { allArticles } from '../../../ssr/articles';
 
 import 'server-only';
+
+export const config = {
+  dynamicParams: false,
+};
+
+// noinspection JSUnusedGlobalSymbols
+export async function generateStaticParams() {
+  const pages = await allArticles();
+  return pages.map((page) => ({
+    id: page.id,
+  }));
+}
 
 const Optional = ({ children, text }: React.PropsWithChildren<{ text?: string }>) => (
   <>{text ? <span>{children}</span> : null}</>
@@ -48,16 +59,12 @@ export default async function Article({ params }: { params: { id: string } }): P
 
   if (!page) {
     notFound();
-    throw new Error();
   }
 
   const { content, metadata } = page;
 
   return (
     <div className="mdx">
-      <Head>
-        <title>{metadata.title} - aylett.co.uk</title>
-      </Head>
       <nav>
         <Link href="/">Home</Link> | <Link href="/articles">Articles</Link>
       </nav>

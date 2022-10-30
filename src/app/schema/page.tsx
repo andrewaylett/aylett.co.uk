@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Head from 'next/head';
-
 import styles from '../../index.module.css';
 
 import 'server-only';
@@ -10,11 +8,6 @@ import 'server-only';
 export default function Schema(): React.ReactNode {
   return (
     <div className={styles.container}>
-      <Head>
-        <title>aylett.co.uk schemas</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main>
         <h1 className={styles.title}>Schemas</h1>
 
