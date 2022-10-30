@@ -51,7 +51,9 @@ module.exports = withPlausibleProxy()(
                     key: 'Content-Security-Policy',
                     value: [
                         "default-src 'self'",
+                        "script-src 'self' 'unsafe-inline'",
                         "script-src-elem 'self' 'unsafe-inline'",
+                        "script-src-attr 'self'",
                         "font-src 'none'",
                         "object-src 'none'",
                         "child-src 'none'",

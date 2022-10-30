@@ -17,9 +17,11 @@ export default async function Head({ params }: { params: { id: string } }): Prom
   const { metadata } = page;
 
   return (
-    <head>
+    <>
+      <meta name="author" content={metadata.author} />
+      <meta name="description" content={`${metadata.title}: ${metadata.abstract}`} />
       <title>{metadata.title} - aylett.co.uk</title>
       <link rel="icon" href="/favicon.ico" />
-    </head>
+    </>
   );
 }
