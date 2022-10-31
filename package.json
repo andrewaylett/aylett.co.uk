@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@jest/globals": "29.2.2",
-    "@next/eslint-plugin-next": "12.3.2",
+    "@next/eslint-plugin-next": "13.0.0",
     "@swc/jest": "0.2.23",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
