@@ -34,7 +34,7 @@
     "@swc/jest": "0.2.23",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
-    "@types/node": "16.11.62",
+    "@types/node": "16.18.3",
     "@types/react": "18.0.24",
     "eslint": "8.26.0",
     "eslint-config-andrewaylett": "2.1.1",
