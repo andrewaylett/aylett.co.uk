@@ -2,13 +2,11 @@ import * as React from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { allArticles } from '../../../ssr/articles';
+import { aritcleForId } from '../articles';
 
 // noinspection JSUnusedGlobalSymbols
 export default async function Head({ params }: { params: { id: string } }): Promise<React.ReactNode> {
-  const pages = await allArticles();
-
-  const page = pages.find((page) => page.id === params.id);
+  const page = await aritcleForId(params.id);
 
   if (!page) {
     notFound();

@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import 'server-only';
 
-import styles from '../../index.module.css';
+import styles from '../index.module.css';
 
 // noinspection JSUnusedGlobalSymbols
 export default function Links(): React.ReactNode {

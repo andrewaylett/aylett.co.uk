@@ -1,11 +1,10 @@
 import * as React from 'react';
 
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
-import { GITHUB_URL } from '../../../github';
-import Footer from '../../../footer';
-import { allArticles } from '../../../ssr/articles';
+import { GITHUB_URL } from '../../github';
+import Footer from '../../footer';
+import { allArticles, aritcleForId } from '../articles';
 
 import 'server-only';
 
@@ -53,15 +52,9 @@ const Revisions = ({
 
 // noinspection JSUnusedGlobalSymbols
 export default async function Article({ params }: { params: { id: string } }): Promise<React.ReactNode> {
-  const pages = await allArticles();
+  const page = await aritcleForId(params.id);
 
-  const page = pages.find((page) => page.id === params.id);
-
-  if (!page) {
-    notFound();
-  }
-
-  const { content, metadata } = page;
+  const { content, id, metadata } = page;
 
   return (
     <div className="mdx">
@@ -73,10 +66,10 @@ export default async function Article({ params }: { params: { id: string } }): P
         {metadata.abstract ? metadata.abstract : ''}
         <div className="meta">
           {metadata.author ? <div className="author">Author: {metadata.author}</div> : ''}
-          <Revisions url={`/articles/${params.id}`} {...metadata} />
+          <Revisions url={`/articles/${id}`} {...metadata} />
         </div>
       </header>
-      <main>{content}</main>
+      <main id={id}>{content}</main>
       <Footer author={metadata.author} copyright={metadata.copyright || metadata.revised.split('/')[0]} />
     </div>
   );

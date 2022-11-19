@@ -11,6 +11,7 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkRehype from 'remark-rehype';
 import rehypeReact, { Options as ComponentOptions } from 'rehype-react';
 import { parse } from 'yaml';
+import { notFound } from 'next/navigation';
 
 import { PageMetadata } from '../types';
 import sortBy from '../sort_by';
@@ -45,6 +46,11 @@ async function findArticlesPath() {
 }
 
 let articles: undefined | Promise<Page[]>;
+
+export async function aritcleForId(id: string): Promise<Page> {
+  const pages = await allArticles();
+  return pages.find((page) => page.id === id) ?? notFound();
+}
 
 export const allArticles = () => {
   if (!articles) {
