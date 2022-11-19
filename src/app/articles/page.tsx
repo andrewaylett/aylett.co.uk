@@ -2,10 +2,11 @@ import * as React from 'react';
 
 import Link from 'next/link';
 
-import Footer from '../../footer';
-import { allArticles } from '../../ssr/articles';
+import Footer from '../footer';
 
-import style from '../../articles.module.css';
+import { allArticles } from './articles';
+
+import style from './articles.module.css';
 
 import 'server-only';
 
