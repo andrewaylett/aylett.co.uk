@@ -15,11 +15,8 @@ module.exports = withPlausibleProxy()(
         pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
         productionBrowserSourceMaps: true,
         async headers() {
+            /** @type {{ key: string; value: string; }[]} */
             const headers = [
-                {
-                    key: 'X-XSS-Protection',
-                    value: '1; mode=block',
-                },
                 {
                     key: 'X-Frame-Options',
                     value: 'DENY',
@@ -32,41 +29,44 @@ module.exports = withPlausibleProxy()(
                     key: 'X-Content-Type-Options',
                     value: 'nosniff',
                 },
-                {
-                    key: 'Report-To',
-                    value: [
-                        '{"group":"default"',
-                        '"max_age":31536000',
-                        '"endpoints":[{"url":"https://aylett.report-uri.com/a/d/g"}]',
-                        '"include_subdomains":true}',
-                    ].join(','),
-                },
-                {
-                    key: 'NEL',
-                    value: '{"report_to":"default","max_age":31536000,"include_subdomains":true}',
-                },
             ];
             if (process.env.NODE_ENV === 'production') {
-                headers.push({
-                    key: 'Content-Security-Policy',
-                    value: [
-                        "default-src 'self'",
-                        "script-src 'self' 'unsafe-inline'",
-                        "script-src-elem 'self' 'unsafe-inline'",
-                        "script-src-attr 'self'",
-                        "font-src 'none'",
-                        "object-src 'none'",
-                        "child-src 'none'",
-                        "worker-src 'self'",
-                        "frame-ancestors 'none'",
-                        "form-action 'self'",
-                        'upgrade-insecure-requests',
-                        'block-all-mixed-content',
-                        'disown-opener',
-                        "base-uri 'self'",
-                        'report-uri https://aylett.report-uri.com/r/d/csp/wizard',
-                    ].join('; '),
-                });
+                headers.push(
+                    {
+                        key: 'Report-To',
+                        value: JSON.stringify({
+                            group: 'default',
+                            max_age: 31536000,
+                            endpoints: [{ url: 'https://aylett.report-uri.com/a/d/g' }],
+                            include_subdomains: true,
+                        }),
+                    },
+                    {
+                        key: 'NEL',
+                        value: JSON.stringify({ report_to: 'default', max_age: 31536000, include_subdomains: true }),
+                    },
+                    {
+                        key: 'Content-Security-Policy',
+                        value: [
+                            "default-src 'self'",
+                            "script-src 'self' 'unsafe-inline'",
+                            "script-src-elem 'self' 'unsafe-inline'",
+                            "script-src-attr 'self'",
+                            "font-src 'none'",
+                            "object-src 'none'",
+                            "child-src 'none'",
+                            "worker-src 'self'",
+                            "frame-ancestors 'none'",
+                            "form-action 'self'",
+                            'upgrade-insecure-requests',
+                            'block-all-mixed-content',
+                            'disown-opener',
+                            "base-uri 'self'",
+                            'report-to default',
+                            'report-uri https://aylett.report-uri.com/r/d/csp/enforce',
+                        ].join('; '),
+                    }
+                );
             }
             return [
                 {

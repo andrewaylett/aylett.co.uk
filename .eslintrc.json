@@ -4,14 +4,15 @@
     "eslint-config-andrewaylett",
     "plugin:@next/next/recommended"
   ],
-  "overrides": [
-    {
-      "files": ["./*.js", "test/__mocks__/**.js"],
-      "env": {
-        "node": true
-      }
+  "env": {
+    "shared-node-browser": true
+  },
+  "overrides": [{
+    "files": ["next.config.js"],
+    "env": {
+      "node": true
     }
-  ],
+  }],
   "rules": {
     "@typescript-eslint/no-var-requires": 0,
     "no-html-link-for-pages": 0,
