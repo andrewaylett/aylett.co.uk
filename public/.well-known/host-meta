@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://docs.oasis-open.org/ns/xri/xrd-1.0 https://docs.oasis-open.org/xri/xrd/v1.0/os/xrd-1.0-os.xsd">
+    <Link rel="lrdd" template="https://social.aylett.co.uk/.well-known/webfinger?resource={uri}"
+          type="application/xrd+xml"/>
+</XRD>
