@@ -16,7 +16,9 @@ export default function Links(): React.ReactNode {
         <h1 className={styles.title}>Links</h1>
 
         <p className={styles.description}>
-          <a href="https://photos.app.goo.gl/tRwdQNpn5j15PKJJ7">Lizzie&apos;s Photos</a>
+          <a href="https://photos.app.goo.gl/tRwdQNpn5j15PKJJ7">
+            Lizzie&apos;s Photos
+          </a>
         </p>
       </main>
     </div>

@@ -1,63 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd">
-    <xs:element name="clientConfig" type="clientConfig"/>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:cc="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd"
+    targetNamespace="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd"
+    version="1.1"
+>
+    <xs:element name="clientConfig" type="cc:clientConfig" />
     <xs:complexType name="clientConfig">
         <xs:complexContent>
             <xs:restriction base="clientConfig">
                 <xs:sequence maxOccurs="unbounded">
-                    <xs:element name="emailProvider" type="emailProvider"/>
+                    <xs:element name="emailProvider" type="cc:emailProvider" />
                 </xs:sequence>
-                <xs:attribute name="version" type="versions" use="required"/>
+                <xs:attribute name="version" type="versions" use="required" />
             </xs:restriction>
         </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="emailProvider">
         <xs:sequence>
-            <xs:element name="domain" type="xs:string"/>
-            <xs:element name="displayShortName" type="xs:string"/>
-            <xs:element name="displayName" type="xs:string"/>
+            <xs:element name="domain" type="xs:string" />
+            <xs:element name="displayShortName" type="xs:string" />
+            <xs:element name="displayName" type="xs:string" />
             <xs:sequence maxOccurs="unbounded">
                 <xs:choice>
-                    <xs:element name="incomingServer" type="server"/>
-                    <xs:element name="outgoingServer" type="server"/>
+                    <xs:element name="incomingServer" type="cc:server" />
+                    <xs:element name="outgoingServer" type="cc:server" />
                 </xs:choice>
             </xs:sequence>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:string"/>
+        <xs:attribute name="id" type="xs:string" />
     </xs:complexType>
     <xs:complexType name="server">
         <xs:all>
-            <xs:element name="hostname"/>
-            <xs:element name="port"/>
-            <xs:element name="socketType" type="socketTypes"/>
-            <xs:element name="username"/>
-            <xs:element name="authentication" type="authenticationTypes"/>
+            <xs:element name="hostname" />
+            <xs:element name="port" />
+            <xs:element name="socketType" type="cc:socketTypes" />
+            <xs:element name="username" />
+            <xs:element name="authentication" type="cc:authenticationTypes" />
         </xs:all>
-        <xs:attribute name="type"/>
+        <xs:attribute name="type" />
     </xs:complexType>
     <xs:simpleType name="socketTypes">
         <xs:restriction>
-            <xs:enumeration value="STARTTLS"/>
-            <xs:enumeration value="SSL"/>
-            <xs:enumeration value="plain"/>
+            <xs:enumeration value="STARTTLS" />
+            <xs:enumeration value="SSL" />
+            <xs:enumeration value="plain" />
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="authenticationTypes">
         <xs:restriction>
-            <xs:enumeration value="password-cleartext"/>
-            <xs:enumeration value="password-encrypted"/>
-            <xs:enumeration value="NTLM"/>
-            <xs:enumeration value="GSSAPI"/>
-            <xs:enumeration value="client-ip-address"/>
-            <xs:enumeration value="TLS-client-cert"/>
-            <xs:enumeration value="OAuth2"/>
-            <xs:enumeration value="none"/>
+            <xs:enumeration value="password-cleartext" />
+            <xs:enumeration value="password-encrypted" />
+            <xs:enumeration value="NTLM" />
+            <xs:enumeration value="GSSAPI" />
+            <xs:enumeration value="client-ip-address" />
+            <xs:enumeration value="TLS-client-cert" />
+            <xs:enumeration value="OAuth2" />
+            <xs:enumeration value="none" />
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="versions">
         <xs:restriction>
-            <xs:enumeration value="1.1"/>
+            <xs:enumeration value="1.1" />
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

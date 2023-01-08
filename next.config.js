@@ -37,13 +37,19 @@ module.exports = withPlausibleProxy()(
                         value: JSON.stringify({
                             group: 'default',
                             max_age: 31536000,
-                            endpoints: [{ url: 'https://aylett.report-uri.com/a/d/g' }],
+                            endpoints: [
+                                { url: 'https://aylett.report-uri.com/a/d/g' },
+                            ],
                             include_subdomains: true,
                         }),
                     },
                     {
                         key: 'NEL',
-                        value: JSON.stringify({ report_to: 'default', max_age: 31536000, include_subdomains: true }),
+                        value: JSON.stringify({
+                            report_to: 'default',
+                            max_age: 31536000,
+                            include_subdomains: true,
+                        }),
                     },
                     {
                         key: 'Content-Security-Policy',

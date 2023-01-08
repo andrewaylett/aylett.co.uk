@@ -1,8 +1,10 @@
-html, body {
+html,
+body {
     padding: 0;
     margin: 0;
-    font-family: Calibri, Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    font-family: Calibri, Roboto, -apple-system, BlinkMacSystemFont, Segoe UI,
+        Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+        sans-serif;
     font-size: clamp(100%, 2vmax, 125%);
 }
 
@@ -11,7 +13,7 @@ html, body {
 }
 
 div.mdx {
-    padding: clamp(.5rem, 1vmin, 2rem);
+    padding: clamp(0.5rem, 1vmin, 2rem);
     font-variant-numeric: oldstyle-nums;
     display: grid;
     grid-template-columns: 1fr min(65ch, 100%) 1fr;
@@ -28,7 +30,8 @@ div.mdx > * {
 
 code {
     font-variant-numeric: tabular-nums;
-    font-family: "JetBrains Mono", Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, monospace
+    font-family: 'JetBrains Mono', Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, monospace;
 }
 
 header h1 {

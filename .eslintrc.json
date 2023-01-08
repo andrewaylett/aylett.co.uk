@@ -1,18 +1,17 @@
 {
   "root": true,
-  "extends": [
-    "eslint-config-andrewaylett",
-    "plugin:@next/next/recommended"
-  ],
+  "extends": ["eslint-config-andrewaylett", "plugin:@next/next/recommended"],
   "env": {
     "shared-node-browser": true
   },
-  "overrides": [{
-    "files": ["next.config.js"],
-    "env": {
-      "node": true
+  "overrides": [
+    {
+      "files": ["next.config.js"],
+      "env": {
+        "node": true
+      }
     }
-  }],
+  ],
   "rules": {
     "@typescript-eslint/no-var-requires": 0,
     "no-html-link-for-pages": 0,

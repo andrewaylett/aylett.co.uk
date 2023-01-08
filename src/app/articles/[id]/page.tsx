@@ -20,7 +20,10 @@ export async function generateStaticParams() {
   }));
 }
 
-const Optional = ({ children, text }: React.PropsWithChildren<{ text?: string }>) => (
+const Optional = ({
+  children,
+  text,
+}: React.PropsWithChildren<{ text?: string }>) => (
   <>{text ? <span>{children}</span> : null}</>
 );
 
@@ -51,7 +54,11 @@ const Revisions = ({
 );
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Article({ params }: { params: { id: string } }): Promise<React.ReactNode> {
+export default async function Article({
+  params,
+}: {
+  params: { id: string };
+}): Promise<React.ReactNode> {
   const page = await aritcleForId(params.id);
 
   const { content, id, metadata } = page;
@@ -65,12 +72,19 @@ export default async function Article({ params }: { params: { id: string } }): P
         <h1>{metadata.title}</h1>
         {metadata.abstract ? metadata.abstract : ''}
         <div className="meta">
-          {metadata.author ? <div className="author">Author: {metadata.author}</div> : ''}
+          {metadata.author ? (
+            <div className="author">Author: {metadata.author}</div>
+          ) : (
+            ''
+          )}
           <Revisions url={`/articles/${id}`} {...metadata} />
         </div>
       </header>
       <main id={id}>{content}</main>
-      <Footer author={metadata.author} copyright={metadata.copyright || metadata.revised.split('/')[0]} />
+      <Footer
+        author={metadata.author}
+        copyright={metadata.copyright || metadata.revised.split('/')[0]}
+      />
     </div>
   );
 }

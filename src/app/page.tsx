@@ -13,7 +13,9 @@ export default function Home(): React.ReactNode {
       <main>
         <h1 className={styles.title}>Welcome to aylett.co.uk</h1>
 
-        <p className={styles.description}>Insert &apos;90s &ldquo;site under construction&rdquo; gif here.</p>
+        <p className={styles.description}>
+          Insert &apos;90s &ldquo;site under construction&rdquo; gif here.
+        </p>
         <p className={styles.description}>
           <Link href="articles">Articles</Link>
         </p>
@@ -27,8 +29,8 @@ export default function Home(): React.ReactNode {
 
       <footer>
         <a href="/_logs" target="_blank" rel="noopener noreferrer">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
+          Powered by {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
         </a>
       </footer>
     </div>

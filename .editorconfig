@@ -6,7 +6,6 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 insert_final_newline = true
-max_line_length = 120
 tab_width = 4
 trim_trailing_whitespace = true
 
@@ -17,9 +16,9 @@ tab_width = 2
 [{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,bowerrc,jest.config}]
 indent_size = 2
 
-[*.md]
-max_line_length = 80
-
 [{*.yml,*.yaml}]
 indent_size = 2
 tab_width = 2
+
+[host-meta]
+indent_size = unset

@@ -1,9 +1,5 @@
 node_modules
 .next
-yarn.lock
+/yarn.lock
 package-lock.json
-public
-.editorconfig
-.prettierignore
-.eslintignore
-out
+/out
