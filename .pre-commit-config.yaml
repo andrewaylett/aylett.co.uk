@@ -36,3 +36,11 @@ repos:
         additional_dependencies:
           - prettier@2.8.1
           - '@prettier/plugin-xml@2.2.0'
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.20.0
+    hooks:
+      - id: check-github-workflows
+      - id: check-renovate
+      - id: check-metaschema
+        files: public/schema/drone-0.8.json

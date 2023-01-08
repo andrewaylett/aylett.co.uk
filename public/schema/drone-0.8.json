@@ -1,22 +1,182 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://www.aylett.co.uk/schema/drone-0.8.json",
-  "type": "object",
-  "properties": {
-    "clone": {
-      "type": "object"
-    },
-    "pipeline": {
+  "$ref": "#/definitions/root",
+  "title": "Drone 0.8 pipeline definition",
+  "definitions": {
+    "root": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/pipelineStage"
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/stage"
+        }
+      },
+      "required": ["pipeline"]
+    },
+    "stage": {
+      "type": "object",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/cloneable"
+        },
+        {
+          "$ref": "#/definitions/ecr"
+        }
+      ],
+      "required": ["image"]
+    },
+    "cloneable": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "The Docker image to use as a Drone plugin",
+          "type": "string",
+          "pattern": "^[^:]+(:[^:]+)?$"
+        },
+        "pull": {
+          "description": "Whether to require the worker to pull the latest version of the image",
+          "type": "boolean",
+          "default": false
+        },
+        "environment": {
+          "description": "Environment variables to apply when running the container",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/variable"
+          }
+        },
+        "commands": {
+          "description": "Commands to execute instead of the default entry point",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "description": "The name of the secret within Drone",
+                    "$ref": "#/definitions/variable"
+                  },
+                  "target": {
+                    "description": "The name of the environment variable that will contain the secret",
+                    "$ref": "#/definitions/variable"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "group": {
+          "description": "Stages with the same group will run in parallel",
+          "type": "string"
+        },
+        "when": {
+          "$ref": "#/definitions/when"
+        }
+      },
+      "required": ["image"]
+    },
+    "ecr": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string",
+          "pattern": "[^/]+/drone-plugins/drone-ecr(:[^:]+)?"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "create_repository": {
+          "type": "boolean"
+        },
+        "region": {
+          "description": "Which AWS regions to push the image to",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/region"
+          },
+          "uniqueItems": true
+        },
+        "exposed_accounts": {
+          "description": "Which AWS accounts to allow access from",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["image", "repo"]
+    },
+    "when": {
+      "description": "Restrict when this stage will be executed",
+      "type": "object",
+      "properties": {
+        "branch": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "event": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/string-or-array"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "$ref": "#/definitions/string-or-array"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       }
-    }
-  },
-  "additionalProperties": true,
-  "$defs": {
-    "pipelineStage": {
-      "type": "object"
+    },
+    "string-or-array": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "region": {
+      "description": "An AWS region",
+      "enum": ["eu-west-1", "eu-central-1", "ap-southeast-1", "ap-northeast-1"]
+    },
+    "variable": {
+      "type": "string",
+      "description": "A string holding a valid Bash variable name",
+      "pattern": "[a-zA-Z_][a-zA-Z0-9_]+=.*"
     }
   }
 }

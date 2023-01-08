@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:cc="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd"
-    targetNamespace="https://www.aylett.co.uk/xsd/clientConfig-1.1.xsd"
+    xmlns:cc="https://www.aylett.co.uk/schema/clientConfig-1.1.xsd"
+    targetNamespace="https://www.aylett.co.uk/schema/clientConfig-1.1.xsd"
     version="1.1"
 >
     <xs:element name="clientConfig" type="cc:clientConfig" />
