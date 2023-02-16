@@ -34,7 +34,7 @@
     "@prettier/plugin-xml": "2.2.0",
     "@swc/jest": "0.2.24",
     "@testing-library/jest-dom": "5.16.5",
-    "@testing-library/react": "13.4.0",
+    "@testing-library/react": "14.0.0",
     "@types/node": "16.18.12",
     "@types/react": "18.0.28",
     "eslint": "8.34.0",
