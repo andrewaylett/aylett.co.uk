@@ -37,7 +37,7 @@
     "@testing-library/react": "14.0.0",
     "@types/node": "16.18.12",
     "@types/react": "18.0.28",
-    "eslint": "8.34.0",
+    "eslint": "8.35.0",
     "eslint-config-andrewaylett": "2.1.2",
     "expect": "29.4.3",
     "identity-obj-proxy": "3.0.0",
