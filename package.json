@@ -36,7 +36,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@types/node": "16.18.21",
-    "@types/react": "18.0.28",
+    "@types/react": "18.0.29",
     "eslint": "8.36.0",
     "eslint-config-andrewaylett": "2.2.0",
     "expect": "29.5.0",
