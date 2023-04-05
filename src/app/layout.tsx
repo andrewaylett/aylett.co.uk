@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }): React.ReactNode {
   return (
-    <html>
+    <html lang="en">
       <body>
         <PlausibleProvider
           domain="aylett.co.uk"
