@@ -1,9 +1,17 @@
 import * as React from 'react';
 
 import Link from 'next/link';
+
+import type { Metadata } from 'next';
+
 import 'server-only';
 
 import styles from '../index.module.css';
+
+// noinspection JSUnusedGlobalSymbols
+export const metadata: Metadata = {
+  title: 'Links',
+};
 
 // noinspection JSUnusedGlobalSymbols
 export default function Links(): React.ReactNode {

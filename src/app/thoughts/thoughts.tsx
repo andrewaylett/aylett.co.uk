@@ -20,11 +20,10 @@ import { parse } from 'yaml';
 import { notFound } from 'next/navigation';
 import gfm from 'remark-gfm';
 
-import { PageMetadata } from '../types';
+import { Thought, ThoughtMetadata } from '../types';
 import sortBy from '../sort_by';
 
 import type { YAML } from 'mdast';
-import type { Page } from '../types';
 
 import 'server-only';
 
@@ -47,14 +46,14 @@ const components: ComponentOptions['components'] = {
   ),
 };
 
-async function findArticlesPath() {
+async function findThoughtsPath() {
   let wd = process.cwd();
   do {
     if (
       (await exists(path.join(wd, 'package.json'))) &&
-      (await exists(path.join(wd, 'src/app/articles/page.tsx')))
+      (await exists(path.join(wd, 'src/app/thoughts/page.tsx')))
     ) {
-      return path.join(wd, 'src', 'app', 'articles');
+      return path.join(wd, 'src', 'app', 'thoughts');
     }
     wd = path.resolve(wd, '..');
   } while (wd !== '/');
@@ -62,26 +61,26 @@ async function findArticlesPath() {
   throw new Error('No package.json found');
 }
 
-let articles: undefined | Promise<Page[]>;
+let thoughts: undefined | Promise<Thought[]>;
 
-export async function aritcleForId(id: string): Promise<Page> {
-  const pages = await allArticles();
+export async function thoughtForId(id: string): Promise<Thought> {
+  const pages = await allThoughts();
   return pages.find((page) => page.id === id) ?? notFound();
 }
 
-export const allArticles = () => {
-  if (!articles) {
-    articles = findArticles();
+export const allThoughts = () => {
+  if (!thoughts) {
+    thoughts = findThoughts();
   }
-  return articles;
+  return thoughts;
 };
 
-const findArticles = async () => {
-  const ARTICLES_PATH = await findArticlesPath();
-  const items = await readdir(ARTICLES_PATH);
-  const promises: Array<Promise<Page[]>> = items.map(
-    async (item: string): Promise<Page[]> => {
-      const filePath = path.join(ARTICLES_PATH, item);
+const findThoughts = async () => {
+  const THOUGHTS_PATH = await findThoughtsPath();
+  const items = await readdir(THOUGHTS_PATH);
+  const promises: Array<Promise<Thought[]>> = items.map(
+    async (item: string): Promise<Thought[]> => {
+      const filePath = path.join(THOUGHTS_PATH, item);
       const { ext, name } = path.parse(filePath);
       // Only process markdown/mdx files that are not index.tsx pages
       if (
@@ -91,11 +90,10 @@ const findArticles = async () => {
       ) {
         const file = await readFile(filePath);
 
-        const metadata: PageMetadata & Partial<Record<string, string>> = {
+        const metadata: ThoughtMetadata & Partial<Record<string, string>> = {
           title: name,
           author: 'Andrew Aylett',
-          revision: '',
-          revised: '',
+          date: '',
         };
         let node: YAML | undefined;
 
@@ -145,7 +143,7 @@ const findArticles = async () => {
     }
   );
 
-  const entries: Page[] = (await Promise.all(promises)).flat(1);
+  const entries: Thought[] = (await Promise.all(promises)).flat(1);
 
-  return sortBy(entries, (entry) => entry.metadata.title);
+  return sortBy(entries, (entry) => entry.metadata.date);
 };

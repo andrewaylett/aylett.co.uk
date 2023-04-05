@@ -5,6 +5,17 @@ revision: '1.0'
 revised: '2020/09/13'
 expires: '2023/09/13'
 abstract: 'The world changes; is this still relevant?'
+tags:
+    - 'website'
+    - 'document expiry'
+    - 'archives'
+    - 'out-of-date'
+    - 'author'
+    - 'opinions'
+    - 'revision'
+    - 'stale view'
+    - 'current'
+    - 'technologies'
 ---
 
 Articles on this website have an expiry date. It's something you'll see more

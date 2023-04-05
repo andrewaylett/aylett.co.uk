@@ -5,6 +5,16 @@ revision: '1.2'
 revised: '2021/08/09'
 expires: '2022/08/09'
 abstract: 'This is not a privacy policy'
+tags:
+    - 'Privacy Policy'
+    - 'GDPR'
+    - 'Website Hosting'
+    - 'Data Processing'
+    - 'Personal Data'
+    - 'Consent'
+    - 'Log Retention'
+    - 'Event Tracking'
+    - 'Third-party Services'
 ---
 
 Per the subhead, this is not (really) a privacy policy. This site doesn't have a

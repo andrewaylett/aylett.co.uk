@@ -20,19 +20,15 @@ export default function Home(): React.ReactNode {
           <Link href="articles">Articles</Link>
         </p>
         <p className={styles.description}>
+          <Link href="thoughts">Thoughts</Link>
+        </p>
+        <p className={styles.description}>
           <Link href="schema">Schemas</Link>
         </p>
         <p className={styles.description}>
           <Link href="links">Links</Link>
         </p>
       </main>
-
-      <footer>
-        <a href="/_logs" target="_blank" rel="noopener noreferrer">
-          Powered by {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
   );
 }

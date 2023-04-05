@@ -5,6 +5,17 @@ revision: '1.1'
 revised: '2020/09/13'
 expires: '2021/09/13'
 abstract: "Or: why this website isn't a blog"
+tags:
+    - 'website'
+    - 'articles'
+    - 'blogging'
+    - 'curation'
+    - 'version control'
+    - 'Roam'
+    - 'GitHub'
+    - 'editing'
+    - 'content management'
+    - 'publishing'
 ---
 
 This website is a collection of articles, not a blog. Why? Well, I've always

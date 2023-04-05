@@ -5,6 +5,17 @@ revision: '1.0'
 revised: '2012/07/18'
 expires: '2032/07/18'
 abstract: 'Who is this "security" for, anyway?'
+tags:
+    - 'Telephone'
+    - 'Security'
+    - 'Identity Verification'
+    - 'Fraud Prevention'
+    - 'Insurance Services'
+    - 'Customer Protection'
+    - 'Company Policy'
+    - 'Customer Service'
+    - 'Communication'
+    - 'Trustworthiness'
 ---
 
 We don’t get many people phoning our land-line — just my mother-in-law,

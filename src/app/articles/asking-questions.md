@@ -5,6 +5,17 @@ revision: '1.0.0'
 revised: '2022/07/18'
 expires: '2024/07/18'
 abstract: 'Help your colleagues to help you'
+tags:
+    - 'internal support'
+    - 'documentation'
+    - 'problem solving'
+    - 'context'
+    - 'vendor support'
+    - 'communication'
+    - 'planning'
+    - 'impact analysis'
+    - 'team collaboration'
+    - 'prioritization'
 ---
 
 Most companies uses a lot of different technologies, and it's not reasonable to
@@ -17,13 +28,13 @@ definitely recommend Jon Skeet's
 But asking questions internally can sometimes be very different from asking
 questions in a public forum. So here are some things you should bear in mind.
 
-1. [Read The Documentation](#read_the_documentation)
-2. [Explain the Impact](#explain_the_impact)
-3. [Start Nearby](#start_nearby)
-4. [Avoid Solving the Wrong Problem](#avoid_solving_the_wrong_problem)
-5. [Include Context](#include_context)
-6. [Talk To Vendors](#talk_to_vendors)
-7. [Don't Expect Magic](#don_t_expect_magic)
+1. [Read The Documentation](#read-the-documentation)
+2. [Explain the Impact](#explain-the-impact)
+3. [Start Nearby](#start-nearby)
+4. [Avoid Solving the Wrong Problem](#avoid-solving-the-wrong-problem)
+5. [Include Context](#include-context)
+6. [Talk To Vendors](#talk-to-vendors)
+7. [Don't Expect Magic](#dont-expect-magic)
 
 # Read the Documentation
 

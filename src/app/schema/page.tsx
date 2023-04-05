@@ -1,8 +1,15 @@
 import * as React from 'react';
 
+import type { Metadata } from 'next';
+
 import styles from '../index.module.css';
 
 import 'server-only';
+
+// noinspection JSUnusedGlobalSymbols
+export const metadata: Metadata = {
+  title: 'Schemas',
+};
 
 // noinspection JSUnusedGlobalSymbols
 export default function Schema(): React.ReactNode {

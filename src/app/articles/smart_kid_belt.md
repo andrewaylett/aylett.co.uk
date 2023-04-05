@@ -5,6 +5,14 @@ revision: '1.0'
 revised: '2020/09/05'
 expires: '2021/09/05'
 abstract: 'Some thoughts on the "Smart Kid Belt"'
+tags:
+    - 'Smart Kid Belt'
+    - 'Child Restraint System'
+    - 'Type Approval'
+    - 'UNECE'
+    - 'GRSP'
+    - 'Product'
+    - 'Safety'
 ---
 
 -   https://smartkidbelt.com/en/

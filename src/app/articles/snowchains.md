@@ -5,6 +5,17 @@ revision: '1.0'
 revised: '2013/01/19'
 expires: '2033/01/19'
 abstract: 'Useful if you need them'
+tags:
+    - 'driving'
+    - 'snow chains'
+    - 'winter'
+    - 'weather conditions'
+    - 'tire accessories'
+    - 'road safety'
+    - 'vehicle maintenance'
+    - 'outdoor activities'
+    - 'emergency preparation'
+    - 'personal experience'
 ---
 
 It’s been snowing, and as we were planning to see friends who live in the

@@ -1,16 +1,36 @@
 import * as React from 'react';
 
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 import { GITHUB_URL } from '../../github';
 import Footer from '../../footer';
 import { allArticles, aritcleForId } from '../articles';
 
+import type { Metadata } from 'next';
+
 import 'server-only';
 
+// noinspection JSUnusedGlobalSymbols
 export const config = {
   dynamicParams: false,
 };
+
+// noinspection JSUnusedGlobalSymbols
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const page = await aritcleForId(params.id ?? notFound());
+
+  const { metadata } = page;
+
+  return {
+    title: metadata.title,
+    authors: [{ name: metadata.author }],
+  };
+}
 
 // noinspection JSUnusedGlobalSymbols
 export async function generateStaticParams() {
