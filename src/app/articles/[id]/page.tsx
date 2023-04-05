@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { GITHUB_URL } from '../../github';
+import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allArticles, aritcleForId } from '../articles';
 

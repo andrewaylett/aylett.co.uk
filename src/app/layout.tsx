@@ -30,6 +30,7 @@ export default function RootLayout({
         <PlausibleProvider
           domain="aylett.co.uk"
           scriptProps={{ src: '/js/script.js' }}
+          enabled={process.env.NODE_ENV === 'production'}
         >
           {children}
         </PlausibleProvider>

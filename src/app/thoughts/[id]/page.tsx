@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { GITHUB_URL } from '../../github';
+import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allThoughts, thoughtForId } from '../thoughts';
 
@@ -82,7 +82,7 @@ export default async function Article({
         </div>
       </header>
       <main id={id}>{content}</main>
-      <Footer author="Andrew Aylett" copyright={metadata.copyright} />
+      <Footer author="Andrew Aylett" copyright={metadata.date.split('/')[0]} />
     </div>
   );
 }
