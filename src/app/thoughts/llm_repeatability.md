@@ -1,5 +1,13 @@
 ---
-title: 'The Deterministic Nature of Language Models: A Matter of Design Choices'
+title: Is an LLM inherently deterministic?
+description:
+    Exploring the determinism of large language models like GPT, and the
+    possibility of designing them to be deterministic.
+tags:
+    - LLM
+    - determinism
+    - randomness
+    - GPT
 author: 'Andrew Aylett'
 date: '2023/04/05'
 ---

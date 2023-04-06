@@ -2,9 +2,18 @@ import * as React from 'react';
 
 import Link from 'next/link';
 
+import type { Metadata } from 'next';
+
 import styles from './index.module.css';
 
 import 'server-only';
+
+export const metadata: Metadata = {
+  verification: {
+    me: 'https://social.aylett.co.uk/@andrew',
+  },
+  description: 'Welcome to aylett.co.uk',
+};
 
 // noinspection JSUnusedGlobalSymbols
 export default function Home(): React.ReactNode {

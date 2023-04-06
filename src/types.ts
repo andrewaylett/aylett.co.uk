@@ -22,6 +22,7 @@ export const ThoughtSchema = {
     title: { type: 'string' },
     date: { type: 'string' },
     tags: { type: 'array', items: { type: 'string' } },
+    description: { type: 'string' },
   },
 } as const satisfies JSONSchema7;
 
