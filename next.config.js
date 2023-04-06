@@ -58,6 +58,7 @@ module.exports = withPlausibleProxy()(
                             "script-src 'self' 'unsafe-inline'",
                             "script-src-elem 'self' 'unsafe-inline'",
                             "script-src-attr 'self'",
+                            "style-src 'self' 'unsafe-inline'",
                             "font-src 'none'",
                             "object-src 'none'",
                             "child-src 'none'",
