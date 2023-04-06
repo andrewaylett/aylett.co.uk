@@ -1,21 +1,19 @@
 ---
-title: 'Driving With Snow Chains'
-author: 'Andrew Aylett'
+title: Driving With Snow Chains
+author: Andrew Aylett
 revision: '1.0'
-revised: '2013/01/19'
-expires: '2033/01/19'
-abstract: 'Useful if you need them'
+revised: 2013/01/19
+expires: 2033/01/19
+abstract: Useful if you need them
+description:
+    Andrew shares his experience using snow chains for the first time during a
+    snowstorm. Read on to learn about his tips and tricks, and what to keep in
+    mind when using snow chains.
 tags:
-    - 'driving'
-    - 'snow chains'
-    - 'winter'
-    - 'weather conditions'
-    - 'tire accessories'
-    - 'road safety'
-    - 'vehicle maintenance'
-    - 'outdoor activities'
-    - 'emergency preparation'
-    - 'personal experience'
+    - snow chains
+    - winter driving
+    - first-time use
+    - driving in snow
 ---
 
 It’s been snowing, and as we were planning to see friends who live in the

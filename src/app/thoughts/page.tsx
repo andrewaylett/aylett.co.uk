@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { Fragment } from 'react';
 
 import Link from 'next/link';
 
 import Footer from '../footer';
+import { Description } from '../../remark/components';
 
 import { allThoughts } from './thoughts';
 
@@ -34,9 +36,12 @@ export default async function Articles(): Promise<React.ReactNode> {
           <Link href="/articles/thoughts">What is this?</Link>
         </p>
         {pages.map(({ id: name, metadata }) => (
-          <p key={name}>
-            <Link href={`/thoughts/${name}`}>{metadata.title}</Link>
-          </p>
+          <Fragment key={name}>
+            <p>
+              <Link href={`/thoughts/${name}`}>{metadata.title}</Link>
+            </p>
+            <Description metadata={metadata} />
+          </Fragment>
         ))}
       </main>
       <Footer author="Andrew Aylett" />

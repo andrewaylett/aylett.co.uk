@@ -12,6 +12,7 @@ export const ArticleSchema = {
     expires: { type: 'string' },
     abstract: { type: 'string' },
     copyright: { type: 'string' },
+    description: { type: 'string' },
     tags: { type: 'array', items: { type: 'string' } },
   },
 } as const satisfies JSONSchema7;

@@ -3,6 +3,7 @@ import { createElement, Fragment } from 'react';
 import { VFile } from 'vfile';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import remarkStringify from 'remark-stringify';
 import remarkFrontmatter from 'remark-frontmatter';
 import { Root, YAML } from 'mdast';
 import { is } from 'unist-util-is';
@@ -29,20 +30,24 @@ function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
   }
 }
 
-export const processMarkdown = unified()
-  .use(remarkParse)
-  .use([remarkFrontmatter])
-  .use(() => (tree: Root, file: VFile): Root => {
-    shiftIf(tree.children, (yamlnode) => {
-      if (is<YAML>(yamlnode, 'yaml')) {
-        file.data.frontMatter = yamlnode;
-        return true;
-      }
-      return false;
-    });
-    return tree;
-  })
-  .use(gfm)
+export function baseProcessor() {
+  return unified()
+    .use(remarkParse)
+    .use([remarkFrontmatter])
+    .use(() => (tree: Root, file: VFile): Root => {
+      shiftIf(tree.children, (yamlnode) => {
+        if (is<YAML>(yamlnode, 'yaml')) {
+          file.data.frontMatter = yamlnode;
+          return true;
+        }
+        return false;
+      });
+      return tree;
+    })
+    .use(gfm);
+}
+
+export const intoReact = baseProcessor()
   .use(remarkRehype)
   .use(rehypeReact, {
     createElement,
@@ -50,3 +55,5 @@ export const processMarkdown = unified()
     passNode: true,
     components,
   } as ComponentOptions).process;
+
+export const intoText = baseProcessor().use(remarkStringify).process;

@@ -1,21 +1,19 @@
 ---
-title: 'Asking Questions Internally'
-author: 'Andrew Aylett'
-revision: '1.0.0'
-revised: '2022/07/18'
-expires: '2024/07/18'
-abstract: 'Help your colleagues to help you'
+title: Asking Questions Internally
+author: Andrew Aylett
+revision: 1.0.0
+revised: 2022/07/18
+expires: 2024/07/18
+abstract: Help your colleagues to help you
+description:
+    Discover the best practices for asking effective questions internally. Learn
+    how to get the people you work with to prioritize your request, and avoid
+    wasting time and resources.
 tags:
-    - 'internal support'
-    - 'documentation'
-    - 'problem solving'
-    - 'context'
-    - 'vendor support'
-    - 'communication'
-    - 'planning'
-    - 'impact analysis'
-    - 'team collaboration'
-    - 'prioritization'
+    - communication
+    - problem-solving
+    - teamwork
+    - support
 ---
 
 Most companies uses a lot of different technologies, and it's not reasonable to

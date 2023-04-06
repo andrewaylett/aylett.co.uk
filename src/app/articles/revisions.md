@@ -1,21 +1,18 @@
 ---
-title: 'Revisionism'
-author: 'Andrew Aylett'
+title: Revisionism
+author: Andrew Aylett
 revision: '1.1'
-revised: '2020/09/13'
-expires: '2021/09/13'
+revised: 2020/09/13
+expires: 2021/09/13
 abstract: "Or: why this website isn't a blog"
+description:
+    Trying to avoid the pitfalls of traditional blogs, Andrew offers content
+    that can be refreshed and updated over time.
 tags:
-    - 'website'
-    - 'articles'
-    - 'blogging'
-    - 'curation'
-    - 'version control'
-    - 'Roam'
-    - 'GitHub'
-    - 'editing'
-    - 'content management'
-    - 'publishing'
+    - software engineering
+    - curation
+    - timeless content
+    - version control
 ---
 
 This website is a collection of articles, not a blog. Why? Well, I've always

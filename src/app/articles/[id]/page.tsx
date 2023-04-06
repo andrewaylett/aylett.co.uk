@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allArticles, aritcleForId } from '../articles';
+import { Description } from '../../../remark/components';
 
 import type { Metadata } from 'next';
 
@@ -29,6 +30,7 @@ export async function generateMetadata({
   return {
     title: metadata.title,
     authors: [{ name: metadata.author }],
+    description: metadata.description,
   };
 }
 
@@ -98,6 +100,7 @@ export default async function Article({
             ''
           )}
           <Revisions url={`/articles/${id}`} {...metadata} />
+          <Description metadata={metadata} />
         </div>
       </header>
       <main id={id}>{content}</main>

@@ -1,21 +1,16 @@
 ---
-title: 'Document Expiry'
-author: 'Andrew Aylett'
+title: Document Expiry
+author: Andrew Aylett
 revision: '1.0'
-revised: '2020/09/13'
-expires: '2023/09/13'
-abstract: 'The world changes; is this still relevant?'
+revised: 2020/09/13
+expires: 2023/09/13
+abstract: The world changes; is this still relevant?
+description:
+    Learn why it's important to understand whether online content is current or
+    out-of-date, and how expiry dates can help with that.
 tags:
-    - 'website'
-    - 'document expiry'
-    - 'archives'
-    - 'out-of-date'
-    - 'author'
-    - 'opinions'
-    - 'revision'
-    - 'stale view'
-    - 'current'
-    - 'technologies'
+    - website management
+    - content strategy
 ---
 
 Articles on this website have an expiry date. It's something you'll see more

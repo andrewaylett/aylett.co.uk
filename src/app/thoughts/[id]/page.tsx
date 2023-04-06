@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allThoughts, thoughtForId } from '../thoughts';
+import { Description } from '../../../remark/components';
 
 import type { Metadata } from 'next';
 
@@ -81,6 +82,7 @@ export default async function Article({
           <Link href="/articles/thoughts">What is this?</Link>
           <Revisions url={`/thoughts/${id}`} {...metadata} />
         </div>
+        <Description metadata={metadata} />
       </header>
       <main id={id}>{content}</main>
       <Footer author="Andrew Aylett" copyright={metadata.date.split('/')[0]} />

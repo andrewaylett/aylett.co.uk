@@ -1,5 +1,5 @@
-import path from 'path';
-import { readdir, stat } from 'fs/promises';
+import * as path from 'node:path';
+import { readdir, stat } from 'node:fs/promises';
 
 import { read } from 'to-vfile';
 import { parse } from 'yaml';
@@ -8,7 +8,7 @@ import { JSONSchema7 } from 'json-schema';
 
 import { MDPage, TypeFrom } from '../types';
 
-import { processMarkdown } from './process_markdown';
+import { intoReact } from './process_markdown';
 
 import type { VFile } from 'vfile';
 
@@ -59,7 +59,7 @@ export async function findMarkdown<T extends JSONSchema7>(
   const mdFiles = traverse(dir);
   const entries: MDPage<TypeFrom<T>>[] = [];
   for await (const mdFile of mdFiles) {
-    const vfile = await processMarkdown(mdFile.vfile);
+    const vfile = await intoReact(mdFile.vfile);
     const reactContent = vfile.result;
     const node = vfile.data.frontMatter;
 

@@ -1,20 +1,19 @@
 ---
-title: 'Privacy'
-author: 'Andrew Aylett'
+title: Privacy
+author: Andrew Aylett
 revision: '1.2'
-revised: '2021/08/09'
-expires: '2022/08/09'
-abstract: 'This is not a privacy policy'
+revised: 2021/08/09
+expires: 2022/08/09
+abstract: This is not a privacy policy
+description:
+    This website does not set any cookies or retain any logs, and aims to avoid
+    processing any personal data to comply with GDPR. Hosted by Vercel, personal
+    data is not collected for visitors to the site.
 tags:
-    - 'Privacy Policy'
-    - 'GDPR'
-    - 'Website Hosting'
-    - 'Data Processing'
-    - 'Personal Data'
-    - 'Consent'
-    - 'Log Retention'
-    - 'Event Tracking'
-    - 'Third-party Services'
+    - Privacy
+    - GDPR
+    - Cookies
+    - Logs
 ---
 
 Per the subhead, this is not (really) a privacy policy. This site doesn't have a

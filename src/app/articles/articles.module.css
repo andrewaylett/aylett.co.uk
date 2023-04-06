@@ -14,9 +14,20 @@
 }
 
 .revision::before {
-    content: ' (';
+    content: '(';
 }
 
 .revision::after {
     content: ')';
+}
+
+.entry {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 1ch;
+}
+
+.entry span {
+    display: inline-block;
 }

@@ -1,18 +1,20 @@
 ---
-title: 'Smart Kid Belt'
-author: 'Andrew Aylett'
+title: Smart Kid Belt
+author: Andrew Aylett
 revision: '1.0'
-revised: '2020/09/05'
-expires: '2021/09/05'
-abstract: 'Some thoughts on the "Smart Kid Belt"'
+revised: 2020/09/05
+expires: 2021/09/05
+abstract: Some thoughts on the "Smart Kid Belt"
+description:
+    Smart Kid Belt is a type-approved automotive child restraint system with a
+    unique design that consists of a single strap to hold the shoulder belt
+    down, but it does not fully comply with UN Regulation No. 44 requirements,
+    according to some experts' opinions. Andrew wouldn't recommend using it.
 tags:
-    - 'Smart Kid Belt'
-    - 'Child Restraint System'
-    - 'Type Approval'
-    - 'UNECE'
-    - 'GRSP'
-    - 'Product'
-    - 'Safety'
+    - Smart Kid Belt
+    - child restraint
+    - type approval
+    - controversy
 ---
 
 -   https://smartkidbelt.com/en/

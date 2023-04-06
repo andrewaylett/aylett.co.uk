@@ -1,21 +1,18 @@
 ---
-title: 'Telephone "Security" Questions'
-author: 'Andrew Aylett'
+title: Telephone "Security" Questions
+author: Andrew Aylett
 revision: '1.0'
-revised: '2012/07/18'
-expires: '2032/07/18'
-abstract: 'Who is this "security" for, anyway?'
+revised: 2012/07/18
+expires: 2032/07/18
+abstract: Who is this "security" for, anyway?
+description:
+    In this post, Andrew discusses why he is not a fan of answering security
+    questions when receiving incoming call from a company, and how security
+    should be designed to protect both parties.
 tags:
-    - 'Telephone'
-    - 'Security'
-    - 'Identity Verification'
-    - 'Fraud Prevention'
-    - 'Insurance Services'
-    - 'Customer Protection'
-    - 'Company Policy'
-    - 'Customer Service'
-    - 'Communication'
-    - 'Trustworthiness'
+    - phone security
+    - identity verification
+    - company-customer interaction
 ---
 
 We don’t get many people phoning our land-line — just my mother-in-law,

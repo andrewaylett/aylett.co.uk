@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { Fragment } from 'react';
 
 import Link from 'next/link';
 
 import Footer from '../footer';
+import { Description } from '../../remark/components';
 
 import { allArticles } from './articles';
 
@@ -30,15 +32,23 @@ export default async function Articles(): Promise<React.ReactNode> {
       </header>
       <main>
         {pages.map(({ id: name, metadata }) => (
-          <p key={name}>
-            <Link href={`/articles/${name}`}>{metadata.title}</Link>
-            {metadata.author ? ` - ${metadata.author}` : ''}
-            <span className={style.revision}>
-              {metadata.revision ? `v${metadata.revision}, ` : ''}
-              {metadata.revised.split('/')[0]}
-            </span>
-            {metadata.abstract ? `: ${metadata.abstract}` : ''}
-          </p>
+          <Fragment key={name}>
+            <div className={style.entry}>
+              <span>
+                <Link href={`/articles/${name}`}>{metadata.title}</Link>
+                {metadata.author ? ` - ${metadata.author}` : ''}
+              </span>
+              <span>
+                <span className={style.revision}>
+                  {metadata.revision ? `v${metadata.revision}, ` : ''}
+                  {metadata.revised.split('/')[0]}
+                </span>
+                {metadata.abstract ? ':' : ''}
+              </span>
+              {metadata.abstract ? <span>{metadata.abstract}</span> : ''}
+            </div>
+            <Description metadata={metadata} />
+          </Fragment>
         ))}
       </main>
       <Footer author="Andrew Aylett" />

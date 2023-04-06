@@ -1,10 +1,18 @@
 ---
 title: Some Thoughts?
 author: Andrew Aylett
-revision: '1.1'
-revised: 2023/04/05
+revision: '1.2'
+revised: 2023/04/06
 expires: 2024/04/05
 abstract: Worth whatever you paid for them.
+description:
+    In this article, Andrew introduces his new brief thoughts section and
+    techniques for classification and metadata addition.
+tags:
+    - thoughts
+    - note-taking
+    - metadata
+    - LLMs
 ---
 
 In a similar vein to [Simon Wilison's TIL](https://til.simonwillison.net/), I've
@@ -19,6 +27,7 @@ on social media, but where they are, it's in the interests of pulling them out
 of a random thread and into something under my control.
 
 I'm toying with using LLMs to help me classify and add metadata to thoughts. So
-if you think the titles are a bit pretentious, or the tags (when they appear) a
-little OTT, blame my LLM editor. (Or actually, don't: I may have enlisted an LLM
-to help generate content, but I'm still responsible for the content I publish)
+if you think the titles and descriptions are a bit pretentious, or the tags
+(when they appear) a little OTT, blame my LLM editor. (Or actually, don't: I may
+have enlisted an LLM to help generate content, but I'm still responsible for the
+content I publish)
