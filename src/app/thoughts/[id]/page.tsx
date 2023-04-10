@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allThoughts, thoughtForId } from '../thoughts';
-import { Description } from '../../../remark/components';
+import { Description, Optional } from '../../../remark/components';
 
 import type { Metadata } from 'next';
 
@@ -46,14 +46,7 @@ export async function generateStaticParams() {
   }));
 }
 
-const Optional = ({
-  children,
-  text,
-}: React.PropsWithChildren<{ text?: string }>) => (
-  <>{text ? <span>{children}</span> : null}</>
-);
-
-const Revisions = ({ date, url }: { date: string; url: string }) => (
+const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
   <div className="revisions">
     <Optional text={date}>
       <a href={GITHUB_URL(url)}>Date:&nbsp;{date}</a>

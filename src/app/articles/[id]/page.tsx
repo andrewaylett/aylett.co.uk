@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allArticles, aritcleForId } from '../articles';
-import { Description } from '../../../remark/components';
+import { Description, Optional } from '../../../remark/components';
 
 import type { Metadata } from 'next';
 
@@ -42,38 +42,21 @@ export async function generateStaticParams() {
   }));
 }
 
-const Optional = ({
-  children,
-  text,
-}: React.PropsWithChildren<{ text?: string }>) => (
-  <>{text ? <span>{children}</span> : null}</>
-);
-
-const Revisions = ({
-  expires,
-  revised,
-  revision,
-  url,
-}: {
+const Revisions: React.FC<{
   expires?: string;
   revised: string;
   revision?: string;
   url: string;
-}) => (
-  <>
-    {revision || revised || expires ? (
-      <div className="revisions">
-        <Optional text={revision}>Version:&nbsp;{revision}</Optional>
-        <Optional text={revised}>
-          <a href={GITHUB_URL(url)}>Last Revised:&nbsp;{revised}</a>
-        </Optional>
-        <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
-      </div>
-    ) : (
-      ''
-    )}
-  </>
-);
+}> = ({ expires, revised, revision, url }) =>
+  revision || revised || expires ? (
+    <div className="revisions">
+      <Optional text={revision}>Version:&nbsp;{revision}</Optional>
+      <Optional text={revised}>
+        <a href={GITHUB_URL(url)}>Last Revised:&nbsp;{revised}</a>
+      </Optional>
+      <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
+    </div>
+  ) : null;
 
 // noinspection JSUnusedGlobalSymbols
 export default async function Article({
@@ -94,10 +77,8 @@ export default async function Article({
         <h1>{metadata.title}</h1>
         {metadata.abstract ? metadata.abstract : ''}
         <div className="meta">
-          {metadata.author ? (
+          {metadata.author && (
             <div className="author">Author: {metadata.author}</div>
-          ) : (
-            ''
           )}
           <Revisions url={`/articles/${id}`} {...metadata} />
           <Description metadata={metadata} />

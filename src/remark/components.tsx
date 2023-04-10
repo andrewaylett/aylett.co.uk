@@ -18,15 +18,24 @@ export const components: ComponentsWithNodeOptions['components'] = {
   ),
 };
 
-export const Description = ({
+export function Description({
   metadata,
 }: {
   metadata: { description: string };
-}) => (
-  <blockquote>
-    {metadata.description}
-    <sup>
-      <Link href="/thoughts/descriptions">?</Link>
-    </sup>
-  </blockquote>
-);
+}): JSX.Element {
+  return (
+    <blockquote>
+      {metadata.description}
+      <sup>
+        <Link href="/thoughts/descriptions">?</Link>
+      </sup>
+    </blockquote>
+  );
+}
+
+export function Optional({
+  children,
+  text,
+}: React.PropsWithChildren<{ text?: string }>) {
+  return text ? <span>{children}</span> : null;
+}

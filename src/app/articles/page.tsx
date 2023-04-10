@@ -36,16 +36,16 @@ export default async function Articles(): Promise<React.ReactNode> {
             <div className={style.entry}>
               <span>
                 <Link href={`/articles/${name}`}>{metadata.title}</Link>
-                {metadata.author ? ` - ${metadata.author}` : ''}
+                {metadata.author && ` - ${metadata.author}`}
               </span>
               <span>
                 <span className={style.revision}>
-                  {metadata.revision ? `v${metadata.revision}, ` : ''}
+                  {metadata.revision && `v${metadata.revision}, `}
                   {metadata.revised.split('/')[0]}
                 </span>
-                {metadata.abstract ? ':' : ''}
+                {metadata.abstract && ':'}
               </span>
-              {metadata.abstract ? <span>{metadata.abstract}</span> : ''}
+              {metadata.abstract && <span>{metadata.abstract}</span>}
             </div>
             <Description metadata={metadata} />
           </Fragment>
