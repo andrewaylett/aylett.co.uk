@@ -39,7 +39,7 @@
     "@swc/jest": "0.2.24",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
-    "@types/node": "16.18.23",
+    "@types/node": "18.15.11",
     "@types/react": "18.0.34",
     "@types/revalidator": "0.3.8",
     "eslint": "8.38.0",
@@ -62,17 +62,17 @@
   "browserslist": {
     "production": [
       "defaults",
-      "node >= 16"
+      "node >= 18"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version",
-      "node >= 16"
+      "node >= 18"
     ]
   },
   "engines": {
-    "node": "^16"
+    "node": "^18"
   },
   "engineStrict": true
 }
