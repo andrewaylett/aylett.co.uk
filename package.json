@@ -36,7 +36,7 @@
     "@jest/globals": "29.5.0",
     "@next/eslint-plugin-next": "13.3.0",
     "@prettier/plugin-xml": "2.2.0",
-    "@swc/jest": "0.2.25",
+    "@swc/jest": "0.2.26",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@types/node": "18.15.11",
