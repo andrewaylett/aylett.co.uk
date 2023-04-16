@@ -35,6 +35,7 @@ export async function generateMetadata({
     title: metadata.title,
     authors: { name: 'Andrew Aylett', url: 'https://www.aylett.co.uk' },
     description: metadata.description,
+    keywords: metadata.tags,
   };
 }
 

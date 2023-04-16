@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     template: '%s - aylett.co.uk',
   },
   icons: '/favicon.ico',
+  publisher: 'Andrew Aylett',
 };
 
 // noinspection JSUnusedGlobalSymbols

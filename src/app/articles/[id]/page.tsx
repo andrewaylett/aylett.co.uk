@@ -31,6 +31,7 @@ export async function generateMetadata({
     title: metadata.title,
     authors: [{ name: metadata.author }],
     description: metadata.description,
+    keywords: metadata.tags,
   };
 }
 
