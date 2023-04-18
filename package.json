@@ -55,6 +55,7 @@
   },
   "overrides": {
     "react": "$react",
+    "react-dom": "$react-dom",
     "next-plausible": {
       "next": "$next"
     }

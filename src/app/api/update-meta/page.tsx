@@ -1,21 +1,25 @@
 import * as React from 'react';
-import { Fragment } from 'react';
+import { Fragment, Suspense, useMemo, use } from 'react';
 
+import Link from 'next/link';
 import { stringify } from 'yaml';
 
-import { run } from './update-meta';
+import { Entry, run } from './update-meta';
 
 import 'server-only';
 
-function M({
-  m,
-}: {
-  m: { title: string; description: string; tags: string[] };
-}) {
-  const { description, tags, title, ...rest } = m;
+function M({ m }: { m: AsyncGenerator<Entry> }) {
+  const [cur, next] = useMemo(() => [m.next(), m], [m]);
+  const { done, value } = use(cur);
+  if (done) {
+    return <Fragment />;
+  }
+  const { description, tags, title, url, ...rest } = value;
   return (
     <>
-      <h1>{title}</h1>
+      <h1>
+        <Link href={url}>{title}</Link>
+      </h1>
       <dl>
         <dt>Description</dt>
         <dd>{description}</dd>
@@ -28,18 +32,19 @@ function M({
           </Fragment>
         ))}
       </dl>
+      <Suspense fallback="Loading">
+        <M m={next} />
+      </Suspense>
     </>
   );
 }
 
 // noinspection JSUnusedGlobalSymbols
 export default async function Meta(): Promise<React.ReactNode> {
-  const meta = await run();
+  const meta = run();
   return (
-    <>
-      {meta.map((m) => (
-        <M key={m.title} m={m} />
-      ))}
-    </>
+    <Suspense fallback={'Loading'}>
+      <M m={meta} />
+    </Suspense>
   );
 }

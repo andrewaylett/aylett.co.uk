@@ -9,26 +9,34 @@ import remarkStringify from 'remark-stringify';
 import { baseProcessor, intoText } from '../../../remark/process_markdown';
 import { traverse } from '../../../remark/traverse';
 
-export async function run() {
+export type Entry = {
+  title: string;
+  description: string;
+  tags: string[];
+  url: string;
+};
+
+export async function* run() {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
   const openai = new OpenAIApi(configuration);
 
-  return [
-    ...(await processDirectory('thoughts', openai)),
-    ...(await processDirectory('articles', openai)),
-  ];
+  yield* processDirectory('thoughts', openai);
+  yield* processDirectory('articles', openai);
 }
 
-async function processDirectory(dir: string, openai: OpenAIApi) {
+async function* processDirectory(
+  dir: string,
+  openai: OpenAIApi
+): AsyncGenerator<Entry> {
   const mdFiles = traverse(dir);
-  const entries: { title: string; description: string; tags: string[] }[] = [];
   for await (const mdFile of mdFiles) {
     const vfile = await intoText(mdFile.vfile);
     const { frontMatter } = vfile.data;
 
     const metadata = parse(frontMatter?.value ?? '');
+    metadata.url = `/${dir}/${mdFile.id}`;
 
     if (
       process.env.NODE_ENV === 'development' &&
@@ -85,7 +93,7 @@ async function processDirectory(dir: string, openai: OpenAIApi) {
       } catch (e) {
         throw new Error(`Could not parse YAML from ${yamlLines}`, { cause: e });
       }
-      const replacementMetadata = { ...metadata, ...yaml, ...metadata };
+      const replacementMetadata: Entry = { ...metadata, ...yaml, ...metadata };
       const replacementYaml = stringify(replacementMetadata);
       vfile.data.frontMatter = {
         type: 'yaml',
@@ -103,10 +111,9 @@ async function processDirectory(dir: string, openai: OpenAIApi) {
         .process(vfile);
 
       await write(vfile);
-      entries.push(replacementMetadata);
+      yield replacementMetadata;
     } else {
-      entries.push(metadata);
+      yield metadata;
     }
   }
-  return entries;
 }

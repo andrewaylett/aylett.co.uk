@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ReactElement, Suspense, use, useMemo } from 'react';
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -60,20 +61,29 @@ const Revisions: React.FC<{
   ) : null;
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Article({
+export default function article({
   params,
 }: {
   params: { id: string };
-}): Promise<React.ReactNode> {
-  const page = await aritcleForId(params.id);
-
-  const { content, id, metadata } = page;
-
+}): React.ReactNode {
   return (
     <div className="mdx">
       <nav>
         <Link href="/">Home</Link> | <Link href="/articles">Articles</Link>
       </nav>
+      <Suspense fallback="Loading">
+        <ArticlePage id={params.id} />
+      </Suspense>
+    </div>
+  );
+}
+
+function ArticlePage({ id }: { id: string }): ReactElement {
+  const page = useMemo(() => aritcleForId(id), [id]);
+  const { content, metadata } = use(page);
+
+  return (
+    <>
       <header>
         <h1>{metadata.title}</h1>
         {metadata.abstract ? metadata.abstract : ''}
@@ -90,6 +100,6 @@ export default async function Article({
         author={metadata.author}
         copyright={metadata.copyright || metadata.revised.split('/')[0]}
       />
-    </div>
+    </>
   );
 }
