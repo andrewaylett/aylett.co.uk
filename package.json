@@ -40,7 +40,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@types/node": "18.15.13",
-    "@types/react": "18.0.37",
+    "@types/react": "18.0.38",
     "@types/revalidator": "0.3.8",
     "eslint": "8.38.0",
     "eslint-config-andrewaylett": "2.2.0",
