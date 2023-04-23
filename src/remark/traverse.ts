@@ -1,12 +1,14 @@
 import * as path from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
 
+import { ReactElement } from 'react';
+
 import { read } from 'to-vfile';
 import { parse } from 'yaml';
 import { validate } from 'revalidator';
 import { JSONSchema7 } from 'json-schema';
 
-import { MDPage, TypeFrom } from '../types';
+import { TypeFrom } from '../types';
 
 import { intoReact } from './process_markdown';
 
@@ -17,7 +19,7 @@ import JSONSchema = Revalidator.JSONSchema;
 type MDFile = {
   path: string;
   id: string;
-  vfile: VFile;
+  vfile: Promise<VFile>;
 };
 
 async function findProjectDirectory(): Promise<string> {
@@ -34,49 +36,70 @@ async function findProjectDirectory(): Promise<string> {
   throw new Error(`Could not find project directory from ${process.cwd()}`);
 }
 
-export async function* traverse(dir: string): AsyncGenerator<MDFile> {
+export async function traverse(dir: string): Promise<MDFile[]> {
   const app = path.resolve(await findProjectDirectory(), 'src/app');
   const target = path.join(app, dir);
   const filenames = await readdir(target);
-  for (const filename of filenames) {
-    const fullPath = path.join(target, filename);
-    const { ext, name } = path.parse(filename);
-    const stats = await stat(fullPath);
-    if (ext.startsWith('.md') && stats.isFile()) {
-      yield {
-        path: fullPath,
-        id: name,
-        vfile: await read(fullPath),
-      };
+  const filesAndStats = await Promise.all(
+    filenames.map(async (filename) => {
+      const fullPath = path.join(target, filename);
+      const { ext, name } = path.parse(filename);
+      return { ext, fullPath, name, stats: await stat(fullPath) };
+    })
+  );
+  function* gen() {
+    for (const { ext, fullPath, name, stats } of filesAndStats.flat()) {
+      if (ext.startsWith('.md') && stats.isFile()) {
+        yield {
+          path: fullPath,
+          id: name,
+          vfile: read(fullPath),
+        };
+      }
     }
   }
+
+  return [...gen()];
+}
+
+export class Markdown<
+  Schema extends JSONSchema7,
+  Metadata extends TypeFrom<Schema> = TypeFrom<Schema>
+> {
+  constructor(private mdFile: MDFile, schema: Schema) {
+    this.id = mdFile.id;
+    const vfile = mdFile.vfile.then(intoReact);
+    this.content = vfile.then((v) => v.result);
+    this.metadata = vfile.then((v) => {
+      const node = v.data.frontMatter;
+
+      if (node) {
+        const parsed: unknown = parse(node.value);
+        const { errors, valid } = validate(
+          parsed,
+          schema as JSONSchema<unknown>
+        );
+        if (valid) {
+          return parsed as Metadata;
+        } else {
+          throw new Error(`Invalid YAML: ${errors}`);
+        }
+      } else {
+        throw new Error('No metadata found');
+      }
+    });
+  }
+
+  id: string;
+  content: Promise<ReactElement<unknown>>;
+  metadata: Promise<Metadata>;
 }
 
 export async function findMarkdown<T extends JSONSchema7>(
   dir: string,
   schema: T
-): Promise<Array<MDPage<TypeFrom<T>>>> {
-  const mdFiles = traverse(dir);
-  const entries: MDPage<TypeFrom<T>>[] = [];
-  for await (const mdFile of mdFiles) {
-    const vfile = await intoReact(mdFile.vfile);
-    const reactContent = vfile.result;
-    const node = vfile.data.frontMatter;
+): Promise<Markdown<T>[]> {
+  const mdFiles = await traverse(dir);
 
-    if (node) {
-      const parsed: unknown = parse(node.value);
-      const { errors, valid } = validate(parsed, schema as JSONSchema<unknown>);
-      if (valid) {
-        entries.push({
-          id: mdFile.id,
-          content: reactContent,
-          metadata: parsed as TypeFrom<T>,
-        });
-      } else {
-        throw new Error(`Invalid YAML: ${errors}`);
-      }
-    }
-  }
-
-  return entries;
+  return mdFiles.map((f) => new Markdown(f, schema));
 }

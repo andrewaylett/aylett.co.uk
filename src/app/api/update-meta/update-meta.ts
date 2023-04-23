@@ -26,13 +26,109 @@ export async function* run() {
   yield* processDirectory('articles', openai);
 }
 
+class VisiblePromise<T> implements Promise<T> {
+  #promise: Promise<T>;
+  #resolved = false;
+  [Symbol.toStringTag] = 'VisiblePromise';
+
+  get resolved() {
+    return this.#resolved;
+  }
+
+  #resolve() {
+    this.#resolved = true;
+  }
+
+  then: typeof Promise<T>['prototype']['then'];
+  catch: typeof Promise<T>['prototype']['catch'];
+  finally: typeof Promise<T>['prototype']['finally'];
+
+  constructor(promise: PromiseLike<T>) {
+    this.#promise = Promise.resolve(promise);
+    this.#promise.then(this.#resolve.bind(this));
+
+    this.then = this.#promise.then.bind(this.#promise);
+    this.catch = this.#promise.catch.bind(this.#promise);
+    this.finally = this.#promise.finally.bind(this.#promise);
+  }
+}
+
+type Accum<T> = [null | VisiblePromise<T>, VisiblePromise<T>[]];
+
+function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
+  if (orig instanceof VisiblePromise<T>) {
+    return orig;
+  } else {
+    return new VisiblePromise<T>(orig);
+  }
+}
+
+async function nextResolved<T>(
+  input: PromiseLike<T>[]
+): Promise<[T, Promise<T>[]]> {
+  return nextResolvedImpl(input, false);
+}
+
+async function nextResolvedImpl<T>(
+  input: PromiseLike<T>[],
+  recursing: boolean
+): Promise<[T, Promise<T>[]]> {
+  // Safety check
+  if (input.length == 0) {
+    // Match the behaviour of Promise.any()
+    throw new AggregateError([], 'No promises were passed in');
+  }
+
+  const visible = input.map(makeVisible);
+
+  const [val, rest] = visible.reduce(
+    ([val, rest]: Accum<T>, next): Accum<T> => {
+      if (val) {
+        return [val, [...rest, next]];
+      }
+
+      if (next.resolved) {
+        return [next, rest];
+      }
+
+      return [null, [...rest, next]];
+    },
+    [null, []]
+  );
+
+  if (val) {
+    return [await val, rest];
+  }
+
+  // Safety check
+  if (recursing) {
+    throw new Error('Failed to find a resolved promise after Promise.any()');
+  }
+
+  await Promise.any(rest);
+
+  // Recursion: as least one of `rest` has now resolved, so we will exit early
+  return nextResolvedImpl(rest, true);
+}
+
+async function* yieldWhenResolved<T>(
+  input: PromiseLike<T>[]
+): AsyncGenerator<T> {
+  let [next, rest] = await nextResolved(input);
+  yield next;
+  while (rest.length > 0) {
+    [next, rest] = await nextResolved(rest);
+    yield next;
+  }
+}
+
 async function* processDirectory(
   dir: string,
   openai: OpenAIApi
 ): AsyncGenerator<Entry> {
-  const mdFiles = traverse(dir);
-  for await (const mdFile of mdFiles) {
-    const vfile = await intoText(mdFile.vfile);
+  const mdFiles = await traverse(dir);
+  const mdPromises = mdFiles.map(async (mdFile): Promise<Entry> => {
+    const vfile = await intoText(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
     const metadata = parse(frontMatter?.value ?? '');
@@ -111,9 +207,10 @@ async function* processDirectory(
         .process(vfile);
 
       await write(vfile);
-      yield replacementMetadata;
+      return replacementMetadata;
     } else {
-      yield metadata;
+      return metadata;
     }
-  }
+  });
+  yield* yieldWhenResolved(mdPromises);
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Suspense, use } from 'react';
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -7,6 +8,8 @@ import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
 import { allThoughts, thoughtForId } from '../thoughts';
 import { Description, Optional } from '../../../remark/components';
+import { Markdown } from '../../../remark/traverse';
+import { ThoughtSchema, TypeFrom } from '../../../types';
 
 import type { Metadata } from 'next';
 
@@ -29,7 +32,7 @@ export async function generateMetadata({
     notFound();
   }
 
-  const { metadata } = page;
+  const metadata = await page.metadata;
 
   return {
     title: metadata.title,
@@ -56,30 +59,54 @@ const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
 );
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Article({
+export default function article({
   params,
 }: {
   params: { id: string };
-}): Promise<React.ReactNode> {
-  const page = await thoughtForId(params.id);
+}): React.ReactNode {
+  const page = thoughtForId(params.id);
+  return (
+    <Suspense>
+      <Thought page={page} />
+    </Suspense>
+  );
+}
 
-  const { content, id, metadata } = page;
+function Thought({ page }: { page: Promise<Markdown<typeof ThoughtSchema>> }) {
+  const { content, id, metadata } = use(page);
 
   return (
     <div className="mdx">
       <nav>
         <Link href="/">Home</Link> | <Link href="/thoughts">Thoughts</Link>
       </nav>
-      <header>
-        <h1>{metadata.title}</h1>
-        <div className="meta">
-          <Link href="/articles/thoughts">What is this?</Link>
-          <Revisions url={`/thoughts/${id}`} {...metadata} />
-        </div>
-        <Description metadata={metadata} />
-      </header>
-      <main id={id}>{content}</main>
-      <Footer author="Andrew Aylett" copyright={metadata.date.split('/')[0]} />
+      <ThoughtHeader id={id} metadata={metadata} />
+      <Suspense>
+        <main id={id}>{use(content)}</main>
+        <Footer
+          author="Andrew Aylett"
+          copyright={use(metadata).date.split('/')[0]}
+        />
+      </Suspense>
     </div>
+  );
+}
+
+function ThoughtHeader({
+  id,
+  metadata,
+}: {
+  id: string;
+  metadata: Promise<TypeFrom<typeof ThoughtSchema>>;
+}) {
+  return (
+    <header>
+      <h1>{use(metadata).title}</h1>
+      <div className="meta">
+        <Link href="/articles/thoughts">What is this?</Link>
+        <Revisions url={`/thoughts/${id}`} {...use(metadata)} />
+      </div>
+      <Description metadata={metadata} />
+    </header>
   );
 }

@@ -13,6 +13,7 @@ module.exports = withPlausibleProxy()(
         swcMinify: true,
         reactStrictMode: true,
         pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+        productionBrowserSourceMaps: true,
         // productionBrowserSourceMaps: true,
         async headers() {
             /** @type {{ key: string; value: string; }[]} */

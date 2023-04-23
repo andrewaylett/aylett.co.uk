@@ -2,11 +2,10 @@ import * as React from 'react';
 import { ReactElement, Suspense, use, useMemo } from 'react';
 
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 import { GITHUB_URL } from '../../../github';
 import Footer from '../../footer';
-import { allArticles, aritcleForId } from '../articles';
+import { allArticles, articleForId } from '../articles';
 import { Description, Optional } from '../../../remark/components';
 
 import type { Metadata } from 'next';
@@ -24,9 +23,9 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const page = await aritcleForId(params.id ?? notFound());
+  const page = await articleForId(params.id);
 
-  const { metadata } = page;
+  const metadata = await page.metadata;
 
   return {
     title: metadata.title,
@@ -79,27 +78,33 @@ export default function article({
 }
 
 function ArticlePage({ id }: { id: string }): ReactElement {
-  const page = useMemo(() => aritcleForId(id), [id]);
+  const page = useMemo(() => articleForId(id), [id]);
   const { content, metadata } = use(page);
 
   return (
     <>
-      <header>
-        <h1>{metadata.title}</h1>
-        {metadata.abstract ? metadata.abstract : ''}
-        <div className="meta">
-          {metadata.author && (
-            <div className="author">Author: {metadata.author}</div>
-          )}
-          <Revisions url={`/articles/${id}`} {...metadata} />
-          <Description metadata={metadata} />
-        </div>
-      </header>
-      <main id={id}>{content}</main>
-      <Footer
-        author={metadata.author}
-        copyright={metadata.copyright || metadata.revised.split('/')[0]}
-      />
+      <Suspense>
+        <header>
+          <h1>{use(metadata).title}</h1>
+          {use(metadata).abstract ? use(metadata).abstract : ''}
+          <div className="meta">
+            {use(metadata).author && (
+              <div className="author">Author: {use(metadata).author}</div>
+            )}
+            <Revisions url={`/articles/${id}`} {...use(metadata)} />
+            <Description metadata={metadata} />
+          </div>
+        </header>
+      </Suspense>
+      <Suspense>
+        <main id={id}>{use(content)}</main>
+        <Footer
+          author={use(metadata).author}
+          copyright={
+            use(metadata).copyright || use(metadata).revised.split('/')[0]
+          }
+        />
+      </Suspense>
     </>
   );
 }

@@ -14,6 +14,17 @@ function M({ m }: { m: AsyncGenerator<Entry> }) {
   if (done) {
     return <Fragment />;
   }
+  return (
+    <>
+      <Entry value={value} />
+      <Suspense fallback="Loading">
+        <M m={next} />
+      </Suspense>
+    </>
+  );
+}
+
+function Entry({ value }: { value: Entry }) {
   const { description, tags, title, url, ...rest } = value;
   return (
     <>
@@ -32,9 +43,6 @@ function M({ m }: { m: AsyncGenerator<Entry> }) {
           </Fragment>
         ))}
       </dl>
-      <Suspense fallback="Loading">
-        <M m={next} />
-      </Suspense>
     </>
   );
 }

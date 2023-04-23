@@ -1,5 +1,3 @@
-import type { ReactElement } from 'react';
-
 import { JSONSchema7 } from 'json-schema';
 
 export const ArticleSchema = {
@@ -39,15 +37,3 @@ export type TypeFrom<Schema> = Schema extends {
   : Schema extends { type: 'number' }
   ? number
   : never;
-
-export type ThoughtMetadata = TypeFrom<typeof ThoughtSchema>;
-export type ArticleMetadata = TypeFrom<typeof ArticleSchema>;
-
-export interface MDPage<T> {
-  metadata: T;
-  content: ReactElement;
-  id: string;
-}
-
-export type Thought = MDPage<ThoughtMetadata>;
-export type Article = MDPage<ArticleMetadata>;

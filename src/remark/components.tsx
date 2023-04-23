@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { use } from 'react';
 
 import { ComponentsWithNodeOptions } from 'rehype-react/lib/complex-types';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ export const components: ComponentsWithNodeOptions['components'] = {
     <h1
       id={node.content
         ?.toString()
-        .replaceAll(/[ ]/g, '-')
+        .replaceAll(/ /g, '-')
         .toLowerCase()
         .replaceAll(/[^a-z0-9-]/g, '')}
     >
@@ -21,11 +22,11 @@ export const components: ComponentsWithNodeOptions['components'] = {
 export function Description({
   metadata,
 }: {
-  metadata: { description: string };
+  metadata: Promise<{ description: string }>;
 }): JSX.Element {
   return (
     <blockquote>
-      {metadata.description}
+      {use(metadata).description}
       <sup>
         <Link href="/thoughts/descriptions">?</Link>
       </sup>

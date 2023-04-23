@@ -1,10 +1,13 @@
 import * as React from 'react';
-import { Fragment } from 'react';
+import { Suspense, use } from 'react';
 
 import Link from 'next/link';
 
 import Footer from '../footer';
 import { Description } from '../../remark/components';
+import { ArticleSchema, TypeFrom } from '../../types';
+import { Markdown } from '../../remark/traverse';
+import { asyncSortByKey } from '../../sort_by';
 
 import { allArticles } from './articles';
 
@@ -20,8 +23,8 @@ export const metadata: Metadata = {
 };
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Articles(): Promise<React.ReactNode> {
-  const pages = await allArticles();
+export default function articles(): React.ReactNode {
+  const pages = allArticles();
   return (
     <div className={style.page}>
       <nav>
@@ -30,28 +33,59 @@ export default async function Articles(): Promise<React.ReactNode> {
       <header>
         <h1>Articles</h1>
       </header>
-      <main>
-        {pages.map(({ id: name, metadata }) => (
-          <Fragment key={name}>
-            <div className={style.entry}>
-              <span>
-                <Link href={`/articles/${name}`}>{metadata.title}</Link>
-                {metadata.author && ` - ${metadata.author}`}
-              </span>
-              <span>
-                <span className={style.revision}>
-                  {metadata.revision && `v${metadata.revision}, `}
-                  {metadata.revised.split('/')[0]}
-                </span>
-                {metadata.abstract && ':'}
-              </span>
-              {metadata.abstract && <span>{metadata.abstract}</span>}
-            </div>
-            <Description metadata={metadata} />
-          </Fragment>
-        ))}
-      </main>
+      <Suspense fallback="Rendering...">
+        <Articles pages={pages} />
+      </Suspense>
       <Footer author="Andrew Aylett" />
     </div>
+  );
+}
+
+function Articles({
+  pages,
+}: {
+  pages: Promise<Markdown<typeof ArticleSchema>[]>;
+}) {
+  const resolved = use(pages);
+  const sorted = use(
+    asyncSortByKey(resolved, async (page) => (await page.metadata).title)
+  );
+  return (
+    <main>
+      {sorted.map(({ id: name, metadata }) => (
+        <Suspense key={name}>
+          <Entry name={name} metadata={metadata} />
+        </Suspense>
+      ))}
+    </main>
+  );
+}
+
+function Entry({
+  metadata,
+  name,
+}: {
+  metadata: Promise<TypeFrom<typeof ArticleSchema>>;
+  name: string;
+}) {
+  const resolved = use(metadata);
+  return (
+    <>
+      <div className={style.entry}>
+        <span>
+          <Link href={`/articles/${name}`}>{resolved.title}</Link>
+          {resolved.author && ` - ${resolved.author}`}
+        </span>
+        <span>
+          <span className={style.revision}>
+            {resolved.revision && `v${resolved.revision}, `}
+            {resolved.revised.split('/')[0]}
+          </span>
+          {resolved.abstract && ':'}
+        </span>
+        {resolved.abstract && <span>{resolved.abstract}</span>}
+      </div>
+      <Description metadata={metadata} />
+    </>
   );
 }

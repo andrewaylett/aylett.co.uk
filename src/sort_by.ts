@@ -1,7 +1,14 @@
-const sortBy = <P, Q>(array: P[], keyExtractor: (a: P) => Q): P[] =>
-  array
-    .map((entry): [Q, P] => [keyExtractor(entry), entry])
-    .sort()
-    .map(([_, entry]) => entry);
+export async function asyncSortByKey<T, K>(
+  input: T[],
+  keyExtractor: (v: T) => PromiseLike<K>
+): Promise<T[]> {
+  const withKeys = await Promise.all(
+    input.map(
+      async (item): Promise<[Awaited<K>, T]> => [await keyExtractor(item), item]
+    )
+  );
 
-export default sortBy;
+  withKeys.sort();
+
+  return withKeys.map(([_, value]) => value);
+}
