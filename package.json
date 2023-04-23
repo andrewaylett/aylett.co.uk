@@ -39,7 +39,7 @@
     "@swc/jest": "0.2.26",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
-    "@types/node": "18.15.13",
+    "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/revalidator": "0.3.8",
     "eslint": "8.39.0",
