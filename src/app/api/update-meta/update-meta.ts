@@ -27,9 +27,9 @@ export async function* run() {
 }
 
 class VisiblePromise<T> implements Promise<T> {
-  #promise: Promise<T>;
+  readonly #promise: Promise<T>;
   #resolved = false;
-  [Symbol.toStringTag] = 'VisiblePromise';
+  readonly [Symbol.toStringTag] = 'VisiblePromise';
 
   get resolved() {
     return this.#resolved;
@@ -39,9 +39,9 @@ class VisiblePromise<T> implements Promise<T> {
     this.#resolved = true;
   }
 
-  then: typeof Promise<T>['prototype']['then'];
-  catch: typeof Promise<T>['prototype']['catch'];
-  finally: typeof Promise<T>['prototype']['finally'];
+  readonly then: (typeof Promise<T>)['prototype']['then'];
+  readonly catch: (typeof Promise<T>)['prototype']['catch'];
+  readonly finally: (typeof Promise<T>)['prototype']['finally'];
 
   constructor(promise: PromiseLike<T>) {
     this.#promise = Promise.resolve(promise);
