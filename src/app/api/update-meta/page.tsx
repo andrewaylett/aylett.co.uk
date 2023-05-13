@@ -48,7 +48,7 @@ function Entry({ value }: { value: Entry }) {
 }
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Meta(): Promise<React.ReactNode> {
+export default async function Meta(): Promise<React.ReactElement> {
   const meta = run();
   return (
     <Suspense fallback={'Loading'}>
