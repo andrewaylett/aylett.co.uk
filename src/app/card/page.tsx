@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Card(): Promise<React.ReactNode> {
+export default async function Card(): Promise<React.ReactElement> {
   return (
     <div>
       <h1>Andrew and Lizzie Aylett</h1>
