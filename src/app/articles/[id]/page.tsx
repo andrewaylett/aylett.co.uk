@@ -13,9 +13,9 @@ import type { Metadata } from 'next';
 import 'server-only';
 
 // noinspection JSUnusedGlobalSymbols
-export const config = {
-  dynamicParams: false,
-};
+export const dynamicParams = false;
+// noinspection JSUnusedGlobalSymbols
+export const dynamic = 'error';
 
 // noinspection JSUnusedGlobalSymbols
 export async function generateMetadata({
