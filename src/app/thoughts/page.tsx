@@ -42,11 +42,7 @@ export default function thoughts(): React.ReactNode {
   );
 }
 
-function Thoughts({
-  pages,
-}: {
-  pages: Promise<Markdown<typeof ThoughtSchema>[]>;
-}) {
+function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
   const resolved = use(pages);
   const sorted = use(
     asyncSortByKey(resolved, async (page) => (await page.metadata).date)
@@ -69,7 +65,7 @@ function Entry({
   metadata,
   name,
 }: {
-  metadata: Promise<TypeFrom<typeof ThoughtSchema>>;
+  metadata: Promise<TypeFrom<ThoughtSchema>>;
   name: string;
 }) {
   return (

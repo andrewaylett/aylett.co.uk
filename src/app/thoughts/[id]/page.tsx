@@ -72,7 +72,7 @@ export default function article({
   );
 }
 
-function Thought({ page }: { page: Promise<Markdown<typeof ThoughtSchema>> }) {
+function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
   const { content, id, metadata } = use(page);
 
   return (
@@ -97,7 +97,7 @@ function ThoughtHeader({
   metadata,
 }: {
   id: string;
-  metadata: Promise<TypeFrom<typeof ThoughtSchema>>;
+  metadata: Promise<TypeFrom<ThoughtSchema>>;
 }) {
   return (
     <header>
