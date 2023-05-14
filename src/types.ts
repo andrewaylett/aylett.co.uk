@@ -14,6 +14,7 @@ export const ArticleSchema = {
     tags: { type: 'array', items: { type: 'string' } },
   },
 } as const satisfies JSONSchema7;
+export type ArticleSchema = typeof ArticleSchema;
 
 export const ThoughtSchema = {
   type: 'object',
@@ -24,6 +25,7 @@ export const ThoughtSchema = {
     description: { type: 'string' },
   },
 } as const satisfies JSONSchema7;
+export type ThoughtSchema = typeof ThoughtSchema;
 
 export type TypeFrom<Schema> = Schema extends {
   type: 'object';

@@ -16,7 +16,7 @@ export type Entry = {
   url: string;
 };
 
-export async function* run() {
+export async function* run(): AsyncGenerator<Entry, void, never> {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
@@ -113,7 +113,7 @@ async function nextResolvedImpl<T>(
 
 async function* yieldWhenResolved<T>(
   input: PromiseLike<T>[]
-): AsyncGenerator<T> {
+): AsyncGenerator<T, void, never> {
   let [next, rest] = await nextResolved(input);
   yield next;
   while (rest.length > 0) {
@@ -125,7 +125,7 @@ async function* yieldWhenResolved<T>(
 async function* processDirectory(
   dir: string,
   openai: OpenAIApi
-): AsyncGenerator<Entry> {
+): AsyncGenerator<Entry, void, never> {
   const mdFiles = await traverse(dir);
   const mdPromises = mdFiles.map(async (mdFile): Promise<Entry> => {
     const vfile = await intoText(await mdFile.vfile);

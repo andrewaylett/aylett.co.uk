@@ -41,11 +41,7 @@ export default function articles(): React.ReactNode {
   );
 }
 
-function Articles({
-  pages,
-}: {
-  pages: Promise<Markdown<typeof ArticleSchema>[]>;
-}) {
+function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
   const resolved = use(pages);
   const sorted = use(
     asyncSortByKey(resolved, async (page) => (await page.metadata).title)
@@ -65,7 +61,7 @@ function Entry({
   metadata,
   name,
 }: {
-  metadata: Promise<TypeFrom<typeof ArticleSchema>>;
+  metadata: Promise<TypeFrom<ArticleSchema>>;
   name: string;
 }) {
   const resolved = use(metadata);

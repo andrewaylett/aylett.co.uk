@@ -8,7 +8,7 @@ import { Entry, run } from './update-meta';
 
 import 'server-only';
 
-function M({ m }: { m: AsyncGenerator<Entry> }) {
+function M({ m }: { m: AsyncGenerator<Entry, void, never> }) {
   const [cur, next] = useMemo(() => [m.next(), m], [m]);
   const { done, value } = use(cur);
   if (done) {
