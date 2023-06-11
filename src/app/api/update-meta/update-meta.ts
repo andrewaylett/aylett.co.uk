@@ -56,7 +56,7 @@ class VisiblePromise<T> implements Promise<T> {
 type Accum<T> = [null | VisiblePromise<T>, VisiblePromise<T>[]];
 
 function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
-  if (orig instanceof VisiblePromise<T>) {
+  if (orig instanceof VisiblePromise) {
     return orig;
   } else {
     return new VisiblePromise<T>(orig);
