@@ -1,24 +1,25 @@
-import { createElement, Fragment, ReactElement } from 'react';
-
-import { Compatible, VFile } from 'vfile';
-import { Processor, unified } from 'unified';
+import * as prod from 'react/jsx-runtime';
+import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import remarkFrontmatter from 'remark-frontmatter';
-import { Root, YAML } from 'mdast';
 import { is } from 'unist-util-is';
 import gfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
-import rehypeReact, { Options as ComponentOptions } from 'rehype-react';
+import rehypeReact from 'rehype-react';
 import rehypeFormat from 'rehype-format';
 
 import { components } from './components';
+
+import type { Root, Yaml } from 'mdast';
+import type { VFile } from 'vfile';
+import type { Processor } from 'unified';
 
 declare module 'vfile' {
   // Extends the interface used by Unified, so we can use it for our own data
   // noinspection JSUnusedGlobalSymbols
   interface DataMap {
-    frontMatter: YAML;
+    frontMatter: Yaml;
   }
 }
 
@@ -38,7 +39,7 @@ export function baseProcessor(): Processor<Root, Root, Root> {
     .use(remarkFrontmatter)
     .use(() => (tree: Root, file: VFile): Root => {
       shiftIf(tree.children, (yamlnode) => {
-        if (is<YAML>(yamlnode, 'yaml')) {
+        if (is<'yaml'>(yamlnode, 'yaml')) {
           file.data.frontMatter = yamlnode;
           return true;
         }
@@ -49,17 +50,16 @@ export function baseProcessor(): Processor<Root, Root, Root> {
     .use(gfm);
 }
 
-export const intoReact: (
-  file: Compatible
-) => Promise<VFile & { result: ReactElement<unknown> }> = baseProcessor()
+// @ts-expect-error: the React types are missing.
+const production = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
+
+export const intoReact = baseProcessor()
   .use(remarkRehype)
   .use(rehypeFormat)
   .use(rehypeReact, {
-    createElement,
-    Fragment,
-    passNode: true,
     components,
-  } as ComponentOptions).process;
+    development: false,
+    ...production,
+  });
 
-export const intoText: (file: Compatible) => Promise<VFile> =
-  baseProcessor().use(remarkStringify).process;
+export const intoText = baseProcessor().use(remarkStringify);

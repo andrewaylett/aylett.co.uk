@@ -128,7 +128,7 @@ async function* processDirectory(
 ): AsyncGenerator<Entry, void, never> {
   const mdFiles = await traverse(dir);
   const mdPromises = mdFiles.map(async (mdFile): Promise<Entry> => {
-    const vfile = await intoText(await mdFile.vfile);
+    const vfile = await intoText.process(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
     const metadata = parse(frontMatter?.value ?? '');

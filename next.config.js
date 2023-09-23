@@ -1,5 +1,6 @@
 // @ts-check
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withPlausibleProxy } = require('next-plausible');
 
 /**
@@ -9,7 +10,6 @@ const { withPlausibleProxy } = require('next-plausible');
 
 module.exports = withPlausibleProxy()(
     /** @type {NextConfig} */ {
-        experimental: { appDir: true },
         swcMinify: true,
         reactStrictMode: true,
         pageExtensions: ['js', 'jsx', 'ts', 'tsx'],

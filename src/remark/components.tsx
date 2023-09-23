@@ -1,23 +1,27 @@
 import * as React from 'react';
 import { use } from 'react';
 
-import { ComponentsWithNodeOptions } from 'rehype-react/lib/complex-types';
 import Link from 'next/link';
 
+import type { Components } from 'rehype-react';
+
 // noinspection JSUnusedGlobalSymbols
-export const components: ComponentsWithNodeOptions['components'] = {
-  h1: ({ children, node }) => (
-    <h1
-      id={node.content
-        ?.toString()
-        .replaceAll(/ /g, '-')
-        .toLowerCase()
-        .replaceAll(/[^a-z0-9-]/g, '')}
-    >
-      {children}
-    </h1>
-  ),
-};
+export const components = {
+  h1: ({ children, node }) =>
+    node && node.content ? (
+      <h1
+        id={node.content
+          .toString()
+          .replaceAll(/ /g, '-')
+          .toLowerCase()
+          .replaceAll(/[^a-z0-9-]/g, '')}
+      >
+        {children}
+      </h1>
+    ) : (
+      <h1>{children}</h1>
+    ),
+} satisfies Partial<Components>;
 
 export function Description({
   metadata,

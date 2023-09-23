@@ -68,7 +68,7 @@ export class Markdown<
 > {
   constructor(private mdFile: MDFile, schema: Schema) {
     this.id = mdFile.id;
-    const vfile = mdFile.vfile.then(intoReact);
+    const vfile = mdFile.vfile.then((v) => intoReact.process(v));
     this.content = vfile.then((v) => v.result);
     this.metadata = vfile.then((v) => {
       const node = v.data.frontMatter;
