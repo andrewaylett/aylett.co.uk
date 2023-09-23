@@ -8,7 +8,7 @@ import 'server-only';
 let thoughts: undefined | Promise<Markdown<ThoughtSchema>[]>;
 
 export async function thoughtForId(
-  id: string
+  id: string,
 ): Promise<Markdown<ThoughtSchema>> {
   const pages = await allThoughts();
   return pages.find((page) => page.id === id) ?? notFound();

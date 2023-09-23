@@ -8,7 +8,7 @@ import 'server-only';
 let articles: undefined | Promise<Markdown<ArticleSchema>[]>;
 
 export async function articleForId(
-  id: string
+  id: string,
 ): Promise<Markdown<ArticleSchema>> {
   const articles = await allArticles();
   return articles.find((article) => article.id === id) ?? notFound();
