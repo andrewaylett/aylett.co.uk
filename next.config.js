@@ -73,7 +73,7 @@ module.exports = withPlausibleProxy()(
                             'report-to default',
                             'report-uri https://aylett.report-uri.com/r/d/csp/enforce',
                         ].join('; '),
-                    }
+                    },
                 );
             }
             return [
@@ -91,5 +91,5 @@ module.exports = withPlausibleProxy()(
                 },
             ];
         },
-    }
+    },
 );
