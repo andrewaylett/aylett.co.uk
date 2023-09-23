@@ -45,7 +45,7 @@ export default function thoughts(): React.ReactNode {
 function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
   const resolved = use(pages);
   const sorted = use(
-    asyncSortByKey(resolved, async (page) => (await page.metadata).date)
+    asyncSortByKey(resolved, async (page) => (await page.metadata).date),
   );
   return (
     <main>

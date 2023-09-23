@@ -64,14 +64,14 @@ function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
 }
 
 async function nextResolved<T>(
-  input: PromiseLike<T>[]
+  input: PromiseLike<T>[],
 ): Promise<[T, Promise<T>[]]> {
   return nextResolvedImpl(input, false);
 }
 
 async function nextResolvedImpl<T>(
   input: PromiseLike<T>[],
-  recursing: boolean
+  recursing: boolean,
 ): Promise<[T, Promise<T>[]]> {
   // Safety check
   if (input.length == 0) {
@@ -93,7 +93,7 @@ async function nextResolvedImpl<T>(
 
       return [null, [...rest, next]];
     },
-    [null, []]
+    [null, []],
   );
 
   if (val) {
@@ -112,7 +112,7 @@ async function nextResolvedImpl<T>(
 }
 
 async function* yieldWhenResolved<T>(
-  input: PromiseLike<T>[]
+  input: PromiseLike<T>[],
 ): AsyncGenerator<T, void, never> {
   let [next, rest] = await nextResolved(input);
   yield next;
@@ -124,7 +124,7 @@ async function* yieldWhenResolved<T>(
 
 async function* processDirectory(
   dir: string,
-  openai: OpenAIApi
+  openai: OpenAIApi,
 ): AsyncGenerator<Entry, void, never> {
   const mdFiles = await traverse(dir);
   const mdPromises = mdFiles.map(async (mdFile): Promise<Entry> => {
@@ -172,7 +172,7 @@ async function* processDirectory(
       if (!choice || response.choices.length !== 0) {
         const length = response.choices.length + (choice ? 1 : 0);
         throw new Error(
-          `Unexpected response, expected 1 choice, got ${length}`
+          `Unexpected response, expected 1 choice, got ${length}`,
         );
       }
       if (!choice.message) {

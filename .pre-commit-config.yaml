@@ -30,11 +30,11 @@ repos:
           - markdown
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v3.0.3
     hooks:
       - id: prettier
         additional_dependencies:
-          - prettier@2.8.8
+          - prettier@3.0.3
           - '@prettier/plugin-xml@2.2.0'
 
   - repo: https://github.com/python-jsonschema/check-jsonschema

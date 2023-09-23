@@ -45,7 +45,7 @@ export async function traverse(dir: string): Promise<MDFile[]> {
       const fullPath = path.join(target, filename);
       const { ext, name } = path.parse(filename);
       return { ext, fullPath, name, stats: await stat(fullPath) };
-    })
+    }),
   );
   function* gen() {
     for (const { ext, fullPath, name, stats } of filesAndStats.flat()) {
@@ -64,9 +64,12 @@ export async function traverse(dir: string): Promise<MDFile[]> {
 
 export class Markdown<
   Schema extends JSONSchema7,
-  Metadata extends TypeFrom<Schema> = TypeFrom<Schema>
+  Metadata extends TypeFrom<Schema> = TypeFrom<Schema>,
 > {
-  constructor(private mdFile: MDFile, schema: Schema) {
+  constructor(
+    private mdFile: MDFile,
+    schema: Schema,
+  ) {
     this.id = mdFile.id;
     const vfile = mdFile.vfile.then((v) => intoReact.process(v));
     this.content = vfile.then((v) => v.result);
@@ -77,7 +80,7 @@ export class Markdown<
         const parsed: unknown = parse(node.value);
         const { errors, valid } = validate(
           parsed,
-          schema as JSONSchema<unknown>
+          schema as JSONSchema<unknown>,
         );
         if (valid) {
           return parsed as Metadata;
@@ -97,7 +100,7 @@ export class Markdown<
 
 export async function findMarkdown<T extends JSONSchema7>(
   dir: string,
-  schema: T
+  schema: T,
 ): Promise<Markdown<T>[]> {
   const mdFiles = await traverse(dir);
 
