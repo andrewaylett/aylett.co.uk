@@ -3,17 +3,15 @@ import { Suspense, use } from 'react';
 
 import Link from 'next/link';
 
-import Footer from '../footer';
 import { Description } from '../../remark/components';
 import { ArticleSchema, TypeFrom } from '../../types';
 import { Markdown } from '../../remark/traverse';
 import { asyncSortByKey } from '../../sort_by';
+import { PageStructure, TitleHeader } from '../../page-structure';
 
 import { allArticles } from './articles';
 
 import type { Metadata } from 'next';
-
-import style from './articles.module.css';
 
 import 'server-only';
 
@@ -26,18 +24,12 @@ export const metadata: Metadata = {
 export default function articles(): React.ReactNode {
   const pages = allArticles();
   return (
-    <div className={style.page}>
-      <nav>
-        <Link href="/">Home</Link>
-      </nav>
-      <header>
-        <h1>Articles</h1>
-      </header>
-      <Suspense fallback="Rendering...">
-        <Articles pages={pages} />
-      </Suspense>
-      <Footer author="Andrew Aylett" />
-    </div>
+    <PageStructure
+      breadcrumbs={[]}
+      header={<TitleHeader>Articles</TitleHeader>}
+    >
+      <Articles pages={pages} />
+    </PageStructure>
   );
 }
 
@@ -67,19 +59,21 @@ function Entry({
   const resolved = use(metadata);
   return (
     <>
-      <div className={style.entry}>
-        <span>
+      <div className="flex flex-row flex-wrap gap-x-[1ch]">
+        <span className="inline-block">
           <Link href={`/articles/${name}`}>{resolved.title}</Link>
           {resolved.author && ` - ${resolved.author}`}
         </span>
-        <span>
-          <span className={style.revision}>
+        <span className="inline-block">
+          <span className="wrap-parens smaller">
             {resolved.revision && `v${resolved.revision}, `}
             {resolved.revised.split('/')[0]}
           </span>
           {resolved.abstract && ':'}
         </span>
-        {resolved.abstract && <span>{resolved.abstract}</span>}
+        {resolved.abstract && (
+          <span className="inline-block">{resolved.abstract}</span>
+        )}
       </div>
       <Description metadata={metadata} />
     </>

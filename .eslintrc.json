@@ -6,7 +6,7 @@
   },
   "overrides": [
     {
-      "files": ["next.config.js"],
+      "files": ["./*.js"],
       "env": {
         "node": true
       }

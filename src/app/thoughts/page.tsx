@@ -3,17 +3,15 @@ import { Suspense, use } from 'react';
 
 import Link from 'next/link';
 
-import Footer from '../footer';
 import { Description } from '../../remark/components';
 import { ThoughtSchema, TypeFrom } from '../../types';
 import { Markdown } from '../../remark/traverse';
 import { asyncSortByKey } from '../../sort_by';
+import { PageStructure, TitleHeader } from '../../page-structure';
 
 import { allThoughts } from './thoughts';
 
 import type { Metadata } from 'next';
-
-import style from '../articles/articles.module.css';
 
 import 'server-only';
 
@@ -27,18 +25,12 @@ export const metadata: Metadata = {
 export default function thoughts(): React.ReactNode {
   const pages = allThoughts();
   return (
-    <div className={style.page}>
-      <nav>
-        <Link href="/">Home</Link>
-      </nav>
-      <header>
-        <h1>Thoughts</h1>
-      </header>
-      <Suspense fallback="Rendering...">
-        <Thoughts pages={pages} />
-      </Suspense>
-      <Footer author="Andrew Aylett" />
-    </div>
+    <PageStructure
+      breadcrumbs={[]}
+      header={<TitleHeader>Thoughts</TitleHeader>}
+    >
+      <Thoughts pages={pages} />
+    </PageStructure>
   );
 }
 
