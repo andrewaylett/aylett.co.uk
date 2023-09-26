@@ -5,7 +5,6 @@ import PlausibleProvider from 'next-plausible';
 import type { Metadata } from 'next';
 
 import './global.css';
-import '../../node_modules/normalize.css/normalize.css';
 
 import 'server-only';
 
@@ -26,7 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }): React.ReactNode {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 fonts oldstyle-nums"
+    >
       <body>
         <PlausibleProvider
           domain="aylett.co.uk"

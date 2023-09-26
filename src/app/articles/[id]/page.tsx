@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { ReactElement, Suspense, use, useMemo } from 'react';
 
-import Link from 'next/link';
-
 import { GITHUB_URL } from '../../../github';
-import Footer from '../../footer';
 import { allArticles, articleForId } from '../articles';
 import { Description, Optional } from '../../../remark/components';
+import { PageStructure } from '../../../page-structure';
 
 import type { Metadata } from 'next';
 
@@ -50,10 +48,12 @@ const Revisions: React.FC<{
   url: string;
 }> = ({ expires, revised, revision, url }) =>
   revision || revised || expires ? (
-    <div className="revisions">
+    <div className="flex flex-row flex-wrap gap-x-[1ch]">
       <Optional text={revision}>Version:&nbsp;{revision}</Optional>
       <Optional text={revised}>
-        <a href={GITHUB_URL(url)}>Last Revised:&nbsp;{revised}</a>
+        <a className="text-inherit underline" href={GITHUB_URL(url)}>
+          Last Revised:&nbsp;{revised}
+        </a>
       </Optional>
       <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
     </div>
@@ -66,45 +66,41 @@ export default function article({
   params: { id: string };
 }): React.ReactNode {
   return (
-    <div className="mdx">
-      <nav>
-        <Link href="/">Home</Link> | <Link href="/articles">Articles</Link>
-      </nav>
-      <Suspense fallback="Loading">
-        <ArticlePage id={params.id} />
-      </Suspense>
-    </div>
+    <PageStructure
+      breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
+      header={
+        <Suspense>
+          <ArticleHeader id={params.id} />
+        </Suspense>
+      }
+    >
+      <ArticlePage id={params.id} />
+    </PageStructure>
   );
 }
 
 function ArticlePage({ id }: { id: string }): ReactElement {
   const page = useMemo(() => articleForId(id), [id]);
-  const { content, metadata } = use(page);
+  const { content } = use(page);
+
+  return <main id={id}>{use(content)}</main>;
+}
+
+function ArticleHeader({ id }: { id: string }) {
+  const page = useMemo(() => articleForId(id), [id]);
+  const { metadata } = use(page);
 
   return (
-    <>
-      <Suspense>
-        <header>
-          <h1>{use(metadata).title}</h1>
-          {use(metadata).abstract ? use(metadata).abstract : ''}
-          <div className="meta">
-            {use(metadata).author && (
-              <div className="author">Author: {use(metadata).author}</div>
-            )}
-            <Revisions url={`/articles/${id}`} {...use(metadata)} />
-            <Description metadata={metadata} />
-          </div>
-        </header>
-      </Suspense>
-      <Suspense>
-        <main id={id}>{use(content)}</main>
-        <Footer
-          author={use(metadata).author}
-          copyright={
-            use(metadata).copyright || use(metadata).revised.split('/')[0]
-          }
-        />
-      </Suspense>
-    </>
+    <header>
+      <h1 className="main-title">{use(metadata).title}</h1>
+      {use(metadata).abstract ? use(metadata).abstract : ''}
+      <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex]">
+        {use(metadata).author && (
+          <div className="author">Author: {use(metadata).author}</div>
+        )}
+        <Revisions url={`/articles/${id}`} {...use(metadata)} />
+        <Description metadata={metadata} />
+      </div>
+    </header>
   );
 }

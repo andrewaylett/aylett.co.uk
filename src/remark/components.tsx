@@ -27,7 +27,7 @@ export function Description({
   metadata,
 }: {
   metadata: Promise<{ description: string }>;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <blockquote>
       {use(metadata).description}

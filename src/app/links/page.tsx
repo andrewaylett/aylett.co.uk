@@ -1,12 +1,10 @@
 import * as React from 'react';
 
-import Link from 'next/link';
+import { PageStructure, TitleHeader } from '../../page-structure';
 
 import type { Metadata } from 'next';
 
 import 'server-only';
-
-import styles from '../index.module.css';
 
 // noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
@@ -16,19 +14,12 @@ export const metadata: Metadata = {
 // noinspection JSUnusedGlobalSymbols
 export default function Links(): React.ReactNode {
   return (
-    <div className={styles.container}>
-      <main>
-        <nav>
-          <Link href="/">Home</Link>
-        </nav>
-        <h1 className={styles.title}>Links</h1>
-
-        <p className={styles.description}>
-          <a href="https://photos.app.goo.gl/tRwdQNpn5j15PKJJ7">
-            Lizzie&apos;s Photos
-          </a>
-        </p>
-      </main>
-    </div>
+    <PageStructure breadcrumbs={[]} header={<TitleHeader>Links</TitleHeader>}>
+      <p>
+        <a href="https://photos.app.goo.gl/tRwdQNpn5j15PKJJ7">
+          Lizzie&apos;s Photos
+        </a>
+      </p>
+    </PageStructure>
   );
 }

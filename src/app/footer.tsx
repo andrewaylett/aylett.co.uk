@@ -2,13 +2,12 @@ import * as React from 'react';
 
 import { getYear } from 'date-fns';
 
-export default function Footer({
-  author,
-  copyright,
-}: {
-  author: string;
+export type FooterProps = {
+  author?: string;
   copyright?: string;
-}) {
+};
+
+export default function Footer({ author, copyright }: FooterProps) {
   return (
     <footer style={{ paddingTop: '1em' }}>
       Copyright © {author || 'Andrew Aylett'},{' '}

@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { GITHUB_URL } from '../../../github';
-import Footer from '../../footer';
 import { allThoughts, thoughtForId } from '../thoughts';
 import { Description, Optional } from '../../../remark/components';
 import { Markdown } from '../../../remark/traverse';
 import { ThoughtSchema, TypeFrom } from '../../../types';
+import { PageStructure } from '../../../page-structure';
 
 import type { Metadata } from 'next';
 
@@ -51,9 +51,11 @@ export async function generateStaticParams() {
 }
 
 const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
-  <div className="revisions">
+  <div className="flex flex-row flex-wrap gap-x-[1ch]">
     <Optional text={date}>
-      <a href={GITHUB_URL(url)}>Date:&nbsp;{date}</a>
+      <a className="text-inherit" href={GITHUB_URL(url)}>
+        Date:&nbsp;{date}
+      </a>
     </Optional>
   </div>
 );
@@ -76,19 +78,15 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
   const { content, id, metadata } = use(page);
 
   return (
-    <div className="mdx">
-      <nav>
-        <Link href="/">Home</Link> | <Link href="/thoughts">Thoughts</Link>
-      </nav>
-      <ThoughtHeader id={id} metadata={metadata} />
+    <PageStructure
+      breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
+      header={<ThoughtHeader id={id} metadata={metadata} />}
+      footer={{ copyright: use(metadata).date.split('/')[0] }}
+    >
       <Suspense>
         <main id={id}>{use(content)}</main>
-        <Footer
-          author="Andrew Aylett"
-          copyright={use(metadata).date.split('/')[0]}
-        />
       </Suspense>
-    </div>
+    </PageStructure>
   );
 }
 
@@ -101,7 +99,7 @@ function ThoughtHeader({
 }) {
   return (
     <header>
-      <h1>{use(metadata).title}</h1>
+      <h1 className="main-title">{use(metadata).title}</h1>
       <div className="meta">
         <Link href="/articles/thoughts">What is this?</Link>
         <Revisions url={`/thoughts/${id}`} {...use(metadata)} />

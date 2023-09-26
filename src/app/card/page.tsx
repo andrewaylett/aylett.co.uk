@@ -3,6 +3,8 @@ import * as React from 'react';
 
 import Link from 'next/link';
 
+import { PageStructure, TitleHeader } from '../../page-structure';
+
 import type { Metadata } from 'next';
 
 // noinspection JSUnusedGlobalSymbols
@@ -13,8 +15,10 @@ export const metadata: Metadata = {
 // noinspection JSUnusedGlobalSymbols
 export default async function Card(): Promise<React.ReactElement> {
   return (
-    <div>
-      <h1>Andrew and Lizzie Aylett</h1>
+    <PageStructure
+      breadcrumbs={[]}
+      header={<TitleHeader>Andrew and Lizzie Aylett</TitleHeader>}
+    >
       <p>Thank you for scanning one of our cards!</p>
       <p>
         You might be interested in our online presence:
@@ -47,6 +51,6 @@ export default async function Card(): Promise<React.ReactElement> {
           </li>
         </ul>
       </p>
-    </div>
+    </PageStructure>
   );
 }

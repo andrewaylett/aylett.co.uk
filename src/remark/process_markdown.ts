@@ -1,4 +1,5 @@
 import * as prod from 'react/jsx-runtime';
+import * as dev from 'react/jsx-dev-runtime';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
@@ -50,16 +51,21 @@ export function baseProcessor(): Processor<Root, Root, Root> {
     .use(gfm);
 }
 
+const development = process.env.NODE_ENV !== 'production';
+
 // @ts-expect-error: the React types are missing.
-const production = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
+const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
+// @ts-expect-error: the React types are missing.
+const devJsx = { jsxDEV: dev.jsxDEV };
 
 export const intoReact = baseProcessor()
   .use(remarkRehype)
   .use(rehypeFormat)
   .use(rehypeReact, {
     components,
-    development: false,
-    ...production,
+    development,
+    ...devJsx,
+    ...prodJsx,
   });
 
 export const intoText = baseProcessor().use(remarkStringify);
