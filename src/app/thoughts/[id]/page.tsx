@@ -1,17 +1,22 @@
 import * as React from 'react';
-import { Suspense, use } from 'react';
+import { Suspense, Usable, use } from 'react';
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { GITHUB_URL } from '../../../github';
 import { allThoughts, thoughtForId } from '../thoughts';
-import { Description, Optional } from '../../../remark/components';
+import {
+  Description,
+  Optional,
+  TitleSeparator,
+} from '../../../remark/components';
 import { Markdown } from '../../../remark/traverse';
 import { ThoughtSchema, TypeFrom } from '../../../types';
 import { PageStructure } from '../../../page-structure';
 
 import type { Metadata } from 'next';
+import type { FooterProps } from '../../footer';
 
 import 'server-only';
 
@@ -78,13 +83,21 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
   const { content, id, metadata } = use(page);
 
   return (
-    <PageStructure
+    <PageStructure<typeof page>
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
       header={<ThoughtHeader id={id} metadata={metadata} />}
-      footer={{ copyright: use(metadata).date.split('/')[0] }}
+      footer={{
+        func: (page): FooterProps => {
+          const metadata = use(use(page).metadata);
+          return {
+            copyright: metadata.date.split('/')[0],
+          };
+        },
+        input: page,
+      }}
     >
       <Suspense>
-        <main id={id}>{use(content)}</main>
+        <Use el={content} />
       </Suspense>
     </PageStructure>
   );
@@ -99,12 +112,17 @@ function ThoughtHeader({
 }) {
   return (
     <header>
-      <h1 className="main-title">{use(metadata).title}</h1>
+      <h1>{use(metadata).title}</h1>
       <div className="meta">
         <Link href="/articles/thoughts">What is this?</Link>
         <Revisions url={`/thoughts/${id}`} {...use(metadata)} />
       </div>
       <Description metadata={metadata} />
+      <TitleSeparator />
     </header>
   );
+}
+
+function Use({ el }: { el: Usable<React.JSX.Element> }): React.JSX.Element {
+  return use(el);
 }

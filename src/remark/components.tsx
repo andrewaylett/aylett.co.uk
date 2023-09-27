@@ -44,3 +44,7 @@ export function Optional({
 }: React.PropsWithChildren<{ text?: string }>) {
   return text ? <span>{children}</span> : null;
 }
+
+export function TitleSeparator() {
+  return <hr className="my-3 mx-[15%]" />;
+}

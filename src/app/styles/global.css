@@ -4,19 +4,28 @@
 
 @layer base {
     h1 {
-        font-size: 200%;
-        font-weight: 600;
+        @apply text-[200%] font-semibold;
     }
     h2 {
-        font-size: 180%;
-        font-weight: 500;
+        @apply text-[180%] font-medium;
+    }
+    h3 {
+        @apply text-[150%] font-medium;
+    }
+    h4 {
+        @apply text-[140%] font-medium;
+    }
+    h5 {
+        @apply text-[130%] font-[450];
+    }
+    h6 {
+        @apply text-[120%] font-normal before:content-['▸&nbsp;'];
     }
     a {
         @apply text-blue-800 visited:text-purple-800 dark:text-blue-200 dark:visited:text-purple-200 underline;
     }
     p {
-        @apply text-justify;
-        margin: 1ex 0;
+        @apply text-justify mx-0 my-[1ex];
     }
     ol {
         @apply list-decimal;
@@ -28,14 +37,19 @@
         @apply list-item list-inside;
     }
     nav {
-        padding-top: 1ex;
+        @apply pt-[1ex];
     }
     blockquote {
         @apply border-s-4 border-slate-300 dark:border-slate-500 ps-2 pe-3 my-[1ex];
     }
     code {
-        font-variant-numeric: tabular-nums;
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        @apply normal-nums tabular-nums font-mono;
+    }
+}
+
+@layer components {
+    header > h1:first-child {
+        @apply font-bold text-x250;
     }
 }
 
@@ -43,21 +57,7 @@
     .wrap-parens {
         @apply before:content-['('] after:content-[')'];
     }
-    .fonts {
-        font-family: 'IBM Plex Sans', Roboto, sans-serif;
-        font-size: clamp(100%, 2vmax, 125%);
-    }
-    .smaller {
-        font-size: smaller;
-    }
     .grid-cols-centre > * {
         @apply col-2;
-    }
-    .padding-std {
-        padding: clamp(0.5rem, 1vmin, 2rem);
-    }
-    .main-title {
-        font-weight: 700;
-        font-size: 250%;
     }
 }

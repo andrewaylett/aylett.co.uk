@@ -9,7 +9,7 @@ export type FooterProps = {
 
 export default function Footer({ author, copyright }: FooterProps) {
   return (
-    <footer style={{ paddingTop: '1em' }}>
+    <footer className="pt-[1em] text-smaller text-right">
       Copyright © {author || 'Andrew Aylett'},{' '}
       {copyright || getYear(Date.now())}
     </footer>

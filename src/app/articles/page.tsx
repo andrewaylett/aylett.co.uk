@@ -39,13 +39,13 @@ function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).title),
   );
   return (
-    <main>
+    <>
       {sorted.map(({ id: name, metadata }) => (
         <Suspense key={name}>
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </main>
+    </>
   );
 }
 
@@ -65,7 +65,7 @@ function Entry({
           {resolved.author && ` - ${resolved.author}`}
         </span>
         <span className="inline-block">
-          <span className="wrap-parens smaller">
+          <span className="wrap-parens text-smaller">
             {resolved.revision && `v${resolved.revision}, `}
             {resolved.revised.split('/')[0]}
           </span>

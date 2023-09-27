@@ -4,10 +4,15 @@ import Link from 'next/link';
 
 import Footer, { FooterProps } from './app/footer';
 
-export type PageStructureProps = {
+export type FooterFunc<T> = {
+  func: (input: T) => FooterProps;
+  input: T;
+};
+
+export type PageStructureProps<T> = {
   breadcrumbs: { href: string; text: string }[];
   header: React.JSX.Element;
-  footer?: FooterProps;
+  footer?: FooterFunc<T>;
 };
 
 export function TitleHeader({
@@ -15,17 +20,17 @@ export function TitleHeader({
 }: PropsWithChildren): React.JSX.Element {
   return (
     <header>
-      <h1 className="main-title">{children}</h1>
+      <h1>{children}</h1>
     </header>
   );
 }
 
-export function PageStructure({
+export function PageStructure<T = unknown>({
   breadcrumbs,
   children,
   footer,
   header,
-}: PropsWithChildren<PageStructureProps>): React.JSX.Element {
+}: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
   return (
     <div className="grid grid-cols-centre p-vmin">
       <nav className="flex flex-wrap gap-x-[1ch]">
@@ -37,8 +42,14 @@ export function PageStructure({
         ))}
       </nav>
       {header}
-      <Suspense fallback="Rendering...">{children}</Suspense>
-      <Footer {...footer} />
+      <main className="hyphens-manual">
+        <Suspense fallback="Rendering...">{children}</Suspense>
+      </main>
+      <Suspense>{footer ? <FooterGen {...footer} /> : <Footer />}</Suspense>
     </div>
   );
+}
+
+function FooterGen<T>({ func, input }: FooterFunc<T>) {
+  return <Footer {...func(input)} />;
 }
