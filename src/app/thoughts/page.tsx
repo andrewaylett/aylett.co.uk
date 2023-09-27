@@ -40,7 +40,7 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).date),
   );
   return (
-    <main>
+    <>
       <p>
         <Link href="/articles/thoughts">What is this?</Link>
       </p>
@@ -49,7 +49,7 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </main>
+    </>
   );
 }
 

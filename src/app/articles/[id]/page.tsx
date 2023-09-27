@@ -3,8 +3,15 @@ import { ReactElement, Suspense, use, useMemo } from 'react';
 
 import { GITHUB_URL } from '../../../github';
 import { allArticles, articleForId } from '../articles';
-import { Description, Optional } from '../../../remark/components';
+import {
+  Description,
+  Optional,
+  TitleSeparator,
+} from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
+import { Markdown } from '../../../remark/traverse';
+import { ArticleSchema } from '../../../types';
+import { FooterProps } from '../../footer';
 
 import type { Metadata } from 'next';
 
@@ -65,34 +72,53 @@ export default function article({
 }: {
   params: { id: string };
 }): React.ReactNode {
+  const page = useMemo(() => articleForId(params.id), [params.id]);
   return (
-    <PageStructure
+    <PageStructure<typeof page>
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
       header={
         <Suspense>
-          <ArticleHeader id={params.id} />
+          <ArticleHeader id={params.id} page={page} />
         </Suspense>
       }
+      footer={{
+        func: (page): FooterProps => {
+          const metadata = use(use(page).metadata);
+          return {
+            author: metadata.author,
+            copyright: metadata.copyright ?? metadata.revised.split('/')[0],
+          };
+        },
+        input: page,
+      }}
     >
-      <ArticlePage id={params.id} />
+      <ArticlePage page={page} />
     </PageStructure>
   );
 }
 
-function ArticlePage({ id }: { id: string }): ReactElement {
-  const page = useMemo(() => articleForId(id), [id]);
+function ArticlePage({
+  page,
+}: {
+  page: Promise<Markdown<ArticleSchema>>;
+}): ReactElement {
   const { content } = use(page);
 
-  return <main id={id}>{use(content)}</main>;
+  return use(content);
 }
 
-function ArticleHeader({ id }: { id: string }) {
-  const page = useMemo(() => articleForId(id), [id]);
+function ArticleHeader({
+  id,
+  page,
+}: {
+  id: string;
+  page: Promise<Markdown<ArticleSchema>>;
+}) {
   const { metadata } = use(page);
 
   return (
     <header>
-      <h1 className="main-title">{use(metadata).title}</h1>
+      <h1>{use(metadata).title}</h1>
       {use(metadata).abstract ? use(metadata).abstract : ''}
       <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex]">
         {use(metadata).author && (
@@ -101,6 +127,7 @@ function ArticleHeader({ id }: { id: string }) {
         <Revisions url={`/articles/${id}`} {...use(metadata)} />
         <Description metadata={metadata} />
       </div>
+      <TitleSeparator />
     </header>
   );
 }

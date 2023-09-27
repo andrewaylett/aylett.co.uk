@@ -3,6 +3,20 @@ export default {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontSize: {
+        vmax: 'clamp(100%, 2vmax, 125%)',
+        smaller: 'smaller',
+        x250: '250%',
+      },
+      fontFamily: {
+        sans: [
+          'IBM Plex Sans',
+          'var(--font-plex-sans)',
+          'Roboto',
+          'sans-serif',
+        ],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+      },
       gridTemplateColumns: {
         centre: '1fr min(65ch, 100%) 1fr',
       },
