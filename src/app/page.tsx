@@ -11,6 +11,14 @@ export const metadata: Metadata = {
     me: 'https://social.aylett.co.uk/@andrew',
   },
   description: 'Welcome to aylett.co.uk',
+  alternates: {
+    types: {
+      'application/rss+xml': [
+        { url: '/articles/rss', title: 'Articles - aylett.co.uk' },
+        { url: '/thoughts/rss', title: 'Thoughts - aylett.co.uk' },
+      ],
+    },
+  },
 };
 
 // noinspection JSUnusedGlobalSymbols

@@ -18,6 +18,13 @@ import 'server-only';
 // noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   title: 'Articles',
+  alternates: {
+    types: {
+      'application/rss+xml': [
+        { url: '/articles/rss', title: 'Articles - aylett.co.uk' },
+      ],
+    },
+  },
 };
 
 // noinspection JSUnusedGlobalSymbols
