@@ -19,6 +19,13 @@ import 'server-only';
 export const metadata: Metadata = {
   title: 'Thoughts',
   description: 'Some of the things that Andrew has been thinking about',
+  alternates: {
+    types: {
+      'application/rss+xml': [
+        { url: '/thoughts/rss', title: 'Thoughts - aylett.co.uk' },
+      ],
+    },
+  },
 };
 
 // noinspection JSUnusedGlobalSymbols
