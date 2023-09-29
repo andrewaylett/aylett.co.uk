@@ -10,10 +10,9 @@ import './styles/global.css';
 import 'server-only';
 
 const plexSans = localFont({
-  display: 'optional',
+  display: 'fallback',
   variable: '--font-plex-sans',
   preload: false,
-  adjustFontFallback: false,
   src: [
     {
       path: './styles/IBMPlexSans-Thin.woff2',
