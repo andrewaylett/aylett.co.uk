@@ -33,12 +33,15 @@ export function PageStructure<T = unknown>({
 }: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
   return (
     <div className="grid grid-cols-centre p-vmin">
-      <nav className="flex flex-wrap gap-x-[1ch]">
+      <nav>
         <Link href="/">Home</Link>
         {breadcrumbs.map(({ href, text }, idx) => (
-          <Link href={href} key={idx}>
-            {text}
-          </Link>
+          <>
+            {' ▸ '}
+            <Link href={href} key={idx}>
+              {text}
+            </Link>
+          </>
         ))}
       </nav>
       {header}
