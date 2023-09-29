@@ -1,4 +1,5 @@
 ---
+uuid: 1a847721-2828-4b5b-943c-afa2984906c7
 title: Why Christian Education?
 author: James MacInnes
 revised: 2013/06/22

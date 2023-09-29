@@ -11,6 +11,7 @@ export const ArticleSchema = {
     abstract: { type: 'string' },
     copyright: { type: 'string' },
     description: { type: 'string' },
+    uuid: { type: 'string' },
     tags: { type: 'array', items: { type: 'string' } },
   },
 } as const satisfies JSONSchema7;
@@ -22,6 +23,7 @@ export const ThoughtSchema = {
     title: { type: 'string' },
     date: { type: 'string' },
     tags: { type: 'array', items: { type: 'string' } },
+    uuid: { type: 'string' },
     description: { type: 'string' },
   },
 } as const satisfies JSONSchema7;

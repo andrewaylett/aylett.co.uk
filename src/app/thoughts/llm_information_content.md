@@ -1,4 +1,5 @@
 ---
+uuid: 9e7bd1c5-d400-45bb-ba3e-186a247b07d8
 title: 'Targeting LLM-Generated Text: An Analogy'
 author: Andrew Aylett
 date: 2023/06/05

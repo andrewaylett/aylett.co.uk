@@ -1,4 +1,5 @@
 ---
+uuid: 8aecdb22-9cb8-4250-bb4a-6a9bc14c04a5
 title: Generating metadata with GPT
 author: Andrew Aylett
 date: 2023/04/06

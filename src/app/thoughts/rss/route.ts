@@ -20,15 +20,20 @@ export async function GET() {
   );
 
   for (const article of sorted) {
+    const content = await article.content;
     const metadata = await article.metadata;
+    const { renderToStaticMarkup } = await import('react-dom/server');
+    const description = renderToStaticMarkup(content);
+    const { date, tags: categories, title, uuid: guid } = metadata;
+
     feed.item({
-      title: metadata.title,
-      url: `https://www.aylett.co.uk/thoughts/${article.id}`,
-      guid: `https://www.aylett.co.uk/thoughts/${article.id}`,
-      date: new Date(metadata.date).toISOString(),
-      description: metadata.description,
       author: 'Andrew Aylett',
-      categories: metadata.tags,
+      categories,
+      date,
+      description,
+      guid,
+      title,
+      url: `https://www.aylett.co.uk/thoughts/${article.id}`,
     });
   }
 

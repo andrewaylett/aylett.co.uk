@@ -1,4 +1,5 @@
 ---
+uuid: 5498f975-bf46-4789-a786-152f4a00d903
 author: Andrew Aylett
 date: 2023/04/23
 title: TLS Termination Delegation in Browsers

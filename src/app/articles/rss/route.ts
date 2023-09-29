@@ -21,14 +21,26 @@ export async function GET() {
 
   for (const article of sorted) {
     const metadata = await article.metadata;
+
+    const content = await article.content;
+    const { renderToStaticMarkup } = await import('react-dom/server');
+    const description = renderToStaticMarkup(content);
+    const {
+      author,
+      revised: date,
+      tags: categories,
+      title,
+      uuid: guid,
+    } = metadata;
+
     feed.item({
-      title: metadata.title,
+      author,
+      categories,
+      date,
+      description,
+      guid,
+      title,
       url: `https://www.aylett.co.uk/articles/${article.id}`,
-      guid: `https://www.aylett.co.uk/articles/${article.id}`,
-      date: new Date(metadata.revised).toISOString(),
-      description: metadata.description,
-      author: metadata.author,
-      categories: metadata.tags,
     });
   }
 

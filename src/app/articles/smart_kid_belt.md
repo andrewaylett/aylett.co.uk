@@ -1,4 +1,5 @@
 ---
+uuid: 393225ae-84a1-456e-88db-6195fe8f6492
 title: Smart Kid Belt
 author: Andrew Aylett
 revision: '1.0'
