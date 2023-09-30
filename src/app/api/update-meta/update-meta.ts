@@ -1,13 +1,14 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 import { parse, stringify } from 'yaml';
-import { CreateChatCompletionResponse } from 'openai/api';
-import { VFile } from 'vfile';
-import { Root } from 'mdast';
 import { write } from 'to-vfile';
 import remarkStringify from 'remark-stringify';
 
 import { baseProcessor, intoText } from '../../../remark/process_markdown';
 import { traverse } from '../../../remark/traverse';
+
+import type { Root } from 'mdast';
+import type { VFile } from 'vfile';
+import type { ClientOptions } from 'openai';
 
 export type Entry = {
   title: string;
@@ -17,10 +18,15 @@ export type Entry = {
 };
 
 export async function* run(): AsyncGenerator<Entry, void, never> {
-  const configuration = new Configuration({
+  const configuration = {
     apiKey: process.env.OPENAI_API_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+  } satisfies ClientOptions;
+
+  if (!configuration.apiKey) {
+    return;
+  }
+
+  const openai = new OpenAI(configuration);
 
   yield* processDirectory('thoughts', openai);
   yield* processDirectory('articles', openai);
@@ -124,7 +130,7 @@ async function* yieldWhenResolved<T>(
 
 async function* processDirectory(
   dir: string,
-  openai: OpenAIApi,
+  openai: OpenAI,
 ): AsyncGenerator<Entry, void, never> {
   const mdFiles = await traverse(dir);
   const mdPromises = mdFiles.map(async (mdFile): Promise<Entry> => {
@@ -142,7 +148,7 @@ async function* processDirectory(
 
       console.log(markdown);
 
-      const completion = await openai.createChatCompletion({
+      const completion = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
           {
@@ -167,10 +173,9 @@ async function* processDirectory(
         ],
       });
 
-      const response: CreateChatCompletionResponse = completion.data;
-      const choice = response.choices.pop();
-      if (!choice || response.choices.length !== 0) {
-        const length = response.choices.length + (choice ? 1 : 0);
+      const choice = completion.choices.pop();
+      if (!choice || completion.choices.length !== 0) {
+        const length = completion.choices.length + (choice ? 1 : 0);
         throw new Error(
           `Unexpected response, expected 1 choice, got ${length}`,
         );
@@ -178,7 +183,7 @@ async function* processDirectory(
       if (!choice.message) {
         throw new Error('No message in response');
       }
-      const yamlblock = choice.message.content;
+      const yamlblock = choice.message.content ?? '';
       const lines = yamlblock.split('\n');
       // GPT has a habit of returning YAML in a Markdown block
       const yamlLines = lines.filter((line) => !line.startsWith('```'));
