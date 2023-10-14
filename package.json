@@ -31,7 +31,7 @@
     "server-only": "0.0.1",
     "to-vfile": "8.0.0",
     "unified": "11.0.3",
-    "yaml": "2.3.2"
+    "yaml": "2.3.3"
   },
   "devDependencies": {
     "@jest/globals": "29.7.0",
