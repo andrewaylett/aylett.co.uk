@@ -3,7 +3,7 @@ title: Document Expiry
 author: Andrew Aylett
 revision: '1.0'
 revised: 2020/09/13
-expires: 2023/09/13
+expires: 2026/09/13
 abstract: The world changes; is this still relevant?
 description:
     Learn why it's important to understand whether online content is current or

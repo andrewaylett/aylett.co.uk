@@ -20,8 +20,8 @@ tags:
 
 We face a challenge in assessing the ecological impact of the things we do: some
 emissions are entirely under our control, while others are less so. For most
-people, the biggest potential environmental impact isn&apos;t from what we do
-directly, it&apos;s from what we buy.
+people, the biggest potential environmental impact isn't from what we do
+directly, it's from what we buy.
 
 ## What is Scope Three?
 
@@ -32,9 +32,9 @@ to our scope one emissions.
 Scope Two emissions are caused in the process of delivering our energy supply.
 Electrical power, gas distribution, and petrol supplies.
 
-Scope Three is everything else. Which is a <em>lot</em>: all the scope one and
-two emissions for every company that sells you anything, plus all <em>their</em>
-scope three emissions.
+Scope Three is everything else. Which is a _lot_: all the scope one and two
+emissions for every company that sells you anything, plus all _their_ scope
+three emissions.
 
 Keeping track of our scope three emissions is really hard. A motivated consumer
 may be able to glean some insight into the behaviour of the companies they buy
@@ -49,8 +49,8 @@ these emissions.
 
 Our scope three emissions are primarily under the control of our suppliers.
 
-> We can &mdash; to a degree &mdash; control the amount of our scope three
-> emissions by choosing the right suppliers. But this is hard.
+> We can—to a degree—control the amount of our scope three emissions by choosing
+> the right suppliers. But this is hard.
 
 All our emissions are scope three emissions for our customers.
 
@@ -58,9 +58,8 @@ All our emissions are scope three emissions for our customers.
 
 A supplier is better-placed to account for emissions than a customer.
 
-> Especially when offsetting or netting out is undertaken, it&apos;s <em>really
-> hard</em> to work out what one&apos;s impact might be without the help of the
-> supplier.
+> Especially when offsetting or netting out is undertaken, it's _really hard_ to
+> work out what one's impact might be without the help of the supplier.
 
 All suppliers should tell their customers what the carbon impact of their custom
 is.
@@ -95,7 +94,7 @@ products in their relationship with us.
 
 ## Questions
 
-### I&apos;m a consumer. Why should I care whether a company is Scope Three Zero?
+### I'm a consumer. Why should I care whether a company is Scope Three Zero?
 
 Scope Three Zero is a level playing field for businesses: it requires them to
 account for the cost of their emissions, and be transparent about the total cost
@@ -104,23 +103,23 @@ the responsibility of working out CO₂ emissions and dealing with them onto the
 consumer.
 
 Scope Three Zero encourages efficiency: when the carbon cost of a product is
-included in a company&apos;s bottom line, a more expensive process with a lower
+included in a company's bottom line, a more expensive process with a lower
 environmental impact leads to lower prices.
 
 ### I sell to the public, why should I sign the Scope Three Pledge?
 
-The vast bulk of most consumers&apos; environmental emissions are scope three.
-It&apos;s certainly possible for a motivated consumer to offset or remove CO₂
-privately, but it&apos;s not common. The right thing should be the easy thing to
-do: by accounting for the environmental impact of your products, you are making
-more sustainable products available to more people.
+The vast bulk of most consumers' environmental emissions are scope three. It's
+certainly possible for a motivated consumer to offset or remove CO₂ privately,
+but it's not common. The right thing should be the easy thing to do: by
+accounting for the environmental impact of your products, you are making more
+sustainable products available to more people.
 
 Consumers who are conscious of the environmental impact of their lifestyle are
 more likely to seek out suppliers who demonstrate their willingness to help.
 Ensuring that all our products have their CO₂ accounted for makes it easier to
 compare products on a like-for-like basis.
 
-I&apos;m a part of the supply chain, why am I being encouraged to sign the Scope
+I'm a part of the supply chain, why am I being encouraged to sign the Scope
 Three Pledge, and why should I encourage my suppliers to do the same?
 
 The incentives to account for scope three emissions in a B2B relationship
