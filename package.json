@@ -46,7 +46,7 @@
     "@types/rss": "0.0.30",
     "@typescript-eslint/eslint-plugin": "6.8.0",
     "autoprefixer": "10.4.16",
-    "encoding": "^0.1.13",
+    "encoding": "0.1.13",
     "eslint": "8.51.0",
     "eslint-config-andrewaylett": "3.0.0",
     "eslint-plugin-jest": "27.4.2",
