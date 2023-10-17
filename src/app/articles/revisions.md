@@ -3,7 +3,7 @@ title: Revisionism
 author: Andrew Aylett
 revision: '1.1'
 revised: 2020/09/13
-expires: 2021/09/13
+expires: 2025/09/13
 abstract: "Or: why this website isn't a blog"
 description:
     Trying to avoid the pitfalls of traditional blogs, Andrew offers content

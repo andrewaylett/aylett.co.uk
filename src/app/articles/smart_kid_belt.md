@@ -3,7 +3,7 @@ title: Smart Kid Belt
 author: Andrew Aylett
 revision: '1.0'
 revised: 2020/09/05
-expires: 2021/09/05
+expires: 2025/09/05
 abstract: Some thoughts on the "Smart Kid Belt"
 description:
     Smart Kid Belt is a type-approved automotive child restraint system with a

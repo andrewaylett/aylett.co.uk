@@ -3,7 +3,7 @@ title: Privacy
 author: Andrew Aylett
 revision: '1.2'
 revised: 2021/08/09
-expires: 2022/08/09
+expires: 2025/08/09
 abstract: This is not a privacy policy
 description:
     This website does not set any cookies or retain any logs, and aims to avoid
