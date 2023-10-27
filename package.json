@@ -36,7 +36,7 @@
   "devDependencies": {
     "@jest/globals": "29.7.0",
     "@next/eslint-plugin-next": "14.0.0",
-    "@prettier/plugin-xml": "3.2.1",
+    "@prettier/plugin-xml": "3.2.2",
     "@swc/jest": "0.2.29",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.0.0",
