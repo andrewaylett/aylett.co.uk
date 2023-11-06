@@ -44,7 +44,7 @@
     "@types/react": "18.2.6",
     "@types/revalidator": "0.3.11",
     "@types/rss": "0.0.31",
-    "@typescript-eslint/eslint-plugin": "6.9.1",
+    "@typescript-eslint/eslint-plugin": "6.10.0",
     "autoprefixer": "10.4.16",
     "encoding": "0.1.13",
     "eslint": "8.53.0",
