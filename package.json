@@ -42,7 +42,7 @@
     "@testing-library/react": "14.0.0",
     "@types/node": "20.8.10",
     "@types/react": "18.2.6",
-    "@types/revalidator": "0.3.11",
+    "@types/revalidator": "0.3.12",
     "@types/rss": "0.0.32",
     "@typescript-eslint/eslint-plugin": "6.10.0",
     "autoprefixer": "10.4.16",
