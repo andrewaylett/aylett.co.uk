@@ -40,7 +40,7 @@
     "@swc/jest": "0.2.29",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.1.2",
-    "@types/node": "20.9.2",
+    "@types/node": "20.9.3",
     "@types/react": "18.2.6",
     "@types/revalidator": "0.3.12",
     "@types/rss": "0.0.32",
