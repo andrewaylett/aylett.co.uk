@@ -33,9 +33,9 @@ export type TypeFrom<Schema> = Schema extends {
 }
   ? { [k in keyof Schema['properties']]: TypeFrom<Schema['properties'][k]> }
   : Schema extends { type: 'string' }
-  ? string
-  : Schema extends { type: 'array'; items: unknown }
-  ? TypeFrom<Schema['items']>[]
-  : Schema extends { type: 'number' }
-  ? number
-  : never;
+    ? string
+    : Schema extends { type: 'array'; items: unknown }
+      ? TypeFrom<Schema['items']>[]
+      : Schema extends { type: 'number' }
+        ? number
+        : never;
