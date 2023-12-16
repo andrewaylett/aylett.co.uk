@@ -14,7 +14,6 @@ module.exports = withPlausibleProxy()(
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
     productionBrowserSourceMaps: true,
-    // productionBrowserSourceMaps: true,
     async headers() {
       /** @type {{ key: string; value: string; }[]} */
       const headers = [

@@ -33,5 +33,7 @@ export async function GET() {
   }
 
   // Return the feed
-  return new NextResponse(feed.xml({ indent: true }));
+  const response = new NextResponse(feed.xml({ indent: true }));
+  response.headers.set('Content-Type', 'application/rss+xml');
+  return response;
 }
