@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Suspense, Usable, use } from 'react';
+import type { Usable } from 'react';
+import { Suspense, use } from 'react';
 
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 import { GITHUB_URL } from '../../../github';
 import { allThoughts, thoughtForId } from '../thoughts';
@@ -11,10 +11,10 @@ import {
   Optional,
   TitleSeparator,
 } from '../../../remark/components';
-import { Markdown } from '../../../remark/traverse';
-import { ThoughtSchema, TypeFrom } from '../../../types';
 import { PageStructure } from '../../../page-structure';
 
+import type { Markdown } from '../../../remark/traverse';
+import type { ThoughtSchema, TypeFrom } from '../../../types';
 import type { Metadata } from 'next';
 import type { FooterProps } from '../../footer';
 
@@ -31,11 +31,7 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const page = await thoughtForId(params.id ?? notFound());
-
-  if (!page) {
-    notFound();
-  }
+  const page = await thoughtForId(params.id);
 
   const metadata = await page.metadata;
 

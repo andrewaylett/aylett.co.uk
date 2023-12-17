@@ -102,7 +102,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : `http://localhost:${process.env.PORT || 3000}`,
+      : `http://localhost:${process.env.PORT ?? 3000}`,
   ),
   title: {
     absolute: 'aylett.co.uk',

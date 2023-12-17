@@ -4,13 +4,13 @@ import { Suspense, use } from 'react';
 import Link from 'next/link';
 
 import { Description } from '../../remark/components';
-import { ArticleSchema, TypeFrom } from '../../types';
-import { Markdown } from '../../remark/traverse';
 import { asyncSortByKey } from '../../sort_by';
 import { PageStructure, TitleHeader } from '../../page-structure';
 
 import { allArticles } from './articles';
 
+import type { Markdown } from '../../remark/traverse';
+import type { ArticleSchema, TypeFrom } from '../../types';
 import type { Metadata } from 'next';
 
 import 'server-only';

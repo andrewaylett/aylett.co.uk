@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 // noinspection JSUnusedGlobalSymbols
-export default async function Card(): Promise<React.ReactElement> {
+export default function Card(): React.ReactElement {
   return (
     <PageStructure
       schemaType="Organization"

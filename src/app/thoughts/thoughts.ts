@@ -3,9 +3,11 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import { ThoughtSchema } from '../../types';
-import { findMarkdown, Markdown } from '../../remark/traverse';
+import { findMarkdown } from '../../remark/traverse';
 
 import 'server-only';
+
+import type { Markdown } from '../../remark/traverse';
 
 export async function thoughtForId(
   id: string,

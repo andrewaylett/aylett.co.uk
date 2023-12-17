@@ -1,21 +1,24 @@
-import React, { PropsWithChildren, Suspense } from 'react';
+import type { PropsWithChildren } from 'react';
+import React, { Suspense } from 'react';
 
 import Link from 'next/link';
 
-import Footer, { FooterProps } from './app/footer';
+import Footer from './app/footer';
 
-export type FooterFunc<T> = {
+import type { FooterProps } from './app/footer';
+
+export interface FooterFunc<T> {
   func: (input: T) => FooterProps;
   input: T;
-};
+}
 
-export type PageStructureProps<T> = {
+export interface PageStructureProps<T> {
   breadcrumbs: { href: string; text: string }[];
   header: React.JSX.Element;
   footer?: FooterFunc<T>;
   schemaType: string;
   resource: string;
-};
+}
 
 export function TitleHeader({
   children,
