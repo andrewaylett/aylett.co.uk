@@ -54,8 +54,10 @@ export function baseProcessor(): Processor<Root, Root, Root> {
 const development = process.env.NODE_ENV !== 'production';
 
 // @ts-expect-error: the React types are missing.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
 // @ts-expect-error: the React types are missing.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const devJsx = { jsxDEV: dev.jsxDEV };
 
 export const intoReact = baseProcessor()

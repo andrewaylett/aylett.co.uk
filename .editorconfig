@@ -12,6 +12,12 @@ trim_trailing_whitespace = true
 [{*.ats,*.ts,*.tsx,*.js,*.jsx}]
 indent_size = 2
 tab_width = 2
+ij_typescript_align_multiline_parameters = false
+ij_typescript_align_multiline_parameters_in_calls = false
+ij_typescript_force_quote_style = true
+ij_typescript_force_semicolon_style = true
+ij_typescript_use_double_quotes = false
+ij_typescript_use_semicolon_after_statement = true
 
 [{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,bowerrc,jest.config}]
 indent_size = 2

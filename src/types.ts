@@ -1,4 +1,6 @@
-import { JSONSchema7 } from 'json-schema';
+import { validate } from 'revalidator';
+
+import type { JSONSchema7 } from 'json-schema';
 
 export const ArticleSchema = {
   type: 'object',
@@ -29,13 +31,26 @@ export type ThoughtSchema = typeof ThoughtSchema;
 
 export type TypeFrom<Schema> = Schema extends {
   type: 'object';
-  properties: unknown;
+  properties: infer Properties;
 }
-  ? { [k in keyof Schema['properties']]: TypeFrom<Schema['properties'][k]> }
+  ? { [k in keyof Properties]: TypeFrom<Properties[k]> }
   : Schema extends { type: 'string' }
     ? string
-    : Schema extends { type: 'array'; items: unknown }
-      ? TypeFrom<Schema['items']>[]
+    : Schema extends { type: 'array'; items: infer Items }
+      ? TypeFrom<Items>[]
       : Schema extends { type: 'number' }
         ? number
         : never;
+
+export function assertSchema<T extends JSONSchema7>(
+  parsed: unknown,
+  schema: T,
+): asserts parsed is TypeFrom<T> {
+  const { errors, valid } = validate(
+    parsed,
+    schema as Revalidator.JSONSchema<unknown>,
+  );
+  if (!valid) {
+    throw new Error(`Invalid YAML: ${errors.join(', ')}`);
+  }
+}
