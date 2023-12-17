@@ -2,19 +2,29 @@ import { OpenAI } from 'openai';
 import { parse, stringify } from 'yaml';
 import { write } from 'to-vfile';
 import remarkStringify from 'remark-stringify';
+import { JSONSchema7 } from 'json-schema';
 
 import { baseProcessor, intoText } from '../../../remark/process_markdown';
 import { traverse } from '../../../remark/traverse';
+import { assertSchema, TypeFrom } from '../../../types';
 
 import type { Root } from 'mdast';
 import type { VFile } from 'vfile';
 import type { ClientOptions } from 'openai';
 
+export const EntrySchema = {
+  type: 'object',
+  properties: {
+    title: { type: 'string' },
+    url: { type: 'string' },
+    description: { type: 'string' },
+    tags: { type: 'array', items: { type: 'string' } },
+  },
+} as const satisfies JSONSchema7;
+export type EntrySchema = typeof EntrySchema;
+
 export type Entry = {
-  title: string;
-  description: string;
-  tags: string[];
-  url: string;
+  -readonly [k in keyof TypeFrom<EntrySchema>]: TypeFrom<EntrySchema>[k];
 };
 
 export async function* run(): AsyncGenerator<Entry, void, never> {
@@ -32,7 +42,7 @@ export async function* run(): AsyncGenerator<Entry, void, never> {
   yield* processDirectory('articles', openai);
 }
 
-class VisiblePromise<T> implements Promise<T> {
+class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
   readonly #promise: Promise<T>;
   #resolved = false;
   readonly [Symbol.toStringTag] = 'VisiblePromise';
@@ -51,7 +61,7 @@ class VisiblePromise<T> implements Promise<T> {
 
   constructor(promise: PromiseLike<T>) {
     this.#promise = Promise.resolve(promise);
-    this.#promise.then(this.#resolve.bind(this));
+    void this.#promise.then(this.#resolve.bind(this));
 
     this.then = this.#promise.then.bind(this.#promise);
     this.catch = this.#promise.catch.bind(this.#promise);
@@ -63,7 +73,7 @@ type Accum<T> = [null | VisiblePromise<T>, VisiblePromise<T>[]];
 
 function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
   if (orig instanceof VisiblePromise) {
-    return orig;
+    return orig as VisiblePromise<T>;
   } else {
     return new VisiblePromise<T>(orig);
   }
@@ -114,7 +124,7 @@ async function nextResolvedImpl<T>(
   await Promise.any(rest);
 
   // Recursion: as least one of `rest` has now resolved, so we will exit early
-  return nextResolvedImpl(rest, true);
+  return nextResolvedImpl<T>(rest, true);
 }
 
 async function* yieldWhenResolved<T>(
@@ -137,7 +147,8 @@ async function* processDirectory(
     const vfile = await intoText.process(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
-    const metadata = parse(frontMatter?.value ?? '');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const metadata: Partial<Entry> = parse(frontMatter?.value ?? '');
     metadata.url = `/${dir}/${mdFile.id}`;
 
     if (
@@ -180,21 +191,25 @@ async function* processDirectory(
           `Unexpected response, expected 1 choice, got ${length}`,
         );
       }
-      if (!choice.message) {
-        throw new Error('No message in response');
-      }
       const yamlblock = choice.message.content ?? '';
       const lines = yamlblock.split('\n');
       // GPT has a habit of returning YAML in a Markdown block
       const yamlLines = lines.filter((line) => !line.startsWith('```'));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let yaml: any;
+      let yaml: Partial<Entry>;
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         yaml = parse(yamlLines.join('\n'));
       } catch (e) {
-        throw new Error(`Could not parse YAML from ${yamlLines}`, { cause: e });
+        throw new Error(`Could not parse YAML from:\n${yamlLines.join('\n')}`, {
+          cause: e,
+        });
       }
-      const replacementMetadata: Entry = { ...metadata, ...yaml, ...metadata };
+      const replacementMetadata: Partial<Entry> = {
+        ...metadata,
+        ...yaml,
+        ...metadata,
+      };
+      assertSchema(replacementMetadata, EntrySchema);
       const replacementYaml = stringify(replacementMetadata);
       vfile.data.frontMatter = {
         type: 'yaml',
@@ -214,6 +229,7 @@ async function* processDirectory(
       await write(vfile);
       return replacementMetadata;
     } else {
+      assertSchema(metadata, EntrySchema);
       return metadata;
     }
   });

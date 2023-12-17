@@ -1,26 +1,23 @@
 import * as path from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
 
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import { read } from 'to-vfile';
 import { parse } from 'yaml';
-import { validate } from 'revalidator';
-import { JSONSchema7 } from 'json-schema';
 
-import { TypeFrom } from '../types';
+import { assertSchema, TypeFrom } from '../types';
 
 import { intoReact } from './process_markdown';
 
+import type { JSONSchema7 } from 'json-schema';
 import type { VFile } from 'vfile';
 
-import JSONSchema = Revalidator.JSONSchema;
-
-type MDFile = {
+interface MDFile {
   path: string;
   id: string;
   vfile: Promise<VFile>;
-};
+}
 
 async function findProjectDirectory(): Promise<string> {
   let wd = process.cwd();
@@ -62,10 +59,7 @@ export async function traverse(dir: string): Promise<MDFile[]> {
   return [...gen()];
 }
 
-export class Markdown<
-  Schema extends JSONSchema7,
-  Metadata extends TypeFrom<Schema> = TypeFrom<Schema>,
-> {
+export class Markdown<Schema extends JSONSchema7> {
   constructor(
     private mdFile: MDFile,
     schema: Schema,
@@ -78,15 +72,8 @@ export class Markdown<
 
       if (node) {
         const parsed: unknown = parse(node.value);
-        const { errors, valid } = validate(
-          parsed,
-          schema as JSONSchema<unknown>,
-        );
-        if (valid) {
-          return parsed as Metadata;
-        } else {
-          throw new Error(`Invalid YAML: ${errors}`);
-        }
+        assertSchema(parsed, schema);
+        return parsed;
       } else {
         throw new Error('No metadata found');
       }
@@ -95,7 +82,7 @@ export class Markdown<
 
   id: string;
   content: Promise<ReactElement<unknown>>;
-  metadata: Promise<Metadata>;
+  metadata: Promise<TypeFrom<Schema>>;
 }
 
 export async function findMarkdown<T extends JSONSchema7>(

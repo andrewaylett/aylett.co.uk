@@ -8,8 +8,9 @@ import type { Components } from 'rehype-react';
 // noinspection JSUnusedGlobalSymbols
 export const components = {
   h1: ({ children, node }) =>
-    node && node.content ? (
+    node?.content ? (
       <h1
+        /* eslint-disable-next-line @typescript-eslint/no-base-to-string */
         id={node.content
           .toString()
           .replaceAll(/ /g, '-')
