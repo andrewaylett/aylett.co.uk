@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { ReactElement, Suspense, use, useMemo } from 'react';
+import type { ReactElement } from 'react';
+import { Suspense, use, useMemo } from 'react';
 
 import { GITHUB_URL } from '../../../github';
 import { allArticles, articleForId } from '../articles';
@@ -9,10 +10,10 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
-import { Markdown } from '../../../remark/traverse';
-import { ArticleSchema } from '../../../types';
-import { FooterProps } from '../../footer';
 
+import type { Markdown } from '../../../remark/traverse';
+import type { ArticleSchema } from '../../../types';
+import type { FooterProps } from '../../footer';
 import type { Metadata } from 'next';
 
 import 'server-only';
@@ -63,28 +64,27 @@ const Revisions: React.FC<{
   revised: string;
   revision?: string;
   url: string;
-}> = ({ expires, revised, revision, url }) =>
-  revision || revised || expires ? (
-    <div className="flex flex-row flex-wrap gap-x-[1ch]">
-      <Optional text={revision}>
-        Version:&nbsp;<span property="version">{revision}</span>
-      </Optional>
-      <Optional text={revised}>
-        <a
-          className="text-inherit underline"
-          property="subjectOf"
-          typeof="SoftwareSourceCode"
-          href={GITHUB_URL(url)}
-        >
-          Last Revised
-        </a>
-        :&nbsp;<span property="dateModified">{revised}</span>
-      </Optional>
-      <Optional text={expires}>
-        Expires:&nbsp;<span property="expires">{expires}</span>
-      </Optional>
-    </div>
-  ) : null;
+}> = ({ expires, revised, revision, url }) => (
+  <div className="flex flex-row flex-wrap gap-x-[1ch]">
+    <Optional text={revision}>
+      Version:&nbsp;<span property="version">{revision}</span>
+    </Optional>
+    <Optional text={revised}>
+      <a
+        className="text-inherit underline"
+        property="subjectOf"
+        typeof="SoftwareSourceCode"
+        href={GITHUB_URL(url)}
+      >
+        Last Revised
+      </a>
+      :&nbsp;<span property="dateModified">{revised}</span>
+    </Optional>
+    <Optional text={expires}>
+      Expires:&nbsp;<span property="expires">{expires}</span>
+    </Optional>
+  </div>
+);
 
 // noinspection JSUnusedGlobalSymbols
 export default function article({
@@ -108,7 +108,7 @@ export default function article({
           const metadata = use(use(page).metadata);
           return {
             author: metadata.author,
-            copyright: metadata.copyright ?? metadata.revised.split('/')[0],
+            copyright: metadata.copyright,
             keywords: metadata.tags,
           };
         },

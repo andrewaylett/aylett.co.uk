@@ -1,8 +1,16 @@
 {
   "root": true,
-  "extends": ["eslint-config-andrewaylett", "plugin:@next/next/recommended"],
+  "extends": [
+    "plugin:@next/next/recommended",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "eslint-config-andrewaylett"
+  ],
   "env": {
     "shared-node-browser": true
+  },
+  "parserOptions": {
+    "project": true
   },
   "overrides": [
     {
