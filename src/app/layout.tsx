@@ -3,7 +3,7 @@ import * as React from 'react';
 import PlausibleProvider from 'next-plausible';
 import localFont from 'next/font/local';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import './styles/global.css';
 
@@ -105,6 +105,14 @@ export const metadata: Metadata = {
   },
   icons: '/favicon.ico',
   publisher: 'Andrew Aylett',
+};
+
+// noinspection JSUnusedGlobalSymbols
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+  ],
 };
 
 // noinspection JSUnusedGlobalSymbols

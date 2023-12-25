@@ -44,6 +44,15 @@ export async function generateMetadata({
     authors: { name: 'Andrew Aylett', url: 'https://www.aylett.co.uk' },
     description: metadata.description,
     keywords: metadata.tags,
+    openGraph: {
+      type: 'article',
+      authors: 'Andrew Aylett',
+      description: metadata.description,
+      locale: 'en_GB',
+      publishedTime: metadata.date,
+      tags: metadata.tags,
+      title: metadata.title,
+    },
   };
 }
 

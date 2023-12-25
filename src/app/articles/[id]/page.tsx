@@ -37,6 +37,16 @@ export async function generateMetadata({
     authors: [{ name: metadata.author }],
     description: metadata.description,
     keywords: metadata.tags,
+    openGraph: {
+      type: 'article',
+      authors: [metadata.author],
+      description: metadata.description,
+      expirationTime: metadata.expires,
+      locale: 'en_GB',
+      publishedTime: metadata.revised,
+      tags: metadata.tags,
+      title: metadata.title,
+    },
   };
 }
 

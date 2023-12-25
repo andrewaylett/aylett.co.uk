@@ -19,6 +19,13 @@ export const metadata: Metadata = {
       ],
     },
   },
+  openGraph: {
+    type: 'website',
+    title: 'aylett.co.uk',
+    description: 'Welcome to aylett.co.uk',
+    url: 'https://www.aylett.co.uk',
+    locale: 'en_GB',
+  },
 };
 
 // noinspection JSUnusedGlobalSymbols
