@@ -93,6 +93,7 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
 
   return (
     <PageStructure<typeof page>
+      schemaType="Article"
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
       header={<ThoughtHeader id={id} metadata={metadata} />}
       footer={{
@@ -100,13 +101,16 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
           const metadata = use(use(page).metadata);
           return {
             copyright: metadata.date.split('/')[0],
+            keywords: metadata.tags,
           };
         },
         input: page,
       }}
     >
       <Suspense>
-        <Use el={content} />
+        <div property="articleBody">
+          <Use el={content} />
+        </div>
       </Suspense>
     </PageStructure>
   );
@@ -121,7 +125,7 @@ function ThoughtHeader({
 }) {
   return (
     <header>
-      <h1>{use(metadata).title}</h1>
+      <h1 property="name">{use(metadata).title}</h1>
       <div className="meta">
         <Link href="/articles/thoughts">What is this?</Link>
         <Revisions url={`/thoughts/${id}`} {...use(metadata)} />

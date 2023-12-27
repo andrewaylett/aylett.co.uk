@@ -51,13 +51,13 @@
     header > h1:first-child {
         @apply font-bold text-x250;
     }
+    .grid-cols-centre > * {
+        @apply col-2;
+    }
 }
 
 @layer utilities {
     .wrap-parens {
         @apply before:content-['('] after:content-[')'];
-    }
-    .grid-cols-centre > * {
-        @apply col-2;
     }
 }

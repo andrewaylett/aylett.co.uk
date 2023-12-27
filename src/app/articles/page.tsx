@@ -46,13 +46,13 @@ function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).title),
   );
   return (
-    <>
+    <div property="mainEntity" typeof="ItemList">
       {sorted.map(({ id: name, metadata }) => (
         <Suspense key={name}>
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -65,11 +65,18 @@ function Entry({
 }) {
   const resolved = use(metadata);
   return (
-    <>
+    <div property="itemListElement" typeof="Article">
       <div className="flex flex-row flex-wrap gap-x-[1ch]">
         <span className="inline-block">
-          <Link href={`/articles/${name}`}>{resolved.title}</Link>
-          {resolved.author && ` - ${resolved.author}`}
+          <Link property="url" href={`/articles/${name}`}>
+            <span property="name">{resolved.title}</span>
+          </Link>
+          {resolved.author && (
+            <>
+              {' - '}
+              <span property="author">{resolved.author}</span>
+            </>
+          )}
         </span>
         <span className="inline-block">
           <span className="wrap-parens text-smaller">
@@ -79,10 +86,12 @@ function Entry({
           {resolved.abstract && ':'}
         </span>
         {resolved.abstract && (
-          <span className="inline-block">{resolved.abstract}</span>
+          <span className="inline-block" property="alternativeHeadline">
+            {resolved.abstract}
+          </span>
         )}
       </div>
       <Description metadata={metadata} />
-    </>
+    </div>
   );
 }

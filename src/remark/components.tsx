@@ -30,7 +30,7 @@ export function Description({
 }): React.JSX.Element {
   return (
     <blockquote>
-      {use(metadata).description}
+      <span property="abstract">{use(metadata).description}</span>
       <sup>
         <Link href="/thoughts/descriptions">?</Link>
       </sup>

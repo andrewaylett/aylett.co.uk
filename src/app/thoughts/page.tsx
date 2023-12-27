@@ -47,16 +47,18 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).date),
   );
   return (
-    <>
+    <div property="mainEntity" typeof="ItemList">
       <p>
-        <Link href="/articles/thoughts">What is this?</Link>
+        <Link property="subjectOf" href="/articles/thoughts">
+          What is this?
+        </Link>
       </p>
       {sorted.reverse().map(({ id: name, metadata }) => (
         <Suspense key={name}>
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -68,11 +70,13 @@ function Entry({
   name: string;
 }) {
   return (
-    <>
+    <div property="itemListElement" typeof="Article">
       <p>
-        <Link href={`/thoughts/${name}`}>{use(metadata).title}</Link>
+        <Link property="url" href={`/thoughts/${name}`}>
+          <span property="name">{use(metadata).title}</span>
+        </Link>
       </p>
       <Description metadata={metadata} />
-    </>
+    </div>
   );
 }

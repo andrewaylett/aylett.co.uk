@@ -69,10 +69,13 @@ const Revisions: React.FC<{
       <Optional text={revision}>Version:&nbsp;{revision}</Optional>
       <Optional text={revised}>
         <a className="text-inherit underline" href={GITHUB_URL(url)}>
-          Last Revised:&nbsp;{revised}
+          Last Revised
         </a>
+        :&nbsp;<span property="dateModified">{revised}</span>
       </Optional>
-      <Optional text={expires}>Expires:&nbsp;{expires}</Optional>
+      <Optional text={expires}>
+        Expires:&nbsp;<span property="expires">{expires}</span>
+      </Optional>
     </div>
   ) : null;
 
@@ -85,6 +88,7 @@ export default function article({
   const page = useMemo(() => articleForId(params.id), [params.id]);
   return (
     <PageStructure<typeof page>
+      schemaType="Article"
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
       header={
         <Suspense>
@@ -97,6 +101,7 @@ export default function article({
           return {
             author: metadata.author,
             copyright: metadata.copyright ?? metadata.revised.split('/')[0],
+            keywords: metadata.tags,
           };
         },
         input: page,
@@ -114,7 +119,7 @@ function ArticlePage({
 }): ReactElement {
   const { content } = use(page);
 
-  return use(content);
+  return <div property="articleBody">{use(content)}</div>;
 }
 
 function ArticleHeader({
@@ -128,11 +133,17 @@ function ArticleHeader({
 
   return (
     <header>
-      <h1>{use(metadata).title}</h1>
-      {use(metadata).abstract ? use(metadata).abstract : ''}
+      <h1 property="name">{use(metadata).title}</h1>
+      {use(metadata).abstract ? (
+        <span property="alternativeHeadline">{use(metadata).abstract}</span>
+      ) : (
+        ''
+      )}
       <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex]">
         {use(metadata).author && (
-          <div className="author">Author: {use(metadata).author}</div>
+          <div className="author">
+            Author: <span property="author">{use(metadata).author}</span>
+          </div>
         )}
         <Revisions url={`/articles/${id}`} {...use(metadata)} />
         <Description metadata={metadata} />
