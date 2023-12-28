@@ -14,7 +14,12 @@ export const metadata: Metadata = {
 // noinspection JSUnusedGlobalSymbols
 export default function Schema(): React.ReactNode {
   return (
-    <PageStructure breadcrumbs={[]} header={<TitleHeader>Schemas</TitleHeader>}>
+    <PageStructure
+      schemaType="ItemList"
+      resource="/schema"
+      breadcrumbs={[]}
+      header={<TitleHeader>Schemas</TitleHeader>}
+    >
       <p>
         Totally non-standard, provided for convenience. Maintained as part of
         the{' '}
@@ -29,13 +34,23 @@ export default function Schema(): React.ReactNode {
       <p>
         <ol>
           <li>
-            <a href="/schema/clientConfig-1.1.xsd">
-              Autoconfig schema for email
+            <a
+              property="item"
+              typeof="SoftwareSourceCode"
+              href="/schema/clientConfig-1.1.xsd"
+            >
+              <span property="description">Autoconfig schema for email</span>
             </a>
           </li>
           <li>
-            <a href="/schema/drone-0.8.json">
-              Schema for <code>.drone.yml</code> files targeting Drone 0.8
+            <a
+              property="item"
+              typeof="SoftwareSourceCode"
+              href="/schema/drone-0.8.json"
+            >
+              <span property="description">
+                Schema for <code>.drone.yml</code> files targeting Drone 0.8
+              </span>
             </a>
           </li>
         </ol>

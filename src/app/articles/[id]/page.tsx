@@ -66,9 +66,16 @@ const Revisions: React.FC<{
 }> = ({ expires, revised, revision, url }) =>
   revision || revised || expires ? (
     <div className="flex flex-row flex-wrap gap-x-[1ch]">
-      <Optional text={revision}>Version:&nbsp;{revision}</Optional>
+      <Optional text={revision}>
+        Version:&nbsp;<span property="version">{revision}</span>
+      </Optional>
       <Optional text={revised}>
-        <a className="text-inherit underline" href={GITHUB_URL(url)}>
+        <a
+          className="text-inherit underline"
+          property="subjectOf"
+          typeof="SoftwareSourceCode"
+          href={GITHUB_URL(url)}
+        >
           Last Revised
         </a>
         :&nbsp;<span property="dateModified">{revised}</span>
@@ -89,6 +96,7 @@ export default function article({
   return (
     <PageStructure<typeof page>
       schemaType="Article"
+      resource={`/articles/${params.id}`}
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
       header={
         <Suspense>
@@ -133,7 +141,7 @@ function ArticleHeader({
 
   return (
     <header>
-      <h1 property="name">{use(metadata).title}</h1>
+      <h1 property="headline">{use(metadata).title}</h1>
       {use(metadata).abstract ? (
         <span property="alternativeHeadline">{use(metadata).abstract}</span>
       ) : (
@@ -141,8 +149,8 @@ function ArticleHeader({
       )}
       <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex]">
         {use(metadata).author && (
-          <div className="author">
-            Author: <span property="author">{use(metadata).author}</span>
+          <div className="author" property="author" typeof="Person">
+            Author: <span property="name">{use(metadata).author}</span>
           </div>
         )}
         <Revisions url={`/articles/${id}`} {...use(metadata)} />

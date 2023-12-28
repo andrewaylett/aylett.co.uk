@@ -33,6 +33,8 @@ export default function thoughts(): React.ReactNode {
   const pages = allThoughts();
   return (
     <PageStructure
+      schemaType="ItemList"
+      resource="/thoughts"
       breadcrumbs={[]}
       header={<TitleHeader>Thoughts</TitleHeader>}
     >
@@ -47,7 +49,7 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).date),
   );
   return (
-    <div property="mainEntity" typeof="ItemList">
+    <>
       <p>
         <Link property="subjectOf" href="/articles/thoughts">
           What is this?
@@ -58,7 +60,7 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </div>
+    </>
   );
 }
 

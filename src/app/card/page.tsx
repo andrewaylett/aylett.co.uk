@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 export default async function Card(): Promise<React.ReactElement> {
   return (
     <PageStructure
+      schemaType="Organization"
+      resource="/card"
       breadcrumbs={[]}
       header={<TitleHeader>Andrew and Lizzie Aylett</TitleHeader>}
     >

@@ -67,9 +67,15 @@ export async function generateStaticParams() {
 const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
   <div className="flex flex-row flex-wrap gap-x-[1ch]">
     <Optional text={date}>
-      <a className="text-inherit" href={GITHUB_URL(url)}>
-        Date:&nbsp;{date}
+      <a
+        className="text-inherit"
+        property="subjectOf"
+        typeof="SoftwareSourceCode"
+        href={GITHUB_URL(url)}
+      >
+        Date
       </a>
+      :&nbsp;<span property="datePublished">{date}</span>
     </Optional>
   </div>
 );
@@ -94,6 +100,7 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
   return (
     <PageStructure<typeof page>
       schemaType="Article"
+      resource={`/thoughts/${id}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
       header={<ThoughtHeader id={id} metadata={metadata} />}
       footer={{
@@ -125,7 +132,7 @@ function ThoughtHeader({
 }) {
   return (
     <header>
-      <h1 property="name">{use(metadata).title}</h1>
+      <h1 property="headline">{use(metadata).title}</h1>
       <div className="meta">
         <Link href="/articles/thoughts">What is this?</Link>
         <Revisions url={`/thoughts/${id}`} {...use(metadata)} />

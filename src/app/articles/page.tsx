@@ -32,6 +32,8 @@ export default function articles(): React.ReactNode {
   const pages = allArticles();
   return (
     <PageStructure
+      schemaType="ItemList"
+      resource="/articles"
       breadcrumbs={[]}
       header={<TitleHeader>Articles</TitleHeader>}
     >
@@ -46,13 +48,13 @@ function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
     asyncSortByKey(resolved, async (page) => (await page.metadata).title),
   );
   return (
-    <div property="mainEntity" typeof="ItemList">
+    <>
       {sorted.map(({ id: name, metadata }) => (
         <Suspense key={name}>
           <Entry name={name} metadata={metadata} />
         </Suspense>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -65,11 +67,15 @@ function Entry({
 }) {
   const resolved = use(metadata);
   return (
-    <div property="itemListElement" typeof="Article">
+    <div
+      property="itemListElement"
+      typeof="Article"
+      resource={`/articles/${name}`}
+    >
       <div className="flex flex-row flex-wrap gap-x-[1ch]">
         <span className="inline-block">
           <Link property="url" href={`/articles/${name}`}>
-            <span property="name">{resolved.title}</span>
+            <span property="headline">{resolved.title}</span>
           </Link>
           {resolved.author && (
             <>

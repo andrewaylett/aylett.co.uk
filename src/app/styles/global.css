@@ -54,6 +54,9 @@
     .grid-cols-centre > * {
         @apply col-2;
     }
+    nav > *:not(:first-child)::before {
+        content: ' ▸ ';
+    }
 }
 
 @layer utilities {

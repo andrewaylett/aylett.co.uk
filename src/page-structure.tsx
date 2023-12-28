@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, Suspense } from 'react';
+import React, { PropsWithChildren, Suspense } from 'react';
 
 import Link from 'next/link';
 
@@ -13,7 +13,8 @@ export type PageStructureProps<T> = {
   breadcrumbs: { href: string; text: string }[];
   header: React.JSX.Element;
   footer?: FooterFunc<T>;
-  schemaType?: string;
+  schemaType: string;
+  resource: string;
 };
 
 export function TitleHeader({
@@ -21,7 +22,7 @@ export function TitleHeader({
 }: PropsWithChildren): React.JSX.Element {
   return (
     <header>
-      <h1>{children}</h1>
+      <h1 property="name">{children}</h1>
     </header>
   );
 }
@@ -31,33 +32,33 @@ export function PageStructure<T = unknown>({
   children,
   footer,
   header,
+  resource,
   schemaType,
 }: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
-  const schemaMap = schemaType
-    ? { property: 'mainEntity', typeof: schemaType }
-    : {};
   return (
     <div className="grid grid-cols-centre p-vmin">
       <nav property="breadcrumb" typeof="BreadcrumbList">
-        <span property="itemListElement" typeof="ListItem">
+        <span property="itemListElement" typeof="ListItem" resource="/">
           <Link property="item" typeof="WebPage" href="/">
             <span property="name">Home</span>
           </Link>
           <data property="position" content="1" />
         </span>
         {breadcrumbs.map(({ href, text }, idx) => (
-          <Fragment key={idx}>
-            {' ▸ '}
-            <span property="itemListElement" typeof="ListItem">
-              <Link property="item" typeof="WebPage" href={href}>
-                <span property="name">{text}</span>
-              </Link>
-              <data property="position" content={`${idx + 2}`} />
-            </span>
-          </Fragment>
+          <span
+            property="itemListElement"
+            typeof="ListItem"
+            resource={href}
+            key={idx}
+          >
+            <Link property="item" typeof="WebPage" href={href}>
+              <span property="name">{text}</span>
+            </Link>
+            <data property="position" content={`${idx + 2}`} />
+          </span>
         ))}
       </nav>
-      <div {...schemaMap}>
+      <div resource={resource} typeof={schemaType}>
         {header}
         <main className="hyphens-manual">
           <Suspense fallback="Rendering...">{children}</Suspense>
