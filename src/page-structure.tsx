@@ -38,19 +38,14 @@ export function PageStructure<T = unknown>({
   return (
     <div className="grid grid-cols-centre p-vmin">
       <nav property="breadcrumb" typeof="BreadcrumbList">
-        <span property="itemListElement" typeof="ListItem" resource="/">
+        <span property="itemListElement" typeof="ListItem">
           <Link property="item" typeof="WebPage" href="/">
             <span property="name">Home</span>
           </Link>
           <data property="position" content="1" />
         </span>
         {breadcrumbs.map(({ href, text }, idx) => (
-          <span
-            property="itemListElement"
-            typeof="ListItem"
-            resource={href}
-            key={idx}
-          >
+          <span property="itemListElement" typeof="ListItem" key={idx}>
             <Link property="item" typeof="WebPage" href={href}>
               <span property="name">{text}</span>
             </Link>
