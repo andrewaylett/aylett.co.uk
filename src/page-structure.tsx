@@ -36,7 +36,12 @@ export function PageStructure<T = unknown>({
   schemaType,
 }: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
   return (
-    <div className="grid grid-cols-centre p-vmin">
+    <div
+      className="grid grid-cols-centre p-vmin"
+      vocab="https://schema.org/"
+      resource={resource}
+      typeof={schemaType}
+    >
       <nav property="breadcrumb" typeof="BreadcrumbList">
         <span property="itemListElement" typeof="ListItem">
           <Link property="item" typeof="WebPage" href="/">
@@ -53,13 +58,11 @@ export function PageStructure<T = unknown>({
           </span>
         ))}
       </nav>
-      <div resource={resource} typeof={schemaType}>
-        {header}
-        <main className="hyphens-manual">
-          <Suspense fallback="Rendering...">{children}</Suspense>
-        </main>
-        <Suspense>{footer ? <FooterGen {...footer} /> : <Footer />}</Suspense>
-      </div>
+      {header}
+      <main className="hyphens-manual">
+        <Suspense fallback="Rendering...">{children}</Suspense>
+      </main>
+      <Suspense>{footer ? <FooterGen {...footer} /> : <Footer />}</Suspense>
     </div>
   );
 }

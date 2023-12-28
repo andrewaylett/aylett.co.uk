@@ -33,6 +33,7 @@ export default function Home(): React.ReactNode {
   return (
     <div className="flex flex-col justify-center items-center px-2 min-h-screen">
       <main
+        vocab="https://schema.org/"
         typeof="ItemList"
         resource="/"
         className="flex flex-col justify-center items-center text-center text-2xl py-16"
