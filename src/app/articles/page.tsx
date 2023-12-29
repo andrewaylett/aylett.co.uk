@@ -78,10 +78,14 @@ function Entry({
             <span property="headline">{resolved.title}</span>
           </Link>
           {resolved.author && (
-            <>
+            <span
+              property="author"
+              typeof="Person"
+              resource={`#${resolved.author}`}
+            >
               {' - '}
-              <span property="author">{resolved.author}</span>
-            </>
+              <span property="name">{resolved.author}</span>
+            </span>
           )}
         </span>
         <span className="inline-block">
