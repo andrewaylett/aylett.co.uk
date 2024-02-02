@@ -38,7 +38,7 @@
     "@next/eslint-plugin-next": "14.1.0",
     "@prettier/plugin-xml": "3.2.2",
     "@swc/jest": "0.2.34",
-    "@testing-library/jest-dom": "6.4.0",
+    "@testing-library/jest-dom": "6.4.1",
     "@testing-library/react": "14.2.0",
     "@types/node": "20.11.14",
     "@types/react": "18.2.6",
