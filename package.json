@@ -39,7 +39,7 @@
     "@prettier/plugin-xml": "3.2.2",
     "@swc/jest": "0.2.34",
     "@testing-library/jest-dom": "6.4.1",
-    "@testing-library/react": "14.2.0",
+    "@testing-library/react": "14.2.1",
     "@types/node": "20.11.14",
     "@types/react": "18.2.6",
     "@types/revalidator": "0.3.12",
