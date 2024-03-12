@@ -87,6 +87,13 @@ module.exports = withPlausibleProxy()(
       }
       return [
         {
+          source: '/.well-known/(.*)*',
+          headers: {
+            ...headers,
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+        {
           source: '/(.*)*',
           headers,
         },
