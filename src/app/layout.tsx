@@ -131,7 +131,7 @@ export default function RootLayout({
       lang="en"
       className={`${plexSans.variable} bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200`}
     >
-      <body className="oldstyle-nums text-vmax">
+      <body className="oldstyle-nums">
         <PlausibleProvider
           domain="aylett.co.uk"
           scriptProps={{ src: '/js/script.js' }}

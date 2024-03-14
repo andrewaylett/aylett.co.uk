@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        /* With thanks to https://jameshfisher.com/2024/03/12/a-formula-for-responsive-font-size/ */
+        font-size: calc(1rem + 0.25vmax);
+    }
     h1 {
         @apply text-[200%] font-semibold;
     }

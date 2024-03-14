@@ -4,7 +4,6 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        vmax: 'clamp(100%, 2vmax, 125%)',
         smaller: 'smaller',
         x250: '250%',
       },
