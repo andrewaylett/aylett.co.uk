@@ -17,13 +17,10 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       gridTemplateColumns: {
-        centre: '1fr min(65ch, 100%) 1fr',
+        centre: '1fr min(65ch, 90%, 100% - 2rem) 1fr',
       },
       gridColumn: {
         2: '2',
-      },
-      padding: {
-        vmin: 'clamp(0.5rem, 1vmin, 2rem)',
       },
     },
   },

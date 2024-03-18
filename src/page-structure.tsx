@@ -37,7 +37,7 @@ export function PageStructure<T = unknown>({
 }: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
   return (
     <div
-      className="grid grid-cols-centre p-vmin"
+      className="grid grid-cols-centre"
       vocab="https://schema.org/"
       resource={resource}
       typeof={schemaType}
