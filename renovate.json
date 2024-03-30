@@ -8,7 +8,7 @@
   "packageRules": [
     {
       "matchPackageNames": ["node"],
-      "allowedVersions": "^18"
+      "allowedVersions": "^20"
     }
   ]
 }
