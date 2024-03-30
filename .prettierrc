@@ -1,13 +1,13 @@
 {
   "semi": true,
   "singleQuote": true,
-  "xmlWhitespaceSensitivity": "ignore",
   "proseWrap": "always",
   "overrides": [
     {
       "files": "**/host-meta",
       "options": {
-        "parser": "xml"
+        "parser": "xml",
+        "xmlWhitespaceSensitivity": "ignore"
       }
     }
   ]
