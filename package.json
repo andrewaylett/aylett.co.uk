@@ -71,17 +71,17 @@
   "browserslist": {
     "production": [
       "defaults",
-      "node >= 18"
+      "node >= 20"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version",
-      "node >= 18"
+      "node >= 20"
     ]
   },
   "engines": {
-    "node": "^18"
+    "node": "^20"
   },
   "engineStrict": true
 }
