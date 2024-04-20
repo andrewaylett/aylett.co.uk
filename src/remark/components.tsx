@@ -3,6 +3,8 @@ import { use } from 'react';
 
 import Link from 'next/link';
 
+import { Mermaid } from '../client/mermaid';
+
 import type { Components } from 'rehype-react';
 
 // noinspection JSUnusedGlobalSymbols
@@ -22,6 +24,12 @@ export const components = {
     ) : (
       <h1>{children}</h1>
     ),
+  code: ({ children, ...props }) => {
+    if (props.className === 'language-mermaid') {
+      return <Mermaid>{children}</Mermaid>;
+    }
+    return <code {...props}>{children}</code>;
+  },
 } satisfies Partial<Components>;
 
 export function Description({
