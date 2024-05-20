@@ -61,6 +61,8 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
 
   constructor(promise: PromiseLike<T>) {
     this.#promise = Promise.resolve(promise);
+    // Resolve on then, not finally, because Promise.any() will reject
+    // if every promise passed in has rejected
     void this.#promise.then(this.#resolve.bind(this));
 
     this.then = this.#promise.then.bind(this.#promise);
@@ -121,6 +123,7 @@ async function nextResolvedImpl<T>(
     throw new Error('Failed to find a resolved promise after Promise.any()');
   }
 
+  // Will reject iff all of `rest` are rejected
   await Promise.any(rest);
 
   // Recursion: as least one of `rest` has now resolved, so we will exit early
@@ -130,8 +133,8 @@ async function nextResolvedImpl<T>(
 async function* yieldWhenResolved<T>(
   input: PromiseLike<T>[],
 ): AsyncGenerator<T, void, never> {
-  let [next, rest] = await nextResolved(input);
-  yield next;
+  let next: T;
+  let rest = input;
   while (rest.length > 0) {
     [next, rest] = await nextResolved(rest);
     yield next;
