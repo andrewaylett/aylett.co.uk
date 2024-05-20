@@ -18,6 +18,18 @@
       "env": {
         "node": true
       }
+    },
+    {
+      "files": ["./src/client/*"],
+      "env": {
+        "browser": true
+      }
     }
-  ]
+  ],
+  "rules": {
+    "@typescript-eslint/restrict-template-expressions": ["error", {
+      "allowNumber": true,
+      "allowBoolean": true
+    }]
+  }
 }

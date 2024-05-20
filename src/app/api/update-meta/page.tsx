@@ -4,7 +4,7 @@ import { Fragment, Suspense, useMemo, use } from 'react';
 import Link from 'next/link';
 import { stringify } from 'yaml';
 
-import { Entry, run } from './update-meta';
+import { type Entry, run } from './update-meta';
 
 import 'server-only';
 
