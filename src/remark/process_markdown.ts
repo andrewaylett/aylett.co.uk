@@ -2,6 +2,7 @@ import * as prod from 'react/jsx-runtime';
 import * as dev from 'react/jsx-dev-runtime';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import rehypeSlug from 'rehype-slug';
 import remarkStringify from 'remark-stringify';
 import remarkFrontmatter from 'remark-frontmatter';
 import { is } from 'unist-util-is';
@@ -62,6 +63,7 @@ const devJsx = { jsxDEV: dev.jsxDEV };
 
 export const intoReact = baseProcessor()
   .use(remarkRehype)
+  .use(rehypeSlug)
   .use(rehypeFormat)
   .use(rehypeReact, {
     components,

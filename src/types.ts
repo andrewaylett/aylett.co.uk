@@ -13,6 +13,11 @@ export const ArticleSchema = {
     abstract: { type: 'string' },
     copyright: { type: 'string' },
     description: { type: 'string' },
+    lifecycle: {
+      type: 'string',
+      enum: ['draft', 'live', 'historical', 'obsolete'],
+      default: 'live',
+    },
     tags: { type: 'array', items: { type: 'string' } },
   },
 } as const satisfies JSONSchema7;
@@ -35,7 +40,9 @@ export type TypeFrom<Schema> = Schema extends {
 }
   ? { [k in keyof Properties]: TypeFrom<Properties[k]> }
   : Schema extends { type: 'string' }
-    ? string
+    ? Schema extends { type: 'string'; enum: infer T extends string[] }
+      ? T[number]
+      : string
     : Schema extends { type: 'array'; items: infer Items }
       ? TypeFrom<Items>[]
       : Schema extends { type: 'number' }

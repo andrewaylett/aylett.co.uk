@@ -10,6 +10,7 @@ description:
     Once he's finished the article, that is.
 tags:
     - sociology
+lifecycle: draft
 ---
 
 ```mermaid

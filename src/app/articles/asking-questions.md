@@ -3,7 +3,7 @@ title: Asking Questions Internally
 author: Andrew Aylett
 revision: 1.0.0
 revised: 2022/07/18
-expires: 2024/07/18
+expires: 2026/07/18
 abstract: Help your colleagues to help you
 description:
     Discover the best practices for asking effective questions internally. Learn
@@ -14,6 +14,7 @@ tags:
     - problem-solving
     - teamwork
     - support
+lifecycle: live
 ---
 
 Most companies uses a lot of different technologies, and it's not reasonable to
