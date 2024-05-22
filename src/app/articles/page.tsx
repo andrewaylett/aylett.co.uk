@@ -74,6 +74,7 @@ function Entry({
     >
       <div className="flex flex-row flex-wrap gap-x-[1ch]">
         <span className="inline-block">
+          {resolved.lifecycle === 'draft' ? 'Draft: ' : ''}
           <Link property="url" href={`/articles/${name}`}>
             <span property="headline">{resolved.title}</span>
           </Link>

@@ -33,6 +33,13 @@ export async function generateMetadata({
 
   const metadata = await page.metadata;
 
+  const robots =
+    metadata.lifecycle === 'draft'
+      ? {
+          index: false,
+        }
+      : {};
+
   return {
     title: metadata.title,
     authors: [{ name: metadata.author }],
@@ -48,6 +55,7 @@ export async function generateMetadata({
       tags: metadata.tags,
       title: metadata.title,
     },
+    robots,
   };
 }
 
@@ -61,14 +69,16 @@ export async function generateStaticParams() {
 
 const Revisions: React.FC<{
   expires?: string;
+  lifecycle?: string;
   revised: string;
   revision?: string;
   url: string;
-}> = ({ expires, revised, revision, url }) => (
+}> = ({ expires, lifecycle, revised, revision, url }) => (
   <div className="flex flex-row flex-wrap gap-x-[1ch]">
     <Optional text={revision}>
       Version:&nbsp;<span property="version">{revision}</span>
     </Optional>
+    <span>Status: {lifecycle ?? 'active'}</span>
     <Optional text={revised}>
       <a
         className="text-inherit underline"
@@ -93,8 +103,13 @@ export default function article({
   params: { id: string };
 }): React.ReactNode {
   const page = useMemo(() => articleForId(params.id), [params.id]);
+  const lifecycle = useMemo(
+    () => () => use(use(page).metadata).lifecycle,
+    [page],
+  );
   return (
     <PageStructure<typeof page>
+      lifecycle={lifecycle}
       schemaType="Article"
       resource={`/articles/${params.id}`}
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}

@@ -9,21 +9,6 @@ import type { Components } from 'rehype-react';
 
 // noinspection JSUnusedGlobalSymbols
 export const components = {
-  h1: ({ children, node }) =>
-    node?.content ? (
-      <h1
-        /* eslint-disable-next-line @typescript-eslint/no-base-to-string */
-        id={node.content
-          .toString()
-          .replaceAll(/ /g, '-')
-          .toLowerCase()
-          .replaceAll(/[^a-z0-9-]/g, '')}
-      >
-        {children}
-      </h1>
-    ) : (
-      <h1>{children}</h1>
-    ),
   code: ({ children, ...props }) => {
     if (props.className === 'language-mermaid') {
       return <Mermaid>{children}</Mermaid>;

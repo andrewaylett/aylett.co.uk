@@ -67,4 +67,17 @@
     .wrap-parens {
         @apply before:content-['('] after:content-[')'];
     }
+
+    .bg-draft {
+        @apply fixed -z-10 rotate-45 fill-slate-700;
+        --tw-translate-x: -25%;
+        --tw-translate-y: -25%;
+        width: calc(100vw + 100vh);
+        height: calc(100vw + 100vh);
+        /* fill=slate-200 */
+        @apply bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="%23e2e8f0"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
+        /* fill=slate-700 */
+        @apply dark:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="%23334155"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
+        background-repeat: repeat;
+    }
 }

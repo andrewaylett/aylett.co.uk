@@ -21,15 +21,17 @@ export async function GET() {
 
   for (const article of sorted) {
     const metadata = await article.metadata;
-    feed.item({
-      title: metadata.title,
-      url: `https://www.aylett.co.uk/articles/${article.id}`,
-      guid: `https://www.aylett.co.uk/articles/${article.id}`,
-      date: new Date(metadata.revised).toISOString(),
-      description: metadata.description,
-      author: metadata.author,
-      categories: metadata.tags,
-    });
+    if (metadata.lifecycle !== 'draft') {
+      feed.item({
+        title: metadata.title,
+        url: `https://www.aylett.co.uk/articles/${article.id}`,
+        guid: `https://www.aylett.co.uk/articles/${article.id}`,
+        date: new Date(metadata.revised).toISOString(),
+        description: metadata.description,
+        author: metadata.author,
+        categories: metadata.tags,
+      });
+    }
   }
 
   // Return the feed
