@@ -65,6 +65,7 @@ module.exports = withPlausibleProxy()(
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
+              'img-src data: blob:',
               "script-src 'self' 'unsafe-inline'",
               "script-src-elem 'self' 'unsafe-inline'",
               "script-src-attr 'self'",
