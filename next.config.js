@@ -14,7 +14,7 @@ module.exports = withPlausibleProxy()(
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
     productionBrowserSourceMaps: true,
-    async headers() {
+    headers() {
       /** @type {{ key: string; value: string; }[]} */
       const headers = [
         {
@@ -65,7 +65,7 @@ module.exports = withPlausibleProxy()(
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              'img-src data: blob:',
+              "img-src 'self' data: blob:",
               "script-src 'self' 'unsafe-inline'",
               "script-src-elem 'self' 'unsafe-inline'",
               "script-src-attr 'self'",
@@ -86,7 +86,7 @@ module.exports = withPlausibleProxy()(
           },
         );
       }
-      return [
+      return Promise.resolve([
         {
           source: '/.well-known/(.*)*',
           headers: [
@@ -101,15 +101,15 @@ module.exports = withPlausibleProxy()(
           source: '/(.*)*',
           headers,
         },
-      ];
+      ]);
     },
-    async rewrites() {
-      return [
+    rewrites() {
+      return Promise.resolve([
         {
           source: '/api/event',
           destination: 'https://plausible.io/api/event',
         },
-      ];
+      ]);
     },
   },
 );
