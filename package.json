@@ -33,7 +33,7 @@
     "server-only": "0.0.1",
     "to-vfile": "8.0.0",
     "unified": "11.0.4",
-    "yaml": "2.3.4"
+    "yaml": "2.4.2"
   },
   "devDependencies": {
     "@jest/globals": "29.7.0",
@@ -41,8 +41,8 @@
     "@prettier/plugin-xml": "3.4.1",
     "@swc/jest": "0.2.36",
     "@testing-library/jest-dom": "6.4.5",
-    "@testing-library/react": "14.3.1",
-    "@types/node": "20.12.7",
+    "@testing-library/react": "15.0.7",
+    "@types/node": "20.12.12",
     "@types/react": "18.2.6",
     "@types/revalidator": "0.3.12",
     "@types/rss": "0.0.32",
@@ -57,7 +57,7 @@
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "jest-watch-typeahead": "2.2.2",
-    "openai": "4.38.2",
+    "openai": "4.47.1",
     "postcss": "8.4.38",
     "prettier": "3.2.5",
     "tailwindcss": "3.4.3",
