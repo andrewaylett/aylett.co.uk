@@ -1,0 +1,41 @@
+content:
+- name: articles
+  label: Articles
+  type: collection
+  path: src/app/articles
+  subfolders: false
+  fields:
+  - name: title
+    type: string
+  - name: author
+    type: string
+  - name: revision
+    type: string
+  - name: revised
+    type: date
+  - name: expires
+    type: date
+  - name: abstract
+    type: text
+  - name: description
+    type: text
+  - name: tags
+    type: string
+    list: true
+- name: thoughts
+  label: Thoughts
+  type: collection
+  path: src/app/thoughts
+  subfolders: false
+  fields:
+  - name: title
+    type: string
+  - name: author
+    type: string
+  - name: date
+    type: date
+  - name: description
+    type: text
+  - name: tags
+    type: string
+    list: true
