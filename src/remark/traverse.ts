@@ -66,7 +66,7 @@ export class Markdown<Schema extends JSONSchema7> {
   ) {
     this.id = mdFile.id;
     const vfile = mdFile.vfile.then((v) => intoReact.process(v));
-    this.content = vfile.then((v) => v.result);
+    this.content = vfile.then((v) => v.result as ReactElement);
     this.metadata = vfile.then((v) => {
       const node = v.data.frontMatter;
 

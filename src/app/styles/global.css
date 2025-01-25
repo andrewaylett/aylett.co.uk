@@ -1,51 +1,116 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+    --text-smaller: smaller;
+    --text-x250: 250%;
+
+    --font-sans: IBM Plex Sans, var(--font-plex-sans), Roboto, sans-serif;
+    --font-mono: JetBrains Mono, ui-monospace, monospace;
+
+    --grid-template-columns-centre: 1fr min(65ch, 90%, 100% - 2rem) 1fr;
+
+    --grid-column-2: 2;
+}
+
+/*
+    The default border color has changed to `currentColor` in Tailwind CSS v4,
+    so we've added these compatibility styles to make sure everything still
+    looks the same as it did with Tailwind CSS v3.
+
+    If we ever want to remove these styles, we need to add an explicit border
+    color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+@utility grid-cols-centre {
+    & > * {
+        @apply col-2;
+    }
+}
+
+@utility wrap-parens {
+    @apply before:content-['('] after:content-[')'];
+}
+
+@utility bg-draft {
+    @apply fixed -z-10 rotate-45 fill-slate-700;
+    --tw-translate-x: -25%;
+    --tw-translate-y: -25%;
+    width: calc(100vw + 100vh);
+    height: calc(100vw + 100vh);
+    /* fill=slate-200 */
+    @apply bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="oklch(0.929%200.013%20255.508)"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
+    /* fill=slate-700 */
+    @apply dark:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="oklch(0.372%200.044%20257.287)"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
+    background-repeat: repeat;
+}
 
 @layer base {
     :root {
         /* With thanks to https://jameshfisher.com/2024/03/12/a-formula-for-responsive-font-size/ */
         font-size: calc(1rem + 0.25vmax);
     }
+
     h1 {
         @apply text-[200%] font-semibold;
     }
+
     h2 {
         @apply text-[180%] font-medium;
     }
+
     h3 {
         @apply text-[150%] font-medium;
     }
+
     h4 {
         @apply text-[140%] font-medium;
     }
+
     h5 {
         @apply text-[130%] font-[450];
     }
+
     h6 {
         @apply text-[120%] font-normal before:content-['▸&nbsp;'];
     }
+
     a {
         @apply text-blue-800 visited:text-purple-800 dark:text-blue-200 dark:visited:text-purple-200 underline;
     }
+
     p {
         @apply text-justify mx-0 my-[1ex];
     }
+
     ol {
         @apply list-decimal;
     }
+
     ul {
         @apply list-disc;
     }
+
     li {
         @apply list-item list-inside;
     }
+
     nav {
         @apply pt-[1ex];
     }
+
     blockquote {
         @apply border-s-4 border-slate-300 dark:border-slate-500 ps-2 pe-3 my-[1ex];
     }
+
     code {
         @apply normal-nums tabular-nums font-mono;
     }
@@ -55,29 +120,8 @@
     header > h1:first-child {
         @apply font-bold text-x250;
     }
-    .grid-cols-centre > * {
-        @apply col-2;
-    }
+
     nav > *:not(:first-child)::before {
         content: ' ▸ ';
-    }
-}
-
-@layer utilities {
-    .wrap-parens {
-        @apply before:content-['('] after:content-[')'];
-    }
-
-    .bg-draft {
-        @apply fixed -z-10 rotate-45 fill-slate-700;
-        --tw-translate-x: -25%;
-        --tw-translate-y: -25%;
-        width: calc(100vw + 100vh);
-        height: calc(100vw + 100vh);
-        /* fill=slate-200 */
-        @apply bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="%23e2e8f0"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
-        /* fill=slate-700 */
-        @apply dark:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="%23334155"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
-        background-repeat: repeat;
     }
 }
