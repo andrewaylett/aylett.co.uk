@@ -10,7 +10,6 @@ const { withPlausibleProxy } = require('next-plausible');
 
 module.exports = withPlausibleProxy()(
   /** @type {NextConfig} */ {
-    swcMinify: true,
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
     productionBrowserSourceMaps: true,

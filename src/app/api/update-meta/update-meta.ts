@@ -220,13 +220,15 @@ async function* processDirectory(
       };
 
       await baseProcessor()
-        .use(() => (tree: Root, file: VFile) => {
-          const frontMatter = file.data.frontMatter;
-          if (frontMatter) {
-            tree.children.unshift(frontMatter);
-          }
-        })
-        .use(remarkStringify)
+        .use([
+          () => (tree: Root, file: VFile) => {
+            const frontMatter = file.data.frontMatter;
+            if (frontMatter) {
+              tree.children.unshift(frontMatter);
+            }
+          },
+          remarkStringify,
+        ])
         .process(vfile);
 
       await write(vfile);

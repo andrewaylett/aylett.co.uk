@@ -58,6 +58,6 @@ export function assertSchema<T extends JSONSchema7>(
     schema as Revalidator.JSONSchema<unknown>,
   );
   if (!valid) {
-    throw new Error(`Invalid YAML: ${errors.join(', ')}`);
+    throw new Error(`Invalid YAML: ${errors.map((e) => e.message).join(', ')}`);
   }
 }

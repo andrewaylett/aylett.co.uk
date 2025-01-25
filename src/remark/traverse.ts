@@ -81,7 +81,7 @@ export class Markdown<Schema extends JSONSchema7> {
   }
 
   id: string;
-  content: Promise<ReactElement<unknown>>;
+  content: Promise<ReactElement>;
   metadata: Promise<TypeFrom<Schema>>;
 }
 

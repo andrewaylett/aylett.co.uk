@@ -9,7 +9,7 @@ import type { Components } from 'rehype-react';
 
 // noinspection JSUnusedGlobalSymbols
 export const components = {
-  code: ({ children, ...props }) => {
+  code: ({ children, ...props }: React.JSX.IntrinsicElements['code']) => {
     if (props.className === 'language-mermaid') {
       return <Mermaid>{children}</Mermaid>;
     }

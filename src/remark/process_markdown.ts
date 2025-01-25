@@ -1,6 +1,6 @@
 import * as prod from 'react/jsx-runtime';
 import * as dev from 'react/jsx-dev-runtime';
-import { unified } from 'unified';
+import { Plugin, unified } from 'unified';
 import remarkParse from 'remark-parse';
 import rehypeSlug from 'rehype-slug';
 import remarkStringify from 'remark-stringify';
@@ -35,41 +35,44 @@ function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
   }
 }
 
-export function baseProcessor(): Processor<Root, Root, Root> {
-  return unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter)
-    .use(() => (tree: Root, file: VFile): Root => {
-      shiftIf(tree.children, (yamlnode) => {
-        if (is<'yaml'>(yamlnode, 'yaml')) {
-          file.data.frontMatter = yamlnode;
-          return true;
-        }
-        return false;
-      });
-      return tree;
-    })
-    .use(gfm);
+export function baseProcessor(): Processor {
+  return unified().use([
+    remarkParse,
+    remarkFrontmatter,
+    () =>
+      (tree: Root, file: VFile): Root => {
+        shiftIf(tree.children, (yamlnode) => {
+          if (is<'yaml'>(yamlnode, 'yaml')) {
+            file.data.frontMatter = yamlnode;
+            return true;
+          }
+          return false;
+        });
+        return tree;
+      },
+    gfm,
+  ]);
 }
 
 const development = process.env.NODE_ENV !== 'production';
 
-// @ts-expect-error: the React types are missing.
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
-// @ts-expect-error: the React types are missing.
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 const devJsx = { jsxDEV: dev.jsxDEV };
 
-export const intoReact = baseProcessor()
-  .use(remarkRehype)
-  .use(rehypeSlug)
-  .use(rehypeFormat)
-  .use(rehypeReact, {
-    components,
-    development,
-    ...devJsx,
-    ...prodJsx,
-  });
+export const intoReact: Processor = baseProcessor().use([
+  remarkRehype,
+  rehypeSlug,
+  rehypeFormat,
+  [
+    rehypeReact,
+    {
+      components,
+      development,
+      ...devJsx,
+      ...prodJsx,
+    },
+  ],
+]);
 
-export const intoText = baseProcessor().use(remarkStringify);
+export const intoText: Processor = baseProcessor().use([remarkStringify]);
