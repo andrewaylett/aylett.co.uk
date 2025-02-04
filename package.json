@@ -43,7 +43,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
-    "@types/node": "22.10.10",
+    "@types/node": "22.13.1",
     "@types/react": "19.0.8",
     "@types/revalidator": "0.3.12",
     "@types/rss": "0.0.32",
