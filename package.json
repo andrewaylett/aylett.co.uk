@@ -47,7 +47,7 @@
     "@types/react": "19.0.8",
     "@types/revalidator": "0.3.12",
     "@types/rss": "0.0.32",
-    "@typescript-eslint/eslint-plugin": "8.21.0",
+    "@typescript-eslint/eslint-plugin": "8.29.0",
     "encoding": "0.1.13",
     "eslint": "9.22.0",
     "eslint-config-andrewaylett": "4.0.1",

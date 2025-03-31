@@ -1,6 +1,6 @@
 import * as prod from 'react/jsx-runtime';
 import * as dev from 'react/jsx-dev-runtime';
-import { Plugin, unified } from 'unified';
+import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import rehypeSlug from 'rehype-slug';
 import remarkStringify from 'remark-stringify';
