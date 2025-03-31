@@ -46,6 +46,12 @@ repos:
           - ejs
           - json
           - xml
+      - id: dedupe
+        name: Dedupe
+        language: system
+        entry: "npm dedupe"
+        pass_filenames: false
+        files: package-lock.json
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.32.1
