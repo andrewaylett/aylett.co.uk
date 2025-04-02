@@ -12,7 +12,9 @@
           "$ref": "#/definitions/stage"
         }
       },
-      "required": ["pipeline"]
+      "required": [
+        "pipeline"
+      ]
     },
     "stage": {
       "type": "object",
@@ -24,7 +26,9 @@
           "$ref": "#/definitions/ecr"
         }
       ],
-      "required": ["image"]
+      "required": [
+        "image"
+      ]
     },
     "cloneable": {
       "type": "object",
@@ -86,7 +90,9 @@
           "$ref": "#/definitions/when"
         }
       },
-      "required": ["image"]
+      "required": [
+        "image"
+      ]
     },
     "ecr": {
       "type": "object",
@@ -117,7 +123,10 @@
           }
         }
       },
-      "required": ["image", "repo"]
+      "required": [
+        "image",
+        "repo"
+      ]
     },
     "when": {
       "description": "Restrict when this stage will be executed",
@@ -171,7 +180,12 @@
     },
     "region": {
       "description": "An AWS region",
-      "enum": ["eu-west-1", "eu-central-1", "ap-southeast-1", "ap-northeast-1"]
+      "enum": [
+        "eu-west-1",
+        "eu-central-1",
+        "ap-southeast-1",
+        "ap-northeast-1"
+      ]
     },
     "variable": {
       "type": "string",

@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -13,7 +16,9 @@
     "moduleResolution": "node",
     "isolatedModules": true,
     "jsx": "preserve",
-    "typeRoots": ["types"],
+    "typeRoots": [
+      "types"
+    ],
     "incremental": true,
     "allowJs": true,
     "esModuleInterop": true,
@@ -24,7 +29,11 @@
       }
     ]
   },
-  "exclude": ["node_modules", ".next", "out"],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out"
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
