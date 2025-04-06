@@ -60,10 +60,7 @@ export async function traverse(dir: string): Promise<MDFile[]> {
 }
 
 export class Markdown<Schema extends JSONSchema7> {
-  constructor(
-    private mdFile: MDFile,
-    schema: Schema,
-  ) {
+  constructor(mdFile: MDFile, schema: Schema) {
     this.id = mdFile.id;
     const vfile = mdFile.vfile.then((v) => intoReact.process(v));
     this.content = vfile.then((v) => v.result as ReactElement);

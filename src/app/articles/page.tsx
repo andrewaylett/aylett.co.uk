@@ -65,7 +65,8 @@ function Entry({
   metadata: Promise<TypeFrom<ArticleSchema>>;
   name: string;
 }) {
-  const resolved = use(metadata);
+  const { abstract, author, lifecycle, revised, revision, title } =
+    use(metadata);
   return (
     <div
       property="itemListElement"
@@ -74,31 +75,27 @@ function Entry({
     >
       <div className="flex flex-row flex-wrap gap-x-[1ch]">
         <span className="inline-block">
-          {resolved.lifecycle === 'draft' ? 'Draft: ' : ''}
+          {lifecycle === 'draft' ? 'Draft: ' : ''}
           <Link property="url" href={`/articles/${name}`}>
-            <span property="headline">{resolved.title}</span>
+            <span property="headline">{title}</span>
           </Link>
-          {resolved.author && (
-            <span
-              property="author"
-              typeof="Person"
-              resource={`#${resolved.author}`}
-            >
+          {author && (
+            <span property="author" typeof="Person" resource={`#${author}`}>
               {' - '}
-              <span property="name">{resolved.author}</span>
+              <span property="name">{author}</span>
             </span>
           )}
         </span>
         <span className="inline-block">
           <span className="wrap-parens text-smaller">
-            {resolved.revision && `v${resolved.revision}, `}
-            {resolved.revised.split('/')[0]}
+            {revision && `v${revision}, `}
+            {revised.split('/')[0]}
           </span>
-          {resolved.abstract && ':'}
+          {abstract && ':'}
         </span>
-        {resolved.abstract && (
+        {abstract && (
           <span className="inline-block" property="alternativeHeadline">
-            {resolved.abstract}
+            {abstract}
           </span>
         )}
       </div>

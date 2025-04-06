@@ -10,9 +10,10 @@ import type { Markdown } from '../../remark/traverse';
 import 'server-only';
 
 export async function articleForId(
-  id: string,
+  params: Promise<{ id: string }>,
 ): Promise<Markdown<ArticleSchema>> {
   const articles = await allArticles();
+  const id = (await params).id;
   return articles.find((article) => article.id === id) ?? notFound();
 }
 

@@ -150,7 +150,6 @@ async function* processDirectory(
     const vfile = await intoText.process(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const metadata: Partial<Entry> = parse(frontMatter?.value ?? '');
     metadata.url = `/${dir}/${mdFile.id}`;
 
@@ -200,7 +199,6 @@ async function* processDirectory(
       const yamlLines = lines.filter((line) => !line.startsWith('```'));
       let yaml: Partial<Entry>;
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         yaml = parse(yamlLines.join('\n'));
       } catch (e) {
         throw new Error(`Could not parse YAML from:\n${yamlLines.join('\n')}`, {

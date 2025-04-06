@@ -61,3 +61,26 @@ export function assertSchema<T extends JSONSchema7>(
     throw new Error(`Invalid YAML: ${errors.map((e) => e.message).join(', ')}`);
   }
 }
+
+export type Exploded<U> = {
+  [k in keyof U]: U[k] extends PromiseLike<unknown> ? U[k] : Promise<U[k]>;
+};
+
+type ExplodedProxy<V> =
+  | Partial<Exploded<V>>
+  | {
+      input: Promise<V>;
+    };
+
+/**
+ * Takes a promise of object (with keys) and returns an object with promises for each key.
+ *
+ * This means we can delay calling `use()` until we need the values, even if we need to destructure earlier.
+ */
+export function explode<V extends object>(input: PromiseLike<V>): Exploded<V> {
+  const proxy: ExplodedProxy<V> = { input: Promise.resolve(input) };
+  return new Proxy(proxy, {
+    get: (target, prop: string): Promise<V[keyof V]> =>
+      target.input.then((t) => Reflect.get(t, prop)),
+  }) as Partial<Exploded<V>> as Exploded<V>;
+}

@@ -1,14 +1,13 @@
 // @ts-check
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { withPlausibleProxy } = require('next-plausible');
+import { withPlausibleProxy } from 'next-plausible';
 
 /**
  * @typedef {import('next/dist/server/config-shared').NextConfig} NextConfig
  * @typedef {import('next/dist/lib/load-custom-routes').Header} Header
  */
 
-module.exports = withPlausibleProxy()(
+export default withPlausibleProxy()(
   /** @type {NextConfig} */ {
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],

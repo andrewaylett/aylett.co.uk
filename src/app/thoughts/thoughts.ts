@@ -10,9 +10,10 @@ import 'server-only';
 import type { Markdown } from '../../remark/traverse';
 
 export async function thoughtForId(
-  id: string,
+  params: Promise<{ id: string }>,
 ): Promise<Markdown<ThoughtSchema>> {
   const pages = await allThoughts();
+  const id = (await params).id;
   return pages.find((page) => page.id === id) ?? notFound();
 }
 

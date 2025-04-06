@@ -10,9 +10,9 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
+import { ArticleSchema, explode } from '../../../types';
 
 import type { Markdown } from '../../../remark/traverse';
-import type { ArticleSchema } from '../../../types';
 import type { FooterProps } from '../../footer';
 import type { Metadata } from 'next';
 
@@ -27,9 +27,9 @@ export const dynamic = 'error';
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const page = await articleForId(params.id);
+  const page = await articleForId(params);
 
   const metadata = await page.metadata;
 
@@ -100,9 +100,9 @@ const Revisions: React.FC<{
 export default function article({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): React.ReactNode {
-  const page = useMemo(() => articleForId(params.id), [params.id]);
+  const page = useMemo(() => articleForId(params), [params]);
   const lifecycle = useMemo(
     () => () => use(use(page).metadata).lifecycle,
     [page],
@@ -111,11 +111,11 @@ export default function article({
     <PageStructure<typeof page>
       lifecycle={lifecycle}
       schemaType="Article"
-      resource={`/articles/${params.id}`}
+      resource={`/articles/${use(params).id}`}
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
       header={
         <Suspense>
-          <ArticleHeader id={params.id} page={page} />
+          <ArticleHeader id={use(params).id} page={page} />
         </Suspense>
       }
       footer={{
@@ -140,7 +140,7 @@ function ArticlePage({
 }: {
   page: Promise<Markdown<ArticleSchema>>;
 }): ReactElement {
-  const { content } = use(page);
+  const { content } = explode(page);
 
   return <div property="articleBody">{use(content)}</div>;
 }
@@ -152,7 +152,7 @@ function ArticleHeader({
   id: string;
   page: Promise<Markdown<ArticleSchema>>;
 }) {
-  const { metadata } = use(page);
+  const { metadata } = explode(page);
 
   return (
     <header>
