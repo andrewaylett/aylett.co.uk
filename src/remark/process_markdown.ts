@@ -10,6 +10,7 @@ import gfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeReact from 'rehype-react';
 import rehypeFormat from 'rehype-format';
+import { visit } from 'unist-util-visit';
 
 import { components } from './components';
 
@@ -47,6 +48,13 @@ export function baseProcessor(): Processor {
             return true;
           }
           return false;
+        });
+        return tree;
+      },
+    () =>
+      (tree: Root): Root => {
+        visit(tree, 'text', (node) => {
+          node.value = node.value.replaceAll(' -- ', ' — ');
         });
         return tree;
       },

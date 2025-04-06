@@ -12,9 +12,9 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
+import { explode, ThoughtSchema, TypeFrom } from '../../../types';
 
 import type { Markdown } from '../../../remark/traverse';
-import type { ThoughtSchema, TypeFrom } from '../../../types';
 import type { Metadata } from 'next';
 import type { FooterProps } from '../../footer';
 
@@ -29,9 +29,9 @@ export const dynamic = 'error';
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const page = await thoughtForId(params.id);
+  const page = await thoughtForId(params);
 
   const metadata = await page.metadata;
 
@@ -80,9 +80,9 @@ const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
 export default function article({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): React.ReactNode {
-  const page = thoughtForId(params.id);
+  const page = thoughtForId(params);
   return (
     <Suspense>
       <Thought page={page} />
@@ -91,14 +91,14 @@ export default function article({
 }
 
 function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
-  const { content, id, metadata } = use(page);
+  const { content, id, metadata } = explode(page);
 
   return (
     <PageStructure<typeof page>
       schemaType="Article"
-      resource={`/thoughts/${id}`}
+      resource={`/thoughts/${use(id)}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
-      header={<ThoughtHeader id={id} metadata={metadata} />}
+      header={<ThoughtHeader id={use(id)} metadata={metadata} />}
       footer={{
         func: (page): FooterProps => {
           const metadata = use(use(page).metadata);
