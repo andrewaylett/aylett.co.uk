@@ -4,7 +4,7 @@ import { Suspense, use } from 'react';
 
 import Link from 'next/link';
 
-import { GITHUB_URL } from '../../../github';
+import { gitHubUrl } from '../../../github';
 import { allThoughts, thoughtForId } from '../thoughts';
 import {
   Description,
@@ -12,25 +12,23 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
-import { explode, ThoughtSchema, TypeFrom } from '../../../types';
+import { useExploded, ThoughtSchema, TypeFrom } from '../../../types';
 
 import type { Markdown } from '../../../remark/traverse';
 import type { Metadata } from 'next';
-import type { FooterProps } from '../../footer';
 
 import 'server-only';
 
-// noinspection JSUnusedGlobalSymbols
 export const dynamicParams = false;
-// noinspection JSUnusedGlobalSymbols
 export const dynamic = 'error';
 
-// noinspection JSUnusedGlobalSymbols
+interface ThoughtProps {
+  params: Promise<{ id: string }>;
+}
+
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+}: ThoughtProps): Promise<Metadata> {
   const page = await thoughtForId(params);
 
   const metadata = await page.metadata;
@@ -52,7 +50,6 @@ export async function generateMetadata({
   };
 }
 
-// noinspection JSUnusedGlobalSymbols
 export async function generateStaticParams() {
   const thoughts = await allThoughts();
   return thoughts.map((thought) => ({
@@ -67,7 +64,7 @@ const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
         className="text-inherit"
         property="subjectOf"
         typeof="SoftwareSourceCode"
-        href={GITHUB_URL(url)}
+        href={gitHubUrl(url)}
       >
         Date
       </a>
@@ -76,12 +73,7 @@ const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
   </div>
 );
 
-// noinspection JSUnusedGlobalSymbols
-export default function article({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): React.ReactNode {
+export default function thought({ params }: ThoughtProps): React.ReactNode {
   const page = thoughtForId(params);
   return (
     <Suspense>
@@ -91,7 +83,8 @@ export default function article({
 }
 
 function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
-  const { content, id, metadata } = explode(page);
+  const { content, id, metadata } = useExploded(page);
+  const { date, tags } = useExploded(metadata);
 
   return (
     <PageStructure<typeof page>
@@ -99,16 +92,8 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
       resource={`/thoughts/${use(id)}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
       header={<ThoughtHeader id={use(id)} metadata={metadata} />}
-      footer={{
-        func: (page): FooterProps => {
-          const metadata = use(use(page).metadata);
-          return {
-            copyright: metadata.date.split('/')[0],
-            keywords: metadata.tags,
-          };
-        },
-        input: page,
-      }}
+      copyright={date.then((d) => d.split('/')[0])}
+      keywords={tags}
     >
       <Suspense>
         <div property="articleBody">

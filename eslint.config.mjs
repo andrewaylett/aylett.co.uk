@@ -23,7 +23,9 @@ export default tseslint.config(
         languageOptions: {
             parserOptions: {
                 project: true,
-                projectService: true,
+                projectService: {
+                    allowDefaultProject: ['*.js', '*.mjs'],
+                },
             },
             globals: {
                 ...globals['shared-node-browser'],
@@ -52,14 +54,6 @@ export default tseslint.config(
         languageOptions: {
             globals: {
                 ...globals.node,
-            },
-        },
-    },
-    {
-        files: ['src/client/*'],
-        languageOptions: {
-            globals: {
-                ...globals.browser,
             },
         },
     },

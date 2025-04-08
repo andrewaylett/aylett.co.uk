@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 
 import 'client-only';
 
-export function useDarkMode() {
+export function useDarkMode(): boolean {
   const mediaQuery = useMemo(
     () =>
       typeof globalThis.matchMedia === 'function'
@@ -13,18 +13,23 @@ export function useDarkMode() {
     [globalThis],
   );
 
-  const [isDarkMode, setIsDarkMode] = useState(mediaQuery?.matches);
+  const [isDarkMode, setIsDarkMode] = useState(mediaQuery?.matches ?? false);
 
   useEffect(() => {
     const handleMediaQueryChange = (event: MediaQueryListEvent) => {
       setIsDarkMode(event.matches);
     };
 
-    mediaQuery?.addEventListener('change', handleMediaQueryChange);
+    const abortController = new AbortController();
 
-    return () => {
-      mediaQuery?.removeEventListener('change', handleMediaQueryChange);
-    };
+    if (mediaQuery) {
+      mediaQuery.addEventListener('change', handleMediaQueryChange, {
+        passive: true,
+        signal: abortController.signal,
+      });
+    }
+
+    return () => abortController.abort();
   }, [mediaQuery]);
 
   return isDarkMode;

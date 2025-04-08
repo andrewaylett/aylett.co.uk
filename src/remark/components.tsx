@@ -7,7 +7,6 @@ import { Mermaid } from '../client/mermaid';
 
 import type { Components } from 'rehype-react';
 
-// noinspection JSUnusedGlobalSymbols
 export const components = {
   code: ({ children, ...props }: React.JSX.IntrinsicElements['code']) => {
     if (props.className === 'language-mermaid') {

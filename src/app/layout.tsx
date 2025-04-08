@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { PropsWithChildren } from 'react';
 
 import PlausibleProvider from 'next-plausible';
 import localFont from 'next/font/local';
@@ -97,7 +98,6 @@ const plexSans = localFont({
   ],
 });
 
-// noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_URL
@@ -112,7 +112,6 @@ export const metadata: Metadata = {
   publisher: 'Andrew Aylett',
 };
 
-// noinspection JSUnusedGlobalSymbols
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
@@ -120,12 +119,9 @@ export const viewport: Viewport = {
   ],
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}): React.ReactNode {
+}: PropsWithChildren): React.ReactNode {
   return (
     <html
       lang="en"

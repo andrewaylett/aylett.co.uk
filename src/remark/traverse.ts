@@ -45,7 +45,7 @@ export async function traverse(dir: string): Promise<MDFile[]> {
     }),
   );
   function* gen() {
-    for (const { ext, fullPath, name, stats } of filesAndStats.flat()) {
+    for (const { ext, fullPath, name, stats } of filesAndStats) {
       if (ext.startsWith('.md') && stats.isFile()) {
         yield {
           path: fullPath,

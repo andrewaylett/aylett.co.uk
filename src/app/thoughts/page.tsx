@@ -28,7 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function thoughts(): React.ReactNode {
   const pages = allThoughts();
   return (

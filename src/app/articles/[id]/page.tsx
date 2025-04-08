@@ -1,8 +1,8 @@
 import * as React from 'react';
 import type { ReactElement } from 'react';
-import { Suspense, use, useMemo } from 'react';
+import { Suspense, use } from 'react';
 
-import { GITHUB_URL } from '../../../github';
+import { gitHubUrl } from '../../../github';
 import { allArticles, articleForId } from '../articles';
 import {
   Description,
@@ -10,25 +10,23 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { PageStructure } from '../../../page-structure';
-import { ArticleSchema, explode } from '../../../types';
+import { ArticleSchema, useExploded } from '../../../types';
 
 import type { Markdown } from '../../../remark/traverse';
-import type { FooterProps } from '../../footer';
 import type { Metadata } from 'next';
 
 import 'server-only';
 
-// noinspection JSUnusedGlobalSymbols
 export const dynamicParams = false;
-// noinspection JSUnusedGlobalSymbols
 export const dynamic = 'error';
 
-// noinspection JSUnusedGlobalSymbols
+interface ArticleProps {
+  params: Promise<{ id: string }>;
+}
+
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+}: ArticleProps): Promise<Metadata> {
   const page = await articleForId(params);
 
   const metadata = await page.metadata;
@@ -59,7 +57,6 @@ export async function generateMetadata({
   };
 }
 
-// noinspection JSUnusedGlobalSymbols
 export async function generateStaticParams() {
   const pages = await allArticles();
   return pages.map((page) => ({
@@ -84,7 +81,7 @@ const Revisions: React.FC<{
         className="text-inherit underline"
         property="subjectOf"
         typeof="SoftwareSourceCode"
-        href={GITHUB_URL(url)}
+        href={gitHubUrl(url)}
       >
         Last Revised
       </a>
@@ -96,17 +93,10 @@ const Revisions: React.FC<{
   </div>
 );
 
-// noinspection JSUnusedGlobalSymbols
-export default function article({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): React.ReactNode {
-  const page = useMemo(() => articleForId(params), [params]);
-  const lifecycle = useMemo(
-    () => () => use(use(page).metadata).lifecycle,
-    [page],
-  );
+export default function article({ params }: ArticleProps): React.ReactNode {
+  const page = articleForId(params);
+  const { metadata } = useExploded(page);
+  const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
   return (
     <PageStructure<typeof page>
       lifecycle={lifecycle}
@@ -118,17 +108,11 @@ export default function article({
           <ArticleHeader id={use(params).id} page={page} />
         </Suspense>
       }
-      footer={{
-        func: (page): FooterProps => {
-          const metadata = use(use(page).metadata);
-          return {
-            author: metadata.author,
-            copyright: metadata.copyright,
-            keywords: metadata.tags,
-          };
-        },
-        input: page,
-      }}
+      author={author}
+      copyright={copyright.then(
+        (c) => c || revised.then((r) => r.split('/')[0]),
+      )}
+      keywords={tags}
     >
       <ArticlePage page={page} />
     </PageStructure>
@@ -140,7 +124,7 @@ function ArticlePage({
 }: {
   page: Promise<Markdown<ArticleSchema>>;
 }): ReactElement {
-  const { content } = explode(page);
+  const { content } = useExploded(page);
 
   return <div property="articleBody">{use(content)}</div>;
 }
@@ -152,7 +136,7 @@ function ArticleHeader({
   id: string;
   page: Promise<Markdown<ArticleSchema>>;
 }) {
-  const { metadata } = explode(page);
+  const { metadata } = useExploded(page);
 
   return (
     <header>

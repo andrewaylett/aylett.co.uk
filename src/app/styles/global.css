@@ -1,9 +1,10 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source('../../');
 
 @theme {
     --text-smaller: smaller;
     --text-x250: 250%;
 
+    /*noinspection CssUnresolvedCustomProperty*/
     --font-sans: IBM Plex Sans, var(--font-plex-sans), Roboto, sans-serif;
     --font-mono: JetBrains Mono, ui-monospace, monospace;
 

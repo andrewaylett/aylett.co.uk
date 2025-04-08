@@ -47,7 +47,6 @@ function Entry({ value }: { value: Entry }) {
   );
 }
 
-// noinspection JSUnusedGlobalSymbols
 export default function Meta(): React.ReactElement {
   const meta = run();
   return (
