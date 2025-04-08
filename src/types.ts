@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { validate } from 'revalidator';
 
 import type { JSONSchema7 } from 'json-schema';
@@ -63,24 +65,19 @@ export function assertSchema<T extends JSONSchema7>(
 }
 
 export type Exploded<U> = {
-  [k in keyof U]: U[k] extends PromiseLike<unknown> ? U[k] : Promise<U[k]>;
+  [k in keyof U]: U[k] extends Promise<infer V> ? Promise<V> : Promise<U[k]>;
 };
-
-type ExplodedProxy<V> =
-  | Partial<Exploded<V>>
-  | {
-      input: Promise<V>;
-    };
 
 /**
  * Takes a promise of object (with keys) and returns an object with promises for each key.
  *
  * This means we can delay calling `use()` until we need the values, even if we need to destructure earlier.
  */
-export function explode<V extends object>(input: PromiseLike<V>): Exploded<V> {
-  const proxy: ExplodedProxy<V> = { input: Promise.resolve(input) };
-  return new Proxy(proxy, {
-    get: (target, prop: string): Promise<V[keyof V]> =>
-      target.input.then((t) => Reflect.get(t, prop)),
-  }) as Partial<Exploded<V>> as Exploded<V>;
+export function useExploded<V extends object>(input: Promise<V>): Exploded<V> {
+  return useMemo(() => {
+    return new Proxy(input, {
+      get: (target, prop: string): Promise<V[keyof V]> =>
+        target.then((t) => Reflect.get(t, prop)),
+    }) as Exploded<V>;
+  }, [input]);
 }

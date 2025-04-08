@@ -6,12 +6,10 @@ import type { Metadata } from 'next';
 
 import 'server-only';
 
-// noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   title: 'Links',
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function Links(): React.ReactNode {
   return (
     <PageStructure

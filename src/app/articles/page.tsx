@@ -15,7 +15,6 @@ import type { Metadata } from 'next';
 
 import 'server-only';
 
-// noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   title: 'Articles',
   alternates: {
@@ -27,7 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function articles(): React.ReactNode {
   const pages = allArticles();
   return (

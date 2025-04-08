@@ -6,12 +6,10 @@ import type { Metadata } from 'next';
 
 import 'server-only';
 
-// noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   title: 'Schemas',
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function Schema(): React.ReactNode {
   return (
     <PageStructure
@@ -31,30 +29,28 @@ export default function Schema(): React.ReactNode {
         If you&apos;re using any of them, please let me know. And please feel
         free to submit PRs to update/enhance/fix them.
       </p>
-      <p>
-        <ol>
-          <li>
-            <a
-              property="item"
-              typeof="SoftwareSourceCode"
-              href="/schema/clientConfig-1.1.xsd"
-            >
-              <span property="description">Autoconfig schema for email</span>
-            </a>
-          </li>
-          <li>
-            <a
-              property="item"
-              typeof="SoftwareSourceCode"
-              href="/schema/drone-0.8.json"
-            >
-              <span property="description">
-                Schema for <code>.drone.yml</code> files targeting Drone 0.8
-              </span>
-            </a>
-          </li>
-        </ol>
-      </p>
+      <ol>
+        <li>
+          <a
+            property="item"
+            typeof="SoftwareSourceCode"
+            href="/schema/clientConfig-1.1.xsd"
+          >
+            <span property="description">Autoconfig schema for email</span>
+          </a>
+        </li>
+        <li>
+          <a
+            property="item"
+            typeof="SoftwareSourceCode"
+            href="/schema/drone-0.8.json"
+          >
+            <span property="description">
+              Schema for <code>.drone.yml</code> files targeting Drone 0.8
+            </span>
+          </a>
+        </li>
+      </ol>
     </PageStructure>
   );
 }

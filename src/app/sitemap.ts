@@ -3,7 +3,6 @@ import { allThoughts } from './thoughts/thoughts';
 
 import type { MetadataRoute } from 'next';
 
-// noinspection JSUnusedGlobalSymbols
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, thoughts] = await Promise.all([
     allArticles(),

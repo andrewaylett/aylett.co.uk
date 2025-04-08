@@ -7,12 +7,10 @@ import { PageStructure, TitleHeader } from '../../page-structure';
 
 import type { Metadata } from 'next';
 
-// noinspection JSUnusedGlobalSymbols
 export const metadata: Metadata = {
   title: 'QR Code',
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function Card(): React.ReactElement {
   return (
     <PageStructure

@@ -28,7 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-// noinspection JSUnusedGlobalSymbols
 export default function Home(): React.ReactNode {
   return (
     <div className="flex flex-col justify-center items-center px-2 min-h-screen">

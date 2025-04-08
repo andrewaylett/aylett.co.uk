@@ -1,23 +1,16 @@
-import type { PropsWithChildren } from 'react';
+import { PropsWithChildren, use } from 'react';
 import React, { Suspense } from 'react';
 
 import Link from 'next/link';
 import { JSONSchema7 } from 'json-schema';
 
-import Footer from './app/footer';
+import Footer, { FooterProps } from './app/footer';
 import { Markdown } from './remark/traverse';
 
-import type { FooterProps } from './app/footer';
-
-export interface FooterFunc<T> {
-  func: (input: T) => FooterProps;
-  input: T;
-}
-
-export interface PageStructureProps<T extends Promise<Markdown<JSONSchema7>>> {
+export interface PageStructureProps<T extends Promise<Markdown<JSONSchema7>>>
+  extends FooterProps {
   breadcrumbs: { href: string; text: string }[];
   header: React.JSX.Element;
-  footer?: FooterFunc<T>;
   lifecycle?: T extends Promise<Markdown<infer U>>
     ? U extends {
         properties: {
@@ -26,7 +19,7 @@ export interface PageStructureProps<T extends Promise<Markdown<JSONSchema7>>> {
           };
         };
       }
-      ? () => V[number]
+      ? Promise<V[number]>
       : never
     : never;
   schemaType: string;
@@ -44,17 +37,23 @@ export function TitleHeader({
 }
 
 export function PageStructure<T extends Promise<Markdown<JSONSchema7>>>({
+  author,
   breadcrumbs,
   children,
-  footer,
+  copyright,
   header,
+  keywords,
   lifecycle,
   resource,
   schemaType,
 }: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
   return (
     <>
-      {lifecycle && lifecycle() === 'draft' ? <div className="bg-draft" /> : ''}
+      {lifecycle && use(lifecycle) === 'draft' ? (
+        <div className="bg-draft" />
+      ) : (
+        ''
+      )}
       <div
         className="grid grid-cols-centre"
         vocab="https://schema.org/"
@@ -81,12 +80,10 @@ export function PageStructure<T extends Promise<Markdown<JSONSchema7>>>({
         <main className="hyphens-manual">
           <Suspense fallback="Rendering...">{children}</Suspense>
         </main>
-        <Suspense>{footer ? <FooterGen {...footer} /> : <Footer />}</Suspense>
+        <Suspense>
+          <Footer author={author} keywords={keywords} copyright={copyright} />
+        </Suspense>
       </div>
     </>
   );
-}
-
-function FooterGen<T>({ func, input }: FooterFunc<T>) {
-  return <Footer {...func(input)} />;
 }
