@@ -93,7 +93,7 @@ const Revisions: React.FC<{
   </div>
 );
 
-export default function article({ params }: ArticleProps): React.ReactNode {
+export default function Article({ params }: ArticleProps): React.ReactNode {
   const page = articleForId(params);
   const { metadata } = useExploded(page);
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);

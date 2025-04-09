@@ -13,7 +13,12 @@ export default function Footer({ author, copyright, keywords }: FooterProps) {
   return (
     <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex]">
       {keywords ? (
-        <div property="keywords">{use(keywords)?.join(', ')}</div>
+        <div property="keywords">
+          {use(keywords)
+            ?.map((s) => s.trim())
+            .filter((s) => s.length > 0)
+            .join(', ')}
+        </div>
       ) : null}
       <div property="copyrightNotice" className="text-right">
         Copyright ©{' '}
