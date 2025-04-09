@@ -90,7 +90,7 @@ export default async (
 ): Promise<NextConfig> => {
   const headers = [
     ...BASIC_HEADERS,
-    ...(phase in [PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER]
+    ...([PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER].includes(phase)
       ? PRODUCTION_HEADERS
       : []),
   ];
