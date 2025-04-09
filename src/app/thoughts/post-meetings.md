@@ -5,7 +5,7 @@ tags:
     - virtual meetings
     - remote work
     - team collaboration
-    - workflow improvement,
+    - workflow improvement
 date: 2023/04/10
 ---
 

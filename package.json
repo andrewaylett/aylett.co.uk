@@ -10,8 +10,8 @@
     "prebuild": "npm run lint",
     "build": "next build --experimental-app-only",
     "start": "next start",
-    "format": "npm run lint -- --fix",
-    "lint": "tsc -b . && eslint .",
+    "format": "next lint -d . --fix && tsc -b .",
+    "lint": "next lint -d . && tsc -b .",
     "test": "npm run lint"
   },
   "dependencies": {
@@ -54,6 +54,8 @@
     "eslint": "9.23.0",
     "eslint-config-andrewaylett": "4.0.1",
     "eslint-plugin-jest": "28.11.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
     "expect": "29.7.0",
     "globals": "^16.0.0",
     "identity-obj-proxy": "3.0.0",

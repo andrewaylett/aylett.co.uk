@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import type { Usable } from 'react';
 import { Suspense, use } from 'react';
 
@@ -73,7 +73,7 @@ const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
   </div>
 );
 
-export default function thought({ params }: ThoughtProps): React.ReactNode {
+export default function ThoughtPage({ params }: ThoughtProps): React.ReactNode {
   const page = thoughtForId(params);
   return (
     <Suspense>
