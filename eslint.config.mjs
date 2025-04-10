@@ -60,6 +60,26 @@ export default tseslint.config(
         },
       ],
       'unicorn/import-style': ['off'],
+      'react/no-unescaped-entities': [
+        'error',
+        {
+          forbid: [
+            {
+              char: '>',
+              alternatives: ['&gt;'],
+            },
+            {
+              char: '}',
+              alternatives: ['&#125;'],
+            },
+          ],
+        },
+      ],
+      'react/no-unknown-property': [
+        'error',
+        { ignore: ['property', 'resource', 'typeof', 'vocab'] },
+      ],
+      'import/no-extraneous-dependencies': ['error'],
     },
   },
   {
