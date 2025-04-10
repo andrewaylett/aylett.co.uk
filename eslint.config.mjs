@@ -73,6 +73,7 @@ export default tseslint.config(
                 'error',
                 { ignore: ['property', 'resource', 'typeof', 'vocab'] },
             ],
+            'import/no-extraneous-dependencies': ['error'],
         },
     },
     {

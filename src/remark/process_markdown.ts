@@ -7,12 +7,15 @@ import remarkStringify from 'remark-stringify';
 import remarkFrontmatter from 'remark-frontmatter';
 import { is } from 'unist-util-is';
 import gfm from 'remark-gfm';
+import retextSmartypants from 'retext-smartypants';
 import remarkRehype from 'remark-rehype';
 import rehypeReact from 'rehype-react';
 import rehypeFormat from 'rehype-format';
 import { visit } from 'unist-util-visit';
 
 import { components } from './components';
+import retextRemark from './retextRemark';
+import remarkRetextEnglish from './remarkRetextEnglish';
 
 import type { Root, Yaml } from 'mdast';
 import type { VFile } from 'vfile';
@@ -36,8 +39,9 @@ function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
   }
 }
 
-export function baseProcessor(): Processor {
-  return unified().use([
+export const baseProcessor: Processor = unified()
+  .use([
+    // First we split off the frontmatter
     remarkParse,
     remarkFrontmatter,
     () =>
@@ -51,16 +55,21 @@ export function baseProcessor(): Processor {
         });
         return tree;
       },
+    // Then we convert the markdown back to text, to process the text
+    remarkRetextEnglish,
+    [retextSmartypants, { dashes: false, quotes: true }],
+    // Last we convert the text back to markdown
+    retextRemark,
     () =>
       (tree: Root): Root => {
         visit(tree, 'text', (node) => {
-          node.value = node.value.replaceAll(' -- ', ' — ');
+          node.value = node.value.replaceAll(/\s+--\s+/g, ' — ');
         });
         return tree;
       },
     gfm,
-  ]);
-}
+  ])
+  .freeze();
 
 const development = process.env.NODE_ENV !== 'production';
 
@@ -68,19 +77,23 @@ const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
 
 const devJsx = { jsxDEV: dev.jsxDEV };
 
-export const intoReact: Processor = baseProcessor().use([
-  remarkRehype,
-  rehypeSlug,
-  rehypeFormat,
-  [
-    rehypeReact,
-    {
-      components,
-      development,
-      ...devJsx,
-      ...prodJsx,
-    },
-  ],
-]);
+export const intoReact: Processor = baseProcessor()
+  .use([
+    remarkRehype,
+    rehypeSlug,
+    rehypeFormat,
+    [
+      rehypeReact,
+      {
+        components,
+        development,
+        ...devJsx,
+        ...prodJsx,
+      },
+    ],
+  ])
+  .freeze();
 
-export const intoText: Processor = baseProcessor().use([remarkStringify]);
+export const intoText: Processor = baseProcessor()
+  .use([remarkStringify])
+  .freeze();

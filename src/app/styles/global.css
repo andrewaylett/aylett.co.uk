@@ -33,7 +33,7 @@
 
 @utility grid-cols-centre {
     & > * {
-        @apply col-2;
+        @apply col-2 px-0 mx-0;
     }
 }
 
@@ -58,6 +58,18 @@
     :root {
         /* With thanks to https://jameshfisher.com/2024/03/12/a-formula-for-responsive-font-size/ */
         font-size: calc(1rem + 0.25vmax);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply mt-[0.5lh] mb-[0.25lh] text-balance;
+    }
+
+    p, ol, ul, blockquote {
+        @apply my-[0.5lh]
+    }
+
+    :is(div.flex, header) > :is(h1, h2, h3, h4, h5, h6, p, ol, ul, blockquote) {
+        @apply my-[0.25lh]
     }
 
     h1 {
@@ -88,8 +100,8 @@
         @apply text-blue-800 visited:text-purple-800 dark:text-blue-200 dark:visited:text-purple-200 underline;
     }
 
-    p {
-        @apply text-justify mx-0 my-[1ex];
+    p, blockquote {
+        @apply text-justify text-pretty;
     }
 
     ol {
@@ -105,11 +117,11 @@
     }
 
     nav {
-        @apply pt-[1ex];
+        @apply pt-[0.5lh];
     }
 
     blockquote {
-        @apply border-s-4 border-slate-300 dark:border-slate-500 ps-2 pe-3 my-[1ex];
+        @apply border-s-4 border-slate-300 dark:border-slate-500 ps-2 pe-3;
     }
 
     code {
