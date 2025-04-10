@@ -39,5 +39,5 @@ export function Optional({
 }
 
 export function TitleSeparator() {
-  return <hr className="my-3 mx-[15%]" />;
+  return <hr className="mx-[15%]" />;
 }

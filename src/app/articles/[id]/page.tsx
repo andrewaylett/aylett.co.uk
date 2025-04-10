@@ -142,11 +142,11 @@ function ArticleHeader({
     <header>
       <h1 property="headline">{use(metadata).title}</h1>
       {use(metadata).abstract ? (
-        <span property="alternativeHeadline">{use(metadata).abstract}</span>
+        <p property="alternativeHeadline">{use(metadata).abstract}</p>
       ) : (
         ''
       )}
-      <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex]">
+      <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex] my-[0.5lh]">
         {use(metadata).author && (
           <div className="author" property="author" typeof="Person">
             Author: <span property="name">{use(metadata).author}</span>
