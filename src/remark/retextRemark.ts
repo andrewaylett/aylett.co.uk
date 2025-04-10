@@ -7,9 +7,9 @@ import {
   type Options as FromMarkdownOptions,
 } from 'mdast-util-from-markdown';
 import { type Extension as MicromarkExtension } from 'micromark-util-types';
-import { type Root as NclstRoot } from 'nlcst';
+import { type Root as NlcstRoot } from 'nlcst';
+import { type Processor, type Plugin } from 'unified';
 import { toString } from 'nlcst-to-string';
-import { type Plugin, type Processor } from 'unified';
 
 export type Options = Omit<
   FromMarkdownOptions,
@@ -51,13 +51,13 @@ declare module 'unified' {
 
 const retextRemark: Plugin<
   [(Readonly<Options> | null | undefined)?],
-  NclstRoot,
+  NlcstRoot,
   MdastRoot
 > = function retextRemark(
   this: Processor,
   options: Readonly<Options> | null | undefined,
-): (doc: NclstRoot) => MdastRoot {
-  return (doc: NclstRoot): MdastRoot => {
+): (doc: NlcstRoot) => MdastRoot {
+  return (doc: NlcstRoot): MdastRoot => {
     return fromMarkdown(toString(doc), {
       ...this.data('settings'),
       ...options,
