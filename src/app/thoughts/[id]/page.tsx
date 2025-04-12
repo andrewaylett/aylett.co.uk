@@ -1,21 +1,23 @@
-import type * as React from 'react';
-import type { Usable } from 'react';
-import { Suspense, use } from 'react';
+import React, { type ReactNode, Suspense, type Usable, use } from 'react';
 
+import { type Metadata } from 'next';
 import Link from 'next/link';
 
 import { gitHubUrl } from '../../../github';
-import { allThoughts, thoughtForId } from '../thoughts';
+import { PageStructure } from '../../../page-structure';
 import {
   Description,
   Optional,
   TitleSeparator,
 } from '../../../remark/components';
-import { PageStructure } from '../../../page-structure';
-import { useExploded, ThoughtSchema, TypeFrom } from '../../../types';
-
-import type { Markdown } from '../../../remark/traverse';
-import type { Metadata } from 'next';
+import { type Markdown } from '../../../remark/traverse';
+import {
+  memo,
+  type ThoughtSchema,
+  type TypeFrom,
+  useExploded,
+} from '../../../types';
+import { allThoughts, thoughtForId } from '../thoughts';
 
 import 'server-only';
 
@@ -57,32 +59,46 @@ export async function generateStaticParams() {
   }));
 }
 
-const Revisions: React.FC<{ date: string; url: string }> = ({ date, url }) => (
-  <div className="flex flex-row flex-wrap gap-x-[1ch]">
-    <Optional text={date}>
-      <a
-        className="text-inherit"
-        property="subjectOf"
-        typeof="SoftwareSourceCode"
-        href={gitHubUrl(url)}
-      >
-        Date
-      </a>
-      :&nbsp;<span property="datePublished">{date}</span>
-    </Optional>
-  </div>
-);
+const Revisions = memo(function Revisions({
+  date,
+  url,
+}: {
+  date: string;
+  url: string;
+}) {
+  return (
+    <div className="flex flex-row flex-wrap gap-x-[1ch]">
+      <Optional text={date}>
+        <a
+          className="text-inherit"
+          property="subjectOf"
+          typeof="SoftwareSourceCode"
+          href={gitHubUrl(url)}
+        >
+          Date
+        </a>
+        :&nbsp;<span property="datePublished">{date}</span>
+      </Optional>
+    </div>
+  );
+});
 
-export default function ThoughtPage({ params }: ThoughtProps): React.ReactNode {
+const ThoughtPage = memo(function ThoughtPage({ params }: ThoughtProps) {
   const page = thoughtForId(params);
   return (
     <Suspense>
       <Thought page={page} />
     </Suspense>
   );
-}
+});
 
-function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
+export default ThoughtPage;
+
+const Thought = memo(function Thought({
+  page,
+}: {
+  page: Promise<Markdown<ThoughtSchema>>;
+}) {
   const { content, id, metadata } = useExploded(page);
   const { date, tags } = useExploded(metadata);
 
@@ -102,9 +118,9 @@ function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
       </Suspense>
     </PageStructure>
   );
-}
+});
 
-function ThoughtHeader({
+const ThoughtHeader = memo(function ThoughtHeader({
   id,
   metadata,
 }: {
@@ -122,8 +138,12 @@ function ThoughtHeader({
       <TitleSeparator />
     </header>
   );
-}
+});
 
-function Use({ el }: { el: Usable<React.JSX.Element> }): React.JSX.Element {
+const Use = memo(function Use<T extends ReactNode>({
+  el,
+}: {
+  el: Usable<T>;
+}): T {
   return use(el);
-}
+});

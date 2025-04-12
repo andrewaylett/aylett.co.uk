@@ -1,17 +1,16 @@
-import * as path from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
+import * as path from 'node:path';
 
-import type { ReactElement } from 'react';
+import { type ReactElement } from 'react';
 
+import { type JSONSchema7 } from 'json-schema';
 import { read } from 'to-vfile';
+import { type VFile } from 'vfile';
 import { parse } from 'yaml';
 
-import { assertSchema, TypeFrom } from '../types';
+import { assertSchema, type TypeFrom } from '../types';
 
 import { intoReact } from './process_markdown';
-
-import type { JSONSchema7 } from 'json-schema';
-import type { VFile } from 'vfile';
 
 interface MDFile {
   path: string;

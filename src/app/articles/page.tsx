@@ -1,17 +1,15 @@
-import * as React from 'react';
-import { Suspense, use } from 'react';
+import React, { type ReactNode, Suspense, use } from 'react';
 
+import { type Metadata } from 'next';
 import Link from 'next/link';
 
-import { Description } from '../../remark/components';
-import { asyncSortByKey } from '../../sort_by';
 import { PageStructure, TitleHeader } from '../../page-structure';
+import { Description } from '../../remark/components';
+import { type Markdown } from '../../remark/traverse';
+import { asyncSortByKey } from '../../sort_by';
+import { type ArticleSchema, memo, type TypeFrom } from '../../types';
 
 import { allArticles } from './articles';
-
-import type { Markdown } from '../../remark/traverse';
-import type { ArticleSchema, TypeFrom } from '../../types';
-import type { Metadata } from 'next';
 
 import 'server-only';
 
@@ -26,7 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function articles(): React.ReactNode {
+export default function articles(): ReactNode {
   const pages = allArticles();
   return (
     <PageStructure
@@ -40,7 +38,11 @@ export default function articles(): React.ReactNode {
   );
 }
 
-function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
+const Articles = memo(function Articles({
+  pages,
+}: {
+  pages: Promise<Markdown<ArticleSchema>[]>;
+}) {
   const resolved = use(pages);
   const sorted = use(
     asyncSortByKey(resolved, async (page) => (await page.metadata).title),
@@ -54,9 +56,9 @@ function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
       ))}
     </>
   );
-}
+});
 
-function Entry({
+const Entry = memo(function Entry({
   metadata,
   name,
 }: {
@@ -100,4 +102,4 @@ function Entry({
       <Description metadata={metadata} />
     </div>
   );
-}
+});

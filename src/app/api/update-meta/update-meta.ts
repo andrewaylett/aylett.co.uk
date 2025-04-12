@@ -1,16 +1,14 @@
-import { OpenAI } from 'openai';
-import { parse, stringify } from 'yaml';
-import { write } from 'to-vfile';
+import { type JSONSchema7 } from 'json-schema';
+import { type Root } from 'mdast';
+import { type ClientOptions, OpenAI } from 'openai';
 import remarkStringify from 'remark-stringify';
-import { JSONSchema7 } from 'json-schema';
+import { write } from 'to-vfile';
+import { type VFile } from 'vfile';
+import { parse, stringify } from 'yaml';
 
 import { baseProcessor, intoText } from '../../../remark/process_markdown';
 import { traverse } from '../../../remark/traverse';
-import { assertSchema, TypeFrom } from '../../../types';
-
-import type { Root } from 'mdast';
-import type { VFile } from 'vfile';
-import type { ClientOptions } from 'openai';
+import { assertSchema, type TypeFrom } from '../../../types';
 
 export const EntrySchema = {
   type: 'object',

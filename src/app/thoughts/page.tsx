@@ -1,17 +1,15 @@
-import * as React from 'react';
-import { Suspense, use } from 'react';
+import React, { type ReactNode, Suspense, use } from 'react';
 
+import { type Metadata } from 'next';
 import Link from 'next/link';
 
-import { Description } from '../../remark/components';
-import { asyncSortByKey } from '../../sort_by';
 import { PageStructure, TitleHeader } from '../../page-structure';
+import { Description } from '../../remark/components';
+import { type Markdown } from '../../remark/traverse';
+import { asyncSortByKey } from '../../sort_by';
+import { memo, type ThoughtSchema, type TypeFrom } from '../../types';
 
 import { allThoughts } from './thoughts';
-
-import type { Markdown } from '../../remark/traverse';
-import type { ThoughtSchema, TypeFrom } from '../../types';
-import type { Metadata } from 'next';
 
 import 'server-only';
 
@@ -28,7 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function thoughts(): React.ReactNode {
+const ThoughtsPage = memo(function ThoughtsPage(): ReactNode {
   const pages = allThoughts();
   return (
     <PageStructure
@@ -40,9 +38,15 @@ export default function thoughts(): React.ReactNode {
       <Thoughts pages={pages} />
     </PageStructure>
   );
-}
+});
 
-function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
+export default ThoughtsPage;
+
+const Thoughts = memo(function Thoughts({
+  pages,
+}: {
+  pages: Promise<Markdown<ThoughtSchema>[]>;
+}): ReactNode {
   const resolved = use(pages);
   const sorted = use(
     asyncSortByKey(resolved, async (page) => (await page.metadata).date),
@@ -61,9 +65,9 @@ function Thoughts({ pages }: { pages: Promise<Markdown<ThoughtSchema>[]> }) {
       ))}
     </>
   );
-}
+});
 
-function Entry({
+const Entry = memo(function Entry({
   metadata,
   name,
 }: {
@@ -80,4 +84,4 @@ function Entry({
       <Description metadata={metadata} />
     </div>
   );
-}
+});

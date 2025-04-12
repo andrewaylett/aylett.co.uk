@@ -2,10 +2,10 @@ import * as React from 'react';
 import { use } from 'react';
 
 import Link from 'next/link';
+import { type Components } from 'rehype-react';
 
 import { Mermaid } from '../client/mermaid';
-
-import type { Components } from 'rehype-react';
+import { memo } from '../types';
 
 export const components = {
   code: ({ children, ...props }: React.JSX.IntrinsicElements['code']) => {
@@ -16,7 +16,7 @@ export const components = {
   },
 } satisfies Partial<Components>;
 
-export function Description({
+export const Description = memo(function Description({
   metadata,
 }: {
   metadata: Promise<{ description: string }>;
@@ -29,15 +29,15 @@ export function Description({
       </sup>
     </blockquote>
   );
-}
+});
 
-export function Optional({
+export const Optional = memo(function Optional({
   children,
   text,
 }: React.PropsWithChildren<{ text?: string }>) {
   return text ? <span>{children}</span> : null;
-}
+});
 
-export function TitleSeparator() {
+export const TitleSeparator = memo(function TitleSeparator() {
   return <hr className="mx-[15%]" />;
-}
+});

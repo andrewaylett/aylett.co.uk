@@ -1,7 +1,7 @@
+import { type MetadataRoute } from 'next';
+
 import { allArticles } from './articles/articles';
 import { allThoughts } from './thoughts/thoughts';
-
-import type { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, thoughts] = await Promise.all([

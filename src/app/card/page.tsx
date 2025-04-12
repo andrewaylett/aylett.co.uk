@@ -1,17 +1,18 @@
-import 'server-only';
-import * as React from 'react';
+import React, { type FunctionComponent, type ReactElement } from 'react';
 
+import { type Metadata } from 'next';
 import Link from 'next/link';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
+import { memo } from '../../types';
 
-import type { Metadata } from 'next';
+import 'server-only';
 
 export const metadata: Metadata = {
   title: 'QR Code',
 };
 
-export default function Card(): React.ReactElement {
+const Card: FunctionComponent = memo(function Card(): ReactElement {
   return (
     <PageStructure
       schemaType="Organization"
@@ -48,4 +49,6 @@ export default function Card(): React.ReactElement {
       </ul>
     </PageStructure>
   );
-}
+});
+
+export default Card;

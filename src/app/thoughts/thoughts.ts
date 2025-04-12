@@ -2,12 +2,10 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
+import { findMarkdown, type Markdown } from '../../remark/traverse';
 import { ThoughtSchema } from '../../types';
-import { findMarkdown } from '../../remark/traverse';
 
 import 'server-only';
-
-import type { Markdown } from '../../remark/traverse';
 
 export async function thoughtForId(
   params: Promise<{ id: string }>,
