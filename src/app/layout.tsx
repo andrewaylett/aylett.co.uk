@@ -1,16 +1,36 @@
-import * as React from 'react';
-import type { PropsWithChildren } from 'react';
+import React, { type PropsWithChildren, type ReactNode, useMemo } from 'react';
 
-import PlausibleProvider from 'next-plausible';
+import { type Metadata, type Viewport } from 'next';
 import localFont from 'next/font/local';
-
-import type { Metadata, Viewport } from 'next';
+import PlausibleProvider from 'next-plausible';
 
 import './styles/global.css';
 
 import 'server-only';
+import { memo } from '../types';
 
-const plexSans = localFont({
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : `http://localhost:${process.env.PORT ?? 3000}`,
+  ),
+  title: {
+    absolute: 'aylett.co.uk',
+    template: '%s - aylett.co.uk',
+  },
+  icons: '/favicon.ico',
+  publisher: 'Andrew Aylett',
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+  ],
+};
+
+const PLEX_SANS = localFont({
   display: 'fallback',
   variable: '--font-plex-sans',
   preload: false,
@@ -98,30 +118,15 @@ const plexSans = localFont({
   ],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : `http://localhost:${process.env.PORT ?? 3000}`,
-  ),
-  title: {
-    absolute: 'aylett.co.uk',
-    template: '%s - aylett.co.uk',
-  },
-  icons: '/favicon.ico',
-  publisher: 'Andrew Aylett',
-};
-
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-  ],
-};
-
-export default function RootLayout({
+const RootLayout = memo(function RootLayout({
   children,
-}: PropsWithChildren): React.ReactNode {
+}: PropsWithChildren): ReactNode {
+  const plexSans = useMemo(() => PLEX_SANS, [PLEX_SANS]);
+  const nodeEnv = useMemo(
+    () => process.env.NODE_ENV,
+    [process, process.env, process.env.NODE_ENV],
+  );
+
   return (
     <html
       lang="en"
@@ -131,11 +136,13 @@ export default function RootLayout({
         <PlausibleProvider
           domain="aylett.co.uk"
           scriptProps={{ src: '/js/script.js' }}
-          enabled={process.env.NODE_ENV === 'production'}
+          enabled={nodeEnv === 'production'}
         >
           {children}
         </PlausibleProvider>
       </body>
     </html>
   );
-}
+});
+
+export default RootLayout;

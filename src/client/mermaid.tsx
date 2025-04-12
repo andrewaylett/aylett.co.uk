@@ -1,11 +1,13 @@
 'use client';
 
-import React, { lazy, PropsWithChildren, Suspense } from 'react';
+import React, { lazy, type PropsWithChildren, Suspense } from 'react';
+
+import { type MermaidConfig } from 'mermaid';
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+
+import { memo } from '../types';
 
 import 'client-only';
-
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-import { MermaidConfig } from 'mermaid';
 
 export interface MermaidProps {
   name?: string;
@@ -14,9 +16,9 @@ export interface MermaidProps {
 
 const MermaidInner = lazy(() => import('./mermaid-inner'));
 
-export const Mermaid: React.FC<PropsWithChildren<MermaidProps>> = ({
+export const Mermaid = memo(function Mermaid({
   ...props
-}) => {
+}: PropsWithChildren<MermaidProps>) {
   return (
     <ErrorBoundary errorComponent={() => <>Error loading diagram</>}>
       <Suspense fallback={<>Loading...</>}>
@@ -24,4 +26,4 @@ export const Mermaid: React.FC<PropsWithChildren<MermaidProps>> = ({
       </Suspense>
     </ErrorBoundary>
   );
-};
+});

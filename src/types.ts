@@ -1,8 +1,17 @@
-import { useMemo } from 'react';
+import { type ComponentType, memo as memoComponent, useMemo } from 'react';
 
+import { type JSONSchema7 } from 'json-schema';
 import { validate } from 'revalidator';
 
-import type { JSONSchema7 } from 'json-schema';
+export interface LifecycleSchema {
+  properties: {
+    lifecycle: {
+      type: 'string';
+      enum: string[];
+      default: string;
+    };
+  };
+}
 
 export const ArticleSchema = {
   type: 'object',
@@ -22,7 +31,7 @@ export const ArticleSchema = {
     },
     tags: { type: 'array', items: { type: 'string' } },
   },
-} as const satisfies JSONSchema7;
+} as const satisfies JSONSchema7 & LifecycleSchema;
 export type ArticleSchema = typeof ArticleSchema;
 
 export const ThoughtSchema = {
@@ -81,3 +90,7 @@ export function useExploded<V extends object>(input: Promise<V>): Exploded<V> {
     }) as Exploded<V>;
   }, [input]);
 }
+
+export const memo: <T extends ComponentType<never>>(
+  Component: T,
+) => T & { displayName: string } = memoComponent;

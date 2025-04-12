@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { use } from 'react';
+import React, { use } from 'react';
 
 import { getYear } from 'date-fns';
+
+import { memo } from '../types';
 
 export interface FooterProps {
   author?: Promise<string>;
@@ -9,7 +10,11 @@ export interface FooterProps {
   keywords?: Promise<string[]>;
 }
 
-export default function Footer({ author, copyright, keywords }: FooterProps) {
+export const Footer = memo(function Footer({
+  author,
+  copyright,
+  keywords,
+}: FooterProps) {
   return (
     <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex]">
       {keywords ? (
@@ -32,4 +37,4 @@ export default function Footer({ author, copyright, keywords }: FooterProps) {
       </div>
     </footer>
   );
-}
+});

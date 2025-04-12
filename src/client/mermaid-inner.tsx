@@ -1,18 +1,17 @@
 import React, {
-  FC,
-  PropsWithChildren,
+  type PropsWithChildren,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
 
-import mermaid from 'mermaid';
+import mermaid, { type MermaidConfig } from 'mermaid';
 
-import { MermaidProps } from './mermaid';
+import { memo } from '../types';
+
 import { useDarkMode } from './darkMode';
-
-import type { MermaidConfig } from 'mermaid';
+import { type MermaidProps } from './mermaid';
 
 const DEFAULT_CONFIG: MermaidConfig = {
   startOnLoad: false,
@@ -51,12 +50,12 @@ const DEFAULT_CONFIG: MermaidConfig = {
     numberSectionStyles: 4,
     axisFormat: '%Y-%m-%d',
   },
-};
+} as const;
 
-const MermaidInner: FC<PropsWithChildren<MermaidProps>> = ({
+const MermaidInner = memo(function MermaidInner({
   children,
   config,
-}) => {
+}: PropsWithChildren<MermaidProps>) {
   const [isRendered, setIsRendered] = useState(false);
 
   const mermaidDiv = useRef<HTMLDivElement>(null);
@@ -91,6 +90,6 @@ const MermaidInner: FC<PropsWithChildren<MermaidProps>> = ({
       </div>
     </>
   );
-};
+});
 
 export default MermaidInner;

@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React from 'react';
+
+import { type Metadata } from 'next';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
-
-import type { Metadata } from 'next';
+import { memo } from '../../types';
 
 import 'server-only';
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Schemas',
 };
 
-export default function Schema(): React.ReactNode {
+const Schema = memo(function Schema() {
   return (
     <PageStructure
       schemaType="ItemList"
@@ -53,4 +54,6 @@ export default function Schema(): React.ReactNode {
       </ol>
     </PageStructure>
   );
-}
+});
+
+export default Schema;

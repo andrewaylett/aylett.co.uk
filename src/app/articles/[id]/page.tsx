@@ -1,19 +1,17 @@
-import * as React from 'react';
-import type { ReactElement } from 'react';
-import { Suspense, use } from 'react';
+import React, { type ReactElement, type ReactNode, Suspense, use } from 'react';
+
+import { type Metadata } from 'next';
 
 import { gitHubUrl } from '../../../github';
-import { allArticles, articleForId } from '../articles';
+import { PageStructure } from '../../../page-structure';
 import {
   Description,
   Optional,
   TitleSeparator,
 } from '../../../remark/components';
-import { PageStructure } from '../../../page-structure';
-import { ArticleSchema, useExploded } from '../../../types';
-
-import type { Markdown } from '../../../remark/traverse';
-import type { Metadata } from 'next';
+import { type Markdown } from '../../../remark/traverse';
+import { type ArticleSchema, memo, useExploded } from '../../../types';
+import { allArticles, articleForId } from '../articles';
 
 import 'server-only';
 
@@ -64,36 +62,44 @@ export async function generateStaticParams() {
   }));
 }
 
-const Revisions: React.FC<{
+const Revisions = memo(function Revisions({
+  expires,
+  lifecycle,
+  revised,
+  revision,
+  url,
+}: {
   expires?: string;
   lifecycle?: string;
   revised: string;
   revision?: string;
   url: string;
-}> = ({ expires, lifecycle, revised, revision, url }) => (
-  <div className="flex flex-row flex-wrap gap-x-[1ch]">
-    <Optional text={revision}>
-      Version:&nbsp;<span property="version">{revision}</span>
-    </Optional>
-    <span>Status: {lifecycle ?? 'active'}</span>
-    <Optional text={revised}>
-      <a
-        className="text-inherit underline"
-        property="subjectOf"
-        typeof="SoftwareSourceCode"
-        href={gitHubUrl(url)}
-      >
-        Last Revised
-      </a>
-      :&nbsp;<span property="dateModified">{revised}</span>
-    </Optional>
-    <Optional text={expires}>
-      Expires:&nbsp;<span property="expires">{expires}</span>
-    </Optional>
-  </div>
-);
+}) {
+  return (
+    <div className="flex flex-row flex-wrap gap-x-[1ch]">
+      <Optional text={revision}>
+        Version:&nbsp;<span property="version">{revision}</span>
+      </Optional>
+      <span>Status: {lifecycle ?? 'active'}</span>
+      <Optional text={revised}>
+        <a
+          className="text-inherit underline"
+          property="subjectOf"
+          typeof="SoftwareSourceCode"
+          href={gitHubUrl(url)}
+        >
+          Last Revised
+        </a>
+        :&nbsp;<span property="dateModified">{revised}</span>
+      </Optional>
+      <Optional text={expires}>
+        Expires:&nbsp;<span property="expires">{expires}</span>
+      </Optional>
+    </div>
+  );
+});
 
-export default function Article({ params }: ArticleProps): React.ReactNode {
+const Article = memo(function Article({ params }: ArticleProps): ReactNode {
   const page = articleForId(params);
   const { metadata } = useExploded(page);
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
@@ -117,9 +123,9 @@ export default function Article({ params }: ArticleProps): React.ReactNode {
       <ArticlePage page={page} />
     </PageStructure>
   );
-}
+});
 
-function ArticlePage({
+const ArticlePage = memo(function ArticlePage({
   page,
 }: {
   page: Promise<Markdown<ArticleSchema>>;
@@ -127,9 +133,9 @@ function ArticlePage({
   const { content } = useExploded(page);
 
   return <div property="articleBody">{use(content)}</div>;
-}
+});
 
-function ArticleHeader({
+const ArticleHeader = memo(function ArticleHeader({
   id,
   page,
 }: {
@@ -158,4 +164,6 @@ function ArticleHeader({
       <TitleSeparator />
     </header>
   );
-}
+});
+
+export default Article;

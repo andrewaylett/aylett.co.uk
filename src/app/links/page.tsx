@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React, { type ReactNode } from 'react';
+
+import { type Metadata } from 'next';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
-
-import type { Metadata } from 'next';
+import { memo } from '../../types';
 
 import 'server-only';
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Links',
 };
 
-export default function Links(): React.ReactNode {
+const Links = memo(function Links(): ReactNode {
   return (
     <PageStructure
       schemaType="ItemList"
@@ -29,4 +30,6 @@ export default function Links(): React.ReactNode {
       </p>
     </PageStructure>
   );
-}
+});
+
+export default Links;

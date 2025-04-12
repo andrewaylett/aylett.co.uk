@@ -1,42 +1,45 @@
-import { PropsWithChildren, use } from 'react';
-import React, { Suspense } from 'react';
+import React, {
+  type PropsWithChildren,
+  type ReactNode,
+  Suspense,
+  use,
+} from 'react';
 
+import { type JSONSchema7 } from 'json-schema';
 import Link from 'next/link';
-import { JSONSchema7 } from 'json-schema';
 
-import Footer, { FooterProps } from './app/footer';
-import { Markdown } from './remark/traverse';
+import { Footer, type FooterProps } from './app/footer';
+import { type Markdown } from './remark/traverse';
+import { type LifecycleSchema, memo } from './types';
 
-export interface PageStructureProps<T extends Promise<Markdown<JSONSchema7>>>
-  extends FooterProps {
+export interface PageStructureProps<
+  T extends Promise<Markdown<JSONSchema7>>,
+  Schema extends LifecycleSchema = T extends Promise<
+    Markdown<infer S extends LifecycleSchema>
+  >
+    ? S
+    : never,
+> extends FooterProps {
   breadcrumbs: { href: string; text: string }[];
-  header: React.JSX.Element;
-  lifecycle?: T extends Promise<Markdown<infer U>>
-    ? U extends {
-        properties: {
-          lifecycle: {
-            enum: infer V extends string[];
-          };
-        };
-      }
-      ? Promise<V[number]>
-      : never
-    : never;
+  header: ReactNode;
+  lifecycle?: Promise<Schema['properties']['lifecycle']['enum'][number]>;
   schemaType: string;
   resource: string;
 }
 
-export function TitleHeader({
+export const TitleHeader = memo(function TitleHeader({
   children,
-}: PropsWithChildren): React.JSX.Element {
+}: PropsWithChildren): ReactNode {
   return (
     <header>
       <h1 property="name">{children}</h1>
     </header>
   );
-}
+});
 
-export function PageStructure<T extends Promise<Markdown<JSONSchema7>>>({
+export const PageStructure = memo(function PageStructure<
+  T extends Promise<Markdown<JSONSchema7>>,
+>({
   author,
   breadcrumbs,
   children,
@@ -46,7 +49,7 @@ export function PageStructure<T extends Promise<Markdown<JSONSchema7>>>({
   lifecycle,
   resource,
   schemaType,
-}: PropsWithChildren<PageStructureProps<T>>): React.JSX.Element {
+}: PropsWithChildren<PageStructureProps<T>>): ReactNode {
   return (
     <>
       {lifecycle && use(lifecycle) === 'draft' ? (
@@ -86,4 +89,4 @@ export function PageStructure<T extends Promise<Markdown<JSONSchema7>>>({
       </div>
     </>
   );
-}
+});

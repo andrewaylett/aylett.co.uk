@@ -1,25 +1,23 @@
-import * as prod from 'react/jsx-runtime';
+import { type Root, type Yaml } from 'mdast';
 import * as dev from 'react/jsx-dev-runtime';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import rehypeSlug from 'rehype-slug';
-import remarkStringify from 'remark-stringify';
-import remarkFrontmatter from 'remark-frontmatter';
-import { is } from 'unist-util-is';
-import gfm from 'remark-gfm';
-import retextSmartypants from 'retext-smartypants';
-import remarkRehype from 'remark-rehype';
-import rehypeReact from 'rehype-react';
+import * as prod from 'react/jsx-runtime';
 import rehypeFormat from 'rehype-format';
+import rehypeReact from 'rehype-react';
+import rehypeSlug from 'rehype-slug';
+import remarkFrontmatter from 'remark-frontmatter';
+import gfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import remarkStringify from 'remark-stringify';
+import retextSmartypants from 'retext-smartypants';
+import { type Processor, unified } from 'unified';
+import { is } from 'unist-util-is';
 import { visit } from 'unist-util-visit';
+import { type VFile } from 'vfile';
 
 import { components } from './components';
-import retextRemark from './retextRemark';
 import remarkRetextEnglish from './remarkRetextEnglish';
-
-import type { Root, Yaml } from 'mdast';
-import type { VFile } from 'vfile';
-import type { Processor } from 'unified';
+import retextRemark from './retextRemark';
 
 declare module 'vfile' {
   // Extends the interface used by Unified, so we can use it for our own data

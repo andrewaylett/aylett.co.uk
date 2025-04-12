@@ -1,5 +1,10 @@
-import * as React from 'react';
-import { Fragment, Suspense, useMemo, use } from 'react';
+import React, {
+  Fragment,
+  type ReactElement,
+  Suspense,
+  use,
+  useMemo,
+} from 'react';
 
 import Link from 'next/link';
 import { stringify } from 'yaml';
@@ -47,7 +52,7 @@ function Entry({ value }: { value: Entry }) {
   );
 }
 
-export default function Meta(): React.ReactElement {
+export default function Meta(): ReactElement {
   const meta = run();
   return (
     <Suspense fallback={'Loading'}>
