@@ -10,10 +10,8 @@ description:
     snowstorm. Read on to learn about his tips and tricks, and what to keep in
     mind when using snow chains.
 tags:
-    - snow chains
-    - winter driving
-    - first-time use
-    - driving in snow
+    - Education
+    - Parenting & Safety
 ---
 
 It’s been snowing, and as we were planning to see friends who live in the

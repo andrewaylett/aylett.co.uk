@@ -3,7 +3,8 @@ title: Reform, and a trap of politics
 author: Andrew Aylett
 date: 2025/05/03
 description: A brief discussion of why it's hard to counter support for Reform.
-tags: [politics, reform, democracy]
+tags:
+- Ethics & Society
 ---
 In the context of [Reform's election success](https://www.theguardian.com/politics/2025/may/02/reform-uk-nigel-farage-english-local-elections), I commented on a private Slack:
 

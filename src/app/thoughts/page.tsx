@@ -60,14 +60,14 @@ const Thoughts = memo(function Thoughts({
       </p>
       {sorted.reverse().map(({ id: name, metadata }) => (
         <Suspense key={name}>
-          <Entry name={name} metadata={metadata} />
+          <ThoughtEntry name={name} metadata={metadata} />
         </Suspense>
       ))}
     </>
   );
 });
 
-const Entry = memo(function Entry({
+export const ThoughtEntry = memo(function Entry({
   metadata,
   name,
 }: {

@@ -51,14 +51,14 @@ const Articles = memo(function Articles({
     <>
       {sorted.map(({ id: name, metadata }) => (
         <Suspense key={name}>
-          <Entry name={name} metadata={metadata} />
+          <ArticleEntry name={name} metadata={metadata} />
         </Suspense>
       ))}
     </>
   );
 });
 
-const Entry = memo(function Entry({
+export const ArticleEntry = memo(function Entry({
   metadata,
   name,
 }: {

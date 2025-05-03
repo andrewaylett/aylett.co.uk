@@ -6,10 +6,7 @@ description:
     Learn how to configure the Gradle Enterprise plugin in an init script to
     avoid committing agreement to the terms of service into published projects.
 tags:
-    - Gradle
-    - Gradle Enterprise
-    - plugin
-    - init script
+    - Technology
 ---
 
 I want to run the Gradle Enterprise plugin for every build, but Gradle say:

@@ -4,10 +4,8 @@ description:
     Exploring the determinism of large language models like GPT, and the
     possibility of designing them to be deterministic.
 tags:
-    - LLM
-    - determinism
-    - randomness
-    - GPT
+    - AI & NLP
+    - Technology
 author: 'Andrew Aylett'
 date: '2023/04/05'
 ---

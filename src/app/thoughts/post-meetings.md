@@ -2,10 +2,7 @@
 title: Avoid Post-Meeting Meetings
 description: Stop having coffee machine meetings when you have virtual meetings.
 tags:
-    - virtual meetings
-    - remote work
-    - team collaboration
-    - workflow improvement
+    - Business & Collaboration
 date: 2023/04/10
 ---
 

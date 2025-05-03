@@ -10,10 +10,9 @@ description:
     processing any personal data to comply with GDPR. Hosted by Vercel, personal
     data is not collected for visitors to the site.
 tags:
-    - Privacy
-    - GDPR
-    - Cookies
-    - Logs
+    - Ethics & Society
+    - Privacy & Security
+    - Technology
 ---
 
 Per the subhead, this is not (really) a privacy policy. This site doesn't have a

@@ -12,10 +12,8 @@ description:
     importance of suppliers taking responsibility. Explore the Scope Three Zero
     Manifesto and Pledge for a more sustainable future.
 tags:
-    - ecological impact
-    - Scope Three emissions
-    - sustainable future
-    - carbon neutrality
+    - Sustainability
+    - Ethics & Society
 ---
 
 We face a challenge in assessing the ecological impact of the things we do: some

@@ -9,7 +9,7 @@ import { memo } from '../types';
 
 export const components = {
   code: ({ children, ...props }: React.JSX.IntrinsicElements['code']) => {
-    if (props.className === 'language-mermaid') {
+    if (props.className?.includes('language-mermaid')) {
       return <Mermaid>{children}</Mermaid>;
     }
     return <code {...props}>{children}</code>;

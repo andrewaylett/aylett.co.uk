@@ -8,10 +8,8 @@ description:
     warn users when it’s active and support this feature in environments where
     it’s useful.
 tags:
-    - HTTPS
-    - TLS
-    - proxy
-    - MITM
+    - Technology
+    - Privacy & Security
 ---
 
 _Originally [posted](https://social.aylett.co.uk/notice/AUmwZvpCcKvQ2yrwPo) with

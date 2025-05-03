@@ -9,7 +9,7 @@ description:
     Learn what Andrew thinks about Nerds, Geeks, and Hipsters.
     Once he's finished the article, that is.
 tags:
-    - sociology
+    - Ethics & Society
 lifecycle: draft
 ---
 

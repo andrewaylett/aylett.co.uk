@@ -7,9 +7,8 @@ description:
     explain why it's easier to specifically target LLM-generated text, rather
     than simply relying on anti-spam rules.
 tags:
-    - spam
-    - natural language processing
-    - ethics
+    - AI & NLP
+    - Ethics & Society
 ---
 
 _In [response](https://news.ycombinator.com/context?id=36194777) to a question

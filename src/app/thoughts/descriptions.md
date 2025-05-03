@@ -5,10 +5,9 @@ date: 2023/04/06
 description:
     Andrew generates site metadata using GPT, including titles and descriptions.
 tags:
-    - GPT
-    - metadata
+    - AI & NLP
+    - Problem-Solving & Creativity
     - SEO
-    - web development
 ---
 
 I've decided to start generating site metadata using GPT. The specific endpoint

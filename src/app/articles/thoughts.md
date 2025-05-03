@@ -9,10 +9,8 @@ description:
     In this article, Andrew introduces his new brief thoughts section and
     techniques for classification and metadata addition.
 tags:
-    - thoughts
-    - note-taking
-    - metadata
-    - LLMs
+    - AI & NLP
+    - Problem-Solving & Creativity
 ---
 
 In a similar vein to [Simon Wilison's TIL](https://til.simonwillison.net/), I've

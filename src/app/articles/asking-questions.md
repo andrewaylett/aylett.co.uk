@@ -10,10 +10,8 @@ description:
     how to get the people you work with to prioritize your request, and avoid
     wasting time and resources.
 tags:
-    - communication
-    - problem-solving
-    - teamwork
-    - support
+    - Business & Collaboration
+    - Problem-Solving & Creativity
 lifecycle: live
 ---
 

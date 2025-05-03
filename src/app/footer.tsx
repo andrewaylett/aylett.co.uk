@@ -1,6 +1,7 @@
 import React, { use } from 'react';
 
 import { getYear } from 'date-fns';
+import Link from 'next/link';
 
 import { memo } from '../types';
 
@@ -15,25 +16,28 @@ export const Footer = memo(function Footer({
   copyright,
   keywords,
 }: FooterProps) {
+  const resolvedKeywords = keywords ? use(keywords) : [];
+  const resolvedAuthor = author ? use(author) : 'Andrew Aylett';
+  const resolvedCopyright = copyright ? use(copyright) : getYear(Date.now());
+
   return (
-    <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex]">
-      {keywords ? (
+    <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex] pb-1">
+      {resolvedKeywords && resolvedKeywords.length > 0 && (
         <div property="keywords">
-          {use(keywords)
-            ?.map((s) => s.trim())
+          {resolvedKeywords
+            .map((s) => s.trim())
             .filter((s) => s.length > 0)
-            .join(', ')}
+            .map((s, index) => (
+              <React.Fragment key={s}>
+                {index > 0 && ', '}
+                <Link href={`/tags/${s}`}>{s}</Link>
+              </React.Fragment>
+            ))}
         </div>
-      ) : null}
+      )}
       <div property="copyrightNotice" className="text-right">
-        Copyright ©{' '}
-        <span property="copyrightHolder">
-          {(author ? use(author) : '') || 'Andrew Aylett'}
-        </span>
-        ,{' '}
-        <span property="copyrightYear">
-          {(copyright ? use(copyright) : '') || getYear(Date.now())}
-        </span>
+        Copyright © <span property="copyrightHolder">{resolvedAuthor}</span>,{' '}
+        <span property="copyrightYear">{resolvedCopyright}</span>
       </div>
     </footer>
   );

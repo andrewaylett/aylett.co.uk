@@ -13,9 +13,7 @@ description:
     education and how it can help children fulfill their potential while
     glorifying God and enjoying Him forever.
 tags:
-    - Christian education
-    - parenting
-    - children
+    - Education
 ---
 
 Every parent agrees that a good education is one of the most vital and

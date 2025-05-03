@@ -11,10 +11,8 @@ description:
     down, but it does not fully comply with UN Regulation No. 44 requirements,
     according to some experts' opinions. Andrew wouldn't recommend using it.
 tags:
-    - Smart Kid Belt
-    - child restraint
-    - type approval
-    - controversy
+    - Parenting & Safety
+    - Ethics & Society
 ---
 
 -   https://smartkidbelt.com/en/

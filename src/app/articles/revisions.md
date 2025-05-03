@@ -9,10 +9,9 @@ description:
     Trying to avoid the pitfalls of traditional blogs, Andrew offers content
     that can be refreshed and updated over time.
 tags:
-    - software engineering
-    - curation
-    - timeless content
-    - version control
+    - Technology
+    - Problem-Solving & Creativity
+    - Business & Collaboration
 ---
 
 This website is a collection of articles, not a blog. Why? Well, I've always

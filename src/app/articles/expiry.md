@@ -9,8 +9,8 @@ description:
     Learn why it's important to understand whether online content is current or
     out-of-date, and how expiry dates can help with that.
 tags:
-    - website management
-    - content strategy
+    - Technology
+    - Business & Collaboration
 ---
 
 Articles on this website have an expiry date. It's something you'll see more

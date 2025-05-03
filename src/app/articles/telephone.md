@@ -10,9 +10,8 @@ description:
     questions when receiving incoming call from a company, and how security
     should be designed to protect both parties.
 tags:
-    - phone security
-    - identity verification
-    - company-customer interaction
+    - Privacy & Security
+    - Business & Collaboration
 ---
 
 We don’t get many people phoning our land-line — just my mother-in-law,

@@ -6,10 +6,7 @@ description:
     Learn how network printing is easier than ever, and how to set up and use
     the MFC-L3550CDW printer over Ethernet.
 tags:
-    - printer
-    - network printing
-    - MFC-L3550CDW
-    - Linux
+    - Technology
 ---
 
 When I got my recently-acquired MFC-L3550CDW home, I went to set it up over the
