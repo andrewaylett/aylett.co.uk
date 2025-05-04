@@ -17,7 +17,7 @@
   "dependencies": {
     "client-only": "0.0.1",
     "date-fns": "4.1.0",
-    "html-to-image": "^1.11.13",
+    "html-to-image": "1.11.13",
     "mdast-util-from-markdown": "2.0.2",
     "mdast-util-to-markdown": "2.1.2",
     "mermaid": "11.6.0",
