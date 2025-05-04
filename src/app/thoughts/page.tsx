@@ -4,11 +4,11 @@ import { type Metadata } from 'next';
 import Link from 'next/link';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
-import { Description } from '../../remark/components';
 import { type Markdown } from '../../remark/traverse';
 import { asyncSortByKey } from '../../sort_by';
-import { memo, type ThoughtSchema, type TypeFrom } from '../../types';
+import { memo, type ThoughtSchema } from '../../types';
 
+import { ThoughtEntry } from './thoughtEntry';
 import { allThoughts } from './thoughts';
 
 import 'server-only';
@@ -64,24 +64,5 @@ const Thoughts = memo(function Thoughts({
         </Suspense>
       ))}
     </>
-  );
-});
-
-export const ThoughtEntry = memo(function Entry({
-  metadata,
-  name,
-}: {
-  metadata: Promise<TypeFrom<ThoughtSchema>>;
-  name: string;
-}) {
-  return (
-    <div property="itemListElement" typeof="Article">
-      <p>
-        <Link property="url" href={`/thoughts/${name}`}>
-          <span property="name">{use(metadata).title}</span>
-        </Link>
-      </p>
-      <Description metadata={metadata} />
-    </div>
   );
 });
