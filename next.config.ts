@@ -116,6 +116,7 @@ export default async (
     ...({
       experimental: {
         typedRoutes: true,
+        reactCompiler: true,
       },
       reactStrictMode: true,
       pageExtensions: ['js', 'jsx', 'ts', 'tsx'],

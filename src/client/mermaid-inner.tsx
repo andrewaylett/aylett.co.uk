@@ -68,19 +68,19 @@ const MermaidInner = memo(function MermaidInner({
       ...config,
       theme: isDarkMode ? 'dark' : 'default',
     });
-  }, [isDarkMode]);
+  }, []);
 
   const runMermaid = useCallback(async (): Promise<void> => {
     if (!mermaidDiv.current) throw new Error('Mermaid div not found');
     await mermaid.run({ nodes: [mermaidDiv.current] });
-  }, [mermaidDiv]);
+  }, []);
 
   useEffect(() => {
     void runMermaid().then(() => {
       setIsRendered(true);
     });
     return () => setIsRendered(false);
-  }, [runMermaid]);
+  }, []);
 
   return (
     <>
