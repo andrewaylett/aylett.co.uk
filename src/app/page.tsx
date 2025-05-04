@@ -61,6 +61,11 @@ const Home = memo(function Home(): React.ReactNode {
             <span property="name">Links</span>
           </Link>
         </p>
+        <p>
+          <Link property="item" typeof="WebPage" href="qr">
+            <span property="name">QR Code Generator</span>
+          </Link>
+        </p>
       </main>
     </div>
   );

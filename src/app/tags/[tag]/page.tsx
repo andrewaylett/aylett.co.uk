@@ -3,9 +3,9 @@ import React from 'react';
 import { PageStructure, TitleHeader } from '../../../page-structure';
 import { type Markdown } from '../../../remark/traverse';
 import { type ArticleSchema, type ThoughtSchema } from '../../../types';
+import { ArticleEntry } from '../../articles/articleEntry';
 import { allArticles } from '../../articles/articles';
-import { ArticleEntry } from '../../articles/page';
-import { ThoughtEntry } from '../../thoughts/page';
+import { ThoughtEntry } from '../../thoughts/thoughtEntry';
 import { allThoughts } from '../../thoughts/thoughts';
 import { allTags } from '../allTags';
 
