@@ -13,7 +13,7 @@ import { type Markdown } from './remark/traverse';
 import { type LifecycleSchema, memo } from './types';
 
 export interface PageStructureProps<
-  T extends Promise<Markdown<JSONSchema7>>,
+  T extends Promise<Markdown<JSONSchema7>> | never,
   Schema extends LifecycleSchema = T extends Promise<
     Markdown<infer S extends LifecycleSchema>
   >
@@ -38,7 +38,7 @@ export const TitleHeader = memo(function TitleHeader({
 });
 
 export const PageStructure = memo(function PageStructure<
-  T extends Promise<Markdown<JSONSchema7>>,
+  T extends Promise<Markdown<JSONSchema7>> | never,
 >({
   author,
   breadcrumbs,

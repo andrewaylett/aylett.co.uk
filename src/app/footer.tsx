@@ -27,12 +27,15 @@ export const Footer = memo(function Footer({
           {resolvedKeywords
             .map((s) => s.trim())
             .filter((s) => s.length > 0)
-            .map((s, index) => (
-              <React.Fragment key={s}>
-                {index > 0 && ', '}
-                <Link href={`/tags/${s}`}>{s}</Link>
-              </React.Fragment>
-            ))}
+            .map((s, index) => {
+              const encoded = encodeURIComponent(s.toLowerCase());
+              return (
+                <React.Fragment key={s}>
+                  {index > 0 && ', '}
+                  <Link href={`/tags/${encoded}`}>{s}</Link>
+                </React.Fragment>
+              );
+            })}
         </div>
       )}
       <div property="copyrightNotice" className="text-right">
