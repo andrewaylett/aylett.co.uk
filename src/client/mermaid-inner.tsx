@@ -68,7 +68,7 @@ const MermaidInner = memo(function MermaidInner({
       ...config,
       theme: isDarkMode ? 'dark' : 'default',
     });
-  }, []);
+  }, [config, isDarkMode]);
 
   const runMermaid = useCallback(async (): Promise<void> => {
     if (!mermaidDiv.current) throw new Error('Mermaid div not found');
@@ -80,7 +80,7 @@ const MermaidInner = memo(function MermaidInner({
       setIsRendered(true);
     });
     return () => setIsRendered(false);
-  }, []);
+  }, [runMermaid]);
 
   return (
     <>

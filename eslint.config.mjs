@@ -141,6 +141,7 @@ export default tseslint.config(
                 { fixStyle: 'inline-type-imports' },
             ],
             'no-duplicate-imports': ['error', { includeExports: true }],
+            'react-hooks/exhaustive-deps': 'error',
         },
     },
     {
