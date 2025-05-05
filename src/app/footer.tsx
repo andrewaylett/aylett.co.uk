@@ -3,19 +3,13 @@ import React, { use } from 'react';
 import { getYear } from 'date-fns';
 import Link from 'next/link';
 
-import { memo } from '../types';
-
 export interface FooterProps {
   author?: Promise<string>;
   copyright?: Promise<string>;
   keywords?: Promise<string[]>;
 }
 
-export const Footer = memo(function Footer({
-  author,
-  copyright,
-  keywords,
-}: FooterProps) {
+export function Footer({ author, copyright, keywords }: FooterProps) {
   const resolvedKeywords = keywords ? use(keywords) : [];
   const resolvedAuthor = author ? use(author) : 'Andrew Aylett';
   const resolvedCopyright = copyright ? use(copyright) : getYear(Date.now());
@@ -44,4 +38,4 @@ export const Footer = memo(function Footer({
       </div>
     </footer>
   );
-});
+}

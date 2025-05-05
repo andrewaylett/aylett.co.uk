@@ -1,4 +1,4 @@
-import { type ComponentType, memo as memoComponent, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { type JSONSchema7 } from 'json-schema';
 import { validate } from 'revalidator';
@@ -90,7 +90,3 @@ export function useExploded<V extends object>(input: Promise<V>): Exploded<V> {
     }) as Exploded<V>;
   }, [input]);
 }
-
-export const memo: <T extends ComponentType<never>>(
-  Component: T,
-) => T & { displayName: string } = memoComponent;

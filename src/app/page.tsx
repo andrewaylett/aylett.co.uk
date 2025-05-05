@@ -1,9 +1,7 @@
-import * as React from 'react';
+import React, { type ReactNode } from 'react';
 
 import { type Metadata } from 'next';
 import Link from 'next/link';
-
-import { memo } from '../types';
 
 import 'server-only';
 
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-const Home = memo(function Home(): React.ReactNode {
+function Home(): ReactNode {
   return (
     <div className="flex flex-col justify-center items-center px-2 min-h-screen">
       <main
@@ -69,6 +67,6 @@ const Home = memo(function Home(): React.ReactNode {
       </main>
     </div>
   );
-});
+}
 
 export default Home;

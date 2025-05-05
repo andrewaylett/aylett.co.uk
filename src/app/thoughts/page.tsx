@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PageStructure, TitleHeader } from '../../page-structure';
 import { type Markdown } from '../../remark/traverse';
 import { asyncSortByKey } from '../../sort_by';
-import { memo, type ThoughtSchema } from '../../types';
+import { type ThoughtSchema } from '../../types';
 
 import { ThoughtEntry } from './thoughtEntry';
 import { allThoughts } from './thoughts';
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-const ThoughtsPage = memo(function ThoughtsPage(): ReactNode {
+function ThoughtsPage(): ReactNode {
   const pages = allThoughts();
   return (
     <PageStructure
@@ -38,11 +38,11 @@ const ThoughtsPage = memo(function ThoughtsPage(): ReactNode {
       <Thoughts pages={pages} />
     </PageStructure>
   );
-});
+}
 
 export default ThoughtsPage;
 
-const Thoughts = memo(function Thoughts({
+function Thoughts({
   pages,
 }: {
   pages: Promise<Markdown<ThoughtSchema>[]>;
@@ -65,4 +65,4 @@ const Thoughts = memo(function Thoughts({
       ))}
     </>
   );
-});
+}

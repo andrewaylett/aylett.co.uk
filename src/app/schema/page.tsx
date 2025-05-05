@@ -3,7 +3,6 @@ import React from 'react';
 import { type Metadata } from 'next';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
-import { memo } from '../../types';
 
 import 'server-only';
 
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Schemas',
 };
 
-const Schema = memo(function Schema() {
+function Schema() {
   return (
     <PageStructure
       schemaType="ItemList"
@@ -54,6 +53,6 @@ const Schema = memo(function Schema() {
       </ol>
     </PageStructure>
   );
-});
+}
 
 export default Schema;
