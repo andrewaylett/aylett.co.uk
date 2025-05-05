@@ -3,9 +3,9 @@ import React, { use } from 'react';
 import Link from 'next/link';
 
 import { Description } from '../../remark/components';
-import { type ArticleSchema, memo, type TypeFrom } from '../../types';
+import { type ArticleSchema, type TypeFrom } from '../../types';
 
-export const ArticleEntry = memo(function Entry({
+export function ArticleEntry({
   metadata,
   name,
 }: {
@@ -49,4 +49,4 @@ export const ArticleEntry = memo(function Entry({
       <Description metadata={metadata} />
     </div>
   );
-});
+}

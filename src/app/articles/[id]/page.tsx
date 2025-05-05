@@ -10,7 +10,7 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { type Markdown } from '../../../remark/traverse';
-import { type ArticleSchema, memo, useExploded } from '../../../types';
+import { type ArticleSchema, useExploded } from '../../../types';
 import { allArticles, articleForId } from '../articles';
 
 import 'server-only';
@@ -62,7 +62,7 @@ export async function generateStaticParams() {
   }));
 }
 
-const Revisions = memo(function Revisions({
+function Revisions({
   expires,
   lifecycle,
   revised,
@@ -97,9 +97,9 @@ const Revisions = memo(function Revisions({
       </Optional>
     </div>
   );
-});
+}
 
-const Article = memo(function Article({ params }: ArticleProps): ReactNode {
+function Article({ params }: ArticleProps): ReactNode {
   const page = articleForId(params);
   const { metadata } = useExploded(page);
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
@@ -123,9 +123,9 @@ const Article = memo(function Article({ params }: ArticleProps): ReactNode {
       <ArticlePage page={page} />
     </PageStructure>
   );
-});
+}
 
-const ArticlePage = memo(function ArticlePage({
+function ArticlePage({
   page,
 }: {
   page: Promise<Markdown<ArticleSchema>>;
@@ -133,9 +133,9 @@ const ArticlePage = memo(function ArticlePage({
   const { content } = useExploded(page);
 
   return <div property="articleBody">{use(content)}</div>;
-});
+}
 
-const ArticleHeader = memo(function ArticleHeader({
+function ArticleHeader({
   id,
   page,
 }: {
@@ -164,6 +164,6 @@ const ArticleHeader = memo(function ArticleHeader({
       <TitleSeparator />
     </header>
   );
-});
+}
 
 export default Article;

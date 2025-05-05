@@ -16,8 +16,6 @@ import {
 } from 'next/dist/client/components/error-boundary';
 import { QRCodeSVG } from 'qrcode.react';
 
-import { memo } from '../types';
-
 interface TextContextProps {
   setText: (text: string) => void;
   resetRef: RefObject<(() => void) | null>;
@@ -39,7 +37,7 @@ async function nullToError<T>(
   return result;
 }
 
-export const QRCodeForm = memo(function QRCodeForm() {
+export function QRCodeForm() {
   const [_isPending, startTransition] = React.useTransition();
   const [text, setText] = React.useState('');
   const [buttonText, setButtonText] = React.useState(INITIAL_TEXT);
@@ -116,12 +114,9 @@ export const QRCodeForm = memo(function QRCodeForm() {
       </TextContext.Provider>
     </form>
   );
-});
+}
 
-const QRCodeError: ErrorComponent = memo(function QRCodeError({
-  error,
-  reset,
-}) {
+const QRCodeError = function QRCodeError({ error, reset }) {
   const textContext = useContext(TextContext);
   if (textContext === null || !reset) {
     throw new Error('No text context or no reset function provided');
@@ -141,21 +136,32 @@ const QRCodeError: ErrorComponent = memo(function QRCodeError({
       </button>
     </div>
   );
-} satisfies ErrorComponent);
+} satisfies ErrorComponent;
 
 type QRCodeSVGProps =
   typeof QRCodeSVG extends React.ForwardRefExoticComponent<infer T> ? T : never;
 
 function QRCodeSVGWrapper({
+  ref: outerRef,
   setDimensions: outerSetDimensions,
   ...props
-}: QRCodeSVGProps & {
+}: Omit<QRCodeSVGProps, 'ref'> & {
+  ref: RefObject<SVGSVGElement | null>;
   setDimensions: ({ height, width }: { height: number; width: number }) => void;
 }) {
   const ref = useRef<SVGSVGElement>(null);
   const [dimensions, setDimensions] = React.useState({
     width: 29,
     height: 29,
+  });
+
+  useEffect(() => {
+    if (outerRef) {
+      outerRef.current = ref.current;
+    }
+    return () => {
+      outerRef.current = null;
+    };
   });
 
   useEffect(() => {

@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 import { Footer, type FooterProps } from './app/footer';
 import { type Markdown } from './remark/traverse';
-import { type LifecycleSchema, memo } from './types';
+import { type LifecycleSchema } from './types';
 
 export interface PageStructureProps<
   T extends Promise<Markdown<JSONSchema7>> | never,
@@ -27,17 +27,15 @@ export interface PageStructureProps<
   resource: string;
 }
 
-export const TitleHeader = memo(function TitleHeader({
-  children,
-}: PropsWithChildren): ReactNode {
+export function TitleHeader({ children }: PropsWithChildren): ReactNode {
   return (
     <header>
       <h1 property="name">{children}</h1>
     </header>
   );
-});
+}
 
-export const PageStructure = memo(function PageStructure<
+export function PageStructure<
   T extends Promise<Markdown<JSONSchema7>> | never,
 >({
   author,
@@ -89,4 +87,4 @@ export const PageStructure = memo(function PageStructure<
       </div>
     </>
   );
-});
+}

@@ -11,12 +11,7 @@ import {
   TitleSeparator,
 } from '../../../remark/components';
 import { type Markdown } from '../../../remark/traverse';
-import {
-  memo,
-  type ThoughtSchema,
-  type TypeFrom,
-  useExploded,
-} from '../../../types';
+import { type ThoughtSchema, type TypeFrom, useExploded } from '../../../types';
 import { allThoughts, thoughtForId } from '../thoughts';
 
 import 'server-only';
@@ -59,13 +54,7 @@ export async function generateStaticParams() {
   }));
 }
 
-const Revisions = memo(function Revisions({
-  date,
-  url,
-}: {
-  date: string;
-  url: string;
-}) {
+function Revisions({ date, url }: { date: string; url: string }) {
   return (
     <div className="flex flex-row flex-wrap gap-x-[1ch]">
       <Optional text={date}>
@@ -81,24 +70,20 @@ const Revisions = memo(function Revisions({
       </Optional>
     </div>
   );
-});
+}
 
-const ThoughtPage = memo(function ThoughtPage({ params }: ThoughtProps) {
+function ThoughtPage({ params }: ThoughtProps) {
   const page = thoughtForId(params);
   return (
     <Suspense>
       <Thought page={page} />
     </Suspense>
   );
-});
+}
 
 export default ThoughtPage;
 
-const Thought = memo(function Thought({
-  page,
-}: {
-  page: Promise<Markdown<ThoughtSchema>>;
-}) {
+function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
   const { content, id, metadata } = useExploded(page);
   const { date, tags } = useExploded(metadata);
 
@@ -118,9 +103,9 @@ const Thought = memo(function Thought({
       </Suspense>
     </PageStructure>
   );
-});
+}
 
-const ThoughtHeader = memo(function ThoughtHeader({
+function ThoughtHeader({
   id,
   metadata,
 }: {
@@ -138,12 +123,8 @@ const ThoughtHeader = memo(function ThoughtHeader({
       <TitleSeparator />
     </header>
   );
-});
+}
 
-const Use = memo(function Use<T extends ReactNode>({
-  el,
-}: {
-  el: Usable<T>;
-}): T {
+function Use<T extends ReactNode>({ el }: { el: Usable<T> }): T {
   return use(el);
-});
+}

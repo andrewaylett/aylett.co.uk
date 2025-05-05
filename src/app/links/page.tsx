@@ -3,7 +3,6 @@ import React, { type ReactNode } from 'react';
 import { type Metadata } from 'next';
 
 import { PageStructure, TitleHeader } from '../../page-structure';
-import { memo } from '../../types';
 
 import 'server-only';
 
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Links',
 };
 
-const Links = memo(function Links(): ReactNode {
+function Links(): ReactNode {
   return (
     <PageStructure
       schemaType="ItemList"
@@ -30,6 +29,6 @@ const Links = memo(function Links(): ReactNode {
       </p>
     </PageStructure>
   );
-});
+}
 
 export default Links;

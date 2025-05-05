@@ -7,7 +7,6 @@ import PlausibleProvider from 'next-plausible';
 import './styles/global.css';
 
 import 'server-only';
-import { memo } from '../types';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -118,9 +117,7 @@ const PLEX_SANS = localFont({
   ],
 });
 
-const RootLayout = memo(function RootLayout({
-  children,
-}: PropsWithChildren): ReactNode {
+function RootLayout({ children }: PropsWithChildren): ReactNode {
   const plexSans = useMemo(() => PLEX_SANS, []);
   const nodeEnv = useMemo(() => process.env.NODE_ENV, []);
 
@@ -140,6 +137,6 @@ const RootLayout = memo(function RootLayout({
       </body>
     </html>
   );
-});
+}
 
 export default RootLayout;

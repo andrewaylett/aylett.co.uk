@@ -3,9 +3,9 @@ import React, { use } from 'react';
 import Link from 'next/link';
 
 import { Description } from '../../remark/components';
-import { memo, type ThoughtSchema, type TypeFrom } from '../../types';
+import { type ThoughtSchema, type TypeFrom } from '../../types';
 
-export const ThoughtEntry = memo(function Entry({
+export function ThoughtEntry({
   metadata,
   name,
 }: {
@@ -22,4 +22,4 @@ export const ThoughtEntry = memo(function Entry({
       <Description metadata={metadata} />
     </div>
   );
-});
+}

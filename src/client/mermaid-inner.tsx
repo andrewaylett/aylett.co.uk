@@ -8,8 +8,6 @@ import React, {
 
 import mermaid, { type MermaidConfig } from 'mermaid';
 
-import { memo } from '../types';
-
 import { useDarkMode } from './darkMode';
 import { type MermaidProps } from './mermaid';
 
@@ -52,10 +50,7 @@ const DEFAULT_CONFIG: MermaidConfig = {
   },
 } as const;
 
-const MermaidInner = memo(function MermaidInner({
-  children,
-  config,
-}: PropsWithChildren<MermaidProps>) {
+function MermaidInner({ children, config }: PropsWithChildren<MermaidProps>) {
   const [isRendered, setIsRendered] = useState(false);
 
   const mermaidDiv = useRef<HTMLDivElement>(null);
@@ -90,6 +85,6 @@ const MermaidInner = memo(function MermaidInner({
       </div>
     </>
   );
-});
+}
 
 export default MermaidInner;
