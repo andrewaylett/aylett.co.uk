@@ -40,39 +40,23 @@ async function nullToError<T>(
 }
 
 export const QRCodeForm = memo(function QRCodeForm() {
+  const [_isPending, startTransition] = React.useTransition();
   const [text, setText] = React.useState('');
   const [buttonText, setButtonText] = React.useState(INITIAL_TEXT);
   const ref = useRef<SVGSVGElement>(null);
   const resetRef = useRef<() => void>(null);
-
   const [dimensions, setDimensions] = React.useState({
-    width: 64,
-    height: 64,
+    width: 29,
+    height: 29,
   });
 
-  useEffect(() => {
-    if (ref.current) {
-      const svgElement = ref.current;
-      const viewBox = svgElement.getAttribute('viewBox');
-      const viewBoxValues = viewBox?.split(' ');
-      const width = viewBoxValues ? parseInt(viewBoxValues[2], 10) : 64;
-      const height = viewBoxValues ? parseInt(viewBoxValues[3], 10) : 64;
-      setDimensions({ width, height });
+  const setTextAndReset = useCallback((newText: string) => {
+    setText(newText);
+    setButtonText(INITIAL_TEXT);
+    if (resetRef.current) {
+      resetRef.current();
     }
-  }, [ref, text]);
-
-  const { height, width } = dimensions;
-
-  const setTextAndReset = useCallback(
-    (newText: string) => {
-      setText(newText);
-      setButtonText(INITIAL_TEXT);
-      if (resetRef.current) {
-        resetRef.current();
-      }
-    },
-    [setText, setButtonText, resetRef],
-  );
+  }, []);
 
   const copyToClipboard = useCallback(async () => {
     if (!ref.current) {
@@ -84,43 +68,47 @@ export const QRCodeForm = memo(function QRCodeForm() {
         toBlob(ref.current as unknown as HTMLElement, {
           pixelRatio: 1,
           skipFonts: true,
-          width: width * 4,
+          width: dimensions.width * 4,
+          height: dimensions.height * 4,
         }),
         'Failed to render QR code image',
       );
       await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob }),
       ]);
-      setButtonText(SUCCESS_TEXT);
+      startTransition(() => {
+        setButtonText(SUCCESS_TEXT);
+      });
     } catch (error) {
-      console.error(error);
-      setButtonText(FAILED_TEXT);
+      startTransition(() => {
+        console.error(error);
+        setButtonText(FAILED_TEXT);
+      });
     }
-  }, [ref, setButtonText]);
+  }, [dimensions]);
 
   return (
-    <form>
+    <form className="flex items-center flex-col">
       <input
         type="text"
         value={text}
-        onChange={(e) => setTextAndReset(e.target.value)}
+        onChange={(e) => startTransition(() => setTextAndReset(e.target.value))}
         placeholder="Paste your text here"
-        className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre"
+        className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
       />
       <TextContext.Provider value={{ setText: setTextAndReset, resetRef }}>
         <ErrorBoundary errorComponent={QRCodeError}>
-          <QRCodeSVG
+          <QRCodeSVGWrapper
             value={text}
             marginSize={4}
             ref={ref}
             size={512}
-            height={height * 4}
-            width={width * 4}
+            setDimensions={setDimensions}
           />
           <button
             type="button"
-            onClick={copyToClipboard}
-            className="bg-blue-500 text-white rounded-md p-2 mt-4"
+            onClick={() => startTransition(() => copyToClipboard())}
+            className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
           >
             {buttonText}
           </button>
@@ -141,16 +129,66 @@ const QRCodeError: ErrorComponent = memo(function QRCodeError({
   const { resetRef, setText } = textContext;
   resetRef.current = reset;
   return (
-    <div>
+    <div className="w-full">
       <h2 className="text-red-500">Error generating QR code</h2>
       <p>{error.message}</p>
       <button
         type="button"
         onClick={() => setText('')}
-        className="bg-blue-500 text-white rounded-md p-2 mt-4"
+        className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
       >
         Reset
       </button>
     </div>
   );
 } satisfies ErrorComponent);
+
+type QRCodeSVGProps =
+  typeof QRCodeSVG extends React.ForwardRefExoticComponent<infer T> ? T : never;
+
+function QRCodeSVGWrapper({
+  setDimensions: outerSetDimensions,
+  ...props
+}: QRCodeSVGProps & {
+  setDimensions: ({ height, width }: { height: number; width: number }) => void;
+}) {
+  const ref = useRef<SVGSVGElement>(null);
+  const [dimensions, setDimensions] = React.useState({
+    width: 29,
+    height: 29,
+  });
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const callback = (element: SVGSVGElement) => {
+      const viewBox = element.getAttribute('viewBox');
+      const viewBoxValues = viewBox?.split(' ');
+      const width = viewBoxValues ? parseInt(viewBoxValues[2], 10) : 64;
+      const height = viewBoxValues ? parseInt(viewBoxValues[3], 10) : 64;
+      setDimensions({ width, height });
+      outerSetDimensions({ width, height });
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        callback(mutation.target as SVGSVGElement);
+      });
+    });
+    observer.observe(ref.current, {
+      attributes: true,
+      attributeFilter: ['viewBox'],
+    });
+
+    callback(ref.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [outerSetDimensions]);
+
+  const height = dimensions.height * 4;
+  const width = dimensions.width * 4;
+
+  return <QRCodeSVG {...props} height={height} width={width} ref={ref} />;
+}

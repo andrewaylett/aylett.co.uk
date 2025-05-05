@@ -5,7 +5,7 @@ import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import andrewaylett from 'eslint-config-andrewaylett';
 import react from 'eslint-plugin-react';
-import reactCompiler from 'eslint-plugin-react-compiler';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -52,7 +52,7 @@ export default tseslint.config(
         ...react.configs.flat.recommended,
         settings: { react: { version: 'detect' } },
     },
-    reactCompiler.configs.recommended,
+    reactHooks.configs['recommended-latest'],
     {
         rules: {
             '@typescript-eslint/restrict-template-expressions': [
@@ -141,10 +141,11 @@ export default tseslint.config(
                 { fixStyle: 'inline-type-imports' },
             ],
             'no-duplicate-imports': ['error', { includeExports: true }],
+            'react-hooks/exhaustive-deps': 'error',
         },
     },
     {
-        files: ['*.js', '*.mjs', '*.ts'],
+        files: ['*.js', '*.mjs', '*.ts', '*.mts'],
         languageOptions: {
             globals: {
                 ...globals.node,

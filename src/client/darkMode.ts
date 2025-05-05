@@ -10,7 +10,7 @@ export function useDarkMode(): boolean {
       typeof globalThis.matchMedia === 'function'
         ? globalThis.matchMedia('(prefers-color-scheme: dark)')
         : undefined,
-    [globalThis],
+    [],
   );
 
   const [isDarkMode, setIsDarkMode] = useState(mediaQuery?.matches ?? false);
