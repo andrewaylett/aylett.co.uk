@@ -14,10 +14,11 @@ import {
   ErrorBoundary,
   type ErrorComponent,
 } from 'next/dist/client/components/error-boundary';
+import { useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface TextContextProps {
-  setText: (text: string) => void;
+  resetText: () => void;
   resetRef: RefObject<(() => void) | null>;
 }
 const TextContext = createContext<null | TextContextProps>(null);
@@ -39,9 +40,13 @@ async function nullToError<T>(
 
 export function QRCodeForm() {
   const [_isPending, startTransition] = React.useTransition();
-  const [text, setText] = React.useState('');
+  const searchParams = useSearchParams();
+  const [text, setText] = React.useState(() =>
+    decodeURIComponent(searchParams?.get('text') ?? ''),
+  );
   const [buttonText, setButtonText] = React.useState(INITIAL_TEXT);
   const ref = useRef<SVGSVGElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const resetRef = useRef<() => void>(null);
   const [dimensions, setDimensions] = React.useState({
     width: 29,
@@ -53,6 +58,14 @@ export function QRCodeForm() {
     setButtonText(INITIAL_TEXT);
     if (resetRef.current) {
       resetRef.current();
+    }
+  }, []);
+
+  const resetText = useCallback(() => {
+    setText('');
+    setButtonText(INITIAL_TEXT);
+    if (inputRef.current) {
+      inputRef.current.value = '';
     }
   }, []);
 
@@ -89,12 +102,13 @@ export function QRCodeForm() {
     <form className="flex items-center flex-col">
       <input
         type="text"
-        value={text}
+        defaultValue={text}
         onChange={(e) => startTransition(() => setTextAndReset(e.target.value))}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
+        ref={inputRef}
       />
-      <TextContext.Provider value={{ setText: setTextAndReset, resetRef }}>
+      <TextContext.Provider value={{ resetText, resetRef }}>
         <ErrorBoundary errorComponent={QRCodeError}>
           <QRCodeSVGWrapper
             value={text}
@@ -121,7 +135,7 @@ const QRCodeError = function QRCodeError({ error, reset }) {
   if (textContext === null || !reset) {
     throw new Error('No text context or no reset function provided');
   }
-  const { resetRef, setText } = textContext;
+  const { resetRef, resetText } = textContext;
   resetRef.current = reset;
   return (
     <div className="w-full">
@@ -129,7 +143,7 @@ const QRCodeError = function QRCodeError({ error, reset }) {
       <p>{error.message}</p>
       <button
         type="button"
-        onClick={() => setText('')}
+        onClick={() => resetText()}
         className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
       >
         Reset

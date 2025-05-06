@@ -26,7 +26,7 @@ export default tseslint.config(
             parserOptions: {
                 project: true,
                 projectService: {
-                    allowDefaultProject: ['*.js', '*.mjs'],
+                    allowDefaultProject: ['*.js', '*.mjs', 'jest.config.ts'],
                 },
             },
             globals: {
@@ -81,7 +81,16 @@ export default tseslint.config(
                 'error',
                 { ignore: ['property', 'resource', 'typeof', 'vocab'] },
             ],
-            'import/no-extraneous-dependencies': ['error'],
+            'import/no-extraneous-dependencies': [
+                'error',
+                {
+                    devDependencies: [
+                        '**/*.{test,spec}.{m,}{t,j}s{x,}',
+                        '*.{m,}{t,j}s',
+                        '**/test/**',
+                    ],
+                },
+            ],
             'import/consistent-type-specifier-style': [
                 'error',
                 'prefer-inline',
@@ -104,17 +113,6 @@ export default tseslint.config(
                                 '{react,react-dom,react-dom/server,prop-types}',
                             group: 'external',
                             position: 'before',
-                        },
-                        {
-                            pattern:
-                                '{bpk-*,bpk-**,bpk-*/**,bpk-*/**/**,@skyscanner/bpk-*/**/**,@skyscanner/backpack-web/**/**}',
-                            group: 'external',
-                            position: 'after',
-                        },
-                        {
-                            pattern: 'common/**',
-                            group: 'external',
-                            position: 'after',
                         },
                         {
                             pattern: '{*.scss,*.css}',
