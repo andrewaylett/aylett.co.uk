@@ -1,33 +1,29 @@
 'use client';
 
 import React, {
-  createContext,
-  type RefObject,
+  type ReactElement,
   useCallback,
-  useContext,
   useEffect,
+  useReducer,
   useRef,
+  useTransition,
 } from 'react';
 
 import { toBlob } from 'html-to-image';
-import {
-  ErrorBoundary,
-  type ErrorComponent,
-} from 'next/dist/client/components/error-boundary';
+import { produce } from 'immer';
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useSearchParams } from 'next/navigation';
-import { QRCodeSVG } from 'qrcode.react';
 
-interface TextContextProps {
-  resetText: () => void;
-  resetRef: RefObject<(() => void) | null>;
-}
-const TextContext = createContext<null | TextContextProps>(null);
+import { QRCodeError, TextContext } from './QRCodeError';
+import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
+
+import 'client-only';
 
 const INITIAL_TEXT = 'Copy to clipboard';
 const FAILED_TEXT = 'Failed to copy';
 const SUCCESS_TEXT = 'Copied to clipboard!';
 
-async function nullToError<T>(
+export async function nullToError<T>(
   value: Promise<T | null>,
   message?: string,
 ): Promise<T> {
@@ -38,36 +34,135 @@ async function nullToError<T>(
   return result;
 }
 
-export function QRCodeForm() {
-  const [_isPending, startTransition] = React.useTransition();
-  const searchParams = useSearchParams();
-  const [text, setText] = React.useState(() =>
-    decodeURIComponent(searchParams?.get('text') ?? ''),
+/**
+ * RFC 3986 allows:
+ *   pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+ *   query = *( pchar / "/" / "?" )
+ * So we replace everything else with its percent-encoded value.
+ * @param component
+ */
+export function encodeQueryComponent(component: string): string {
+  return component.replace(
+    /[^a-zA-Z0-9:@/?]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
   );
-  const [buttonText, setButtonText] = React.useState(INITIAL_TEXT);
+}
+
+interface Size {
+  width: number;
+  height: number;
+}
+
+interface QRCodeState {
+  unitSize: Size;
+  pxSize: Size;
+  text: string;
+  initialText: string;
+  isQuine: boolean;
+  buttonText: string;
+  linkUrl: string;
+}
+
+export default function QRCodeForm(): ReactElement {
+  const [_isPending, startTransition] = useTransition();
   const ref = useRef<SVGSVGElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resetRef = useRef<() => void>(null);
-  const [dimensions, setDimensions] = React.useState({
-    width: 29,
-    height: 29,
-  });
 
-  const setTextAndReset = useCallback((newText: string) => {
-    setText(newText);
-    setButtonText(INITIAL_TEXT);
-    if (resetRef.current) {
-      resetRef.current();
-    }
+  const [state, updateState] = useReducer<
+    QRCodeState,
+    Pick<QRCodeState, 'initialText' | 'isQuine'>,
+    [Partial<QRCodeState>]
+  >(
+    produce((draft, newState) => {
+      Object.assign(draft, newState);
+      draft.linkUrl = draft.text
+        ? `?text=${encodeQueryComponent(draft.text)}`
+        : './qr';
+      draft.pxSize = {
+        width: draft.unitSize.width * 4,
+        height: draft.unitSize.height * 4,
+      };
+    }),
+    {
+      initialText: decodeURIComponent(useSearchParams()?.get('text') ?? ''),
+      isQuine: useSearchParams()?.get('quine') === 'true',
+    },
+    (init) => {
+      const unitSize = {
+        width: 29,
+        height: 29,
+      };
+      const pxSize = {
+        width: unitSize.width * 4,
+        height: unitSize.height * 4,
+      };
+      return {
+        unitSize,
+        pxSize,
+        text: init.initialText,
+        buttonText: INITIAL_TEXT,
+        linkUrl: init.initialText
+          ? '?text=' + encodeQueryComponent(init.initialText)
+          : './qr',
+        ...init,
+      };
+    },
+  );
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const qrText = event.state?.qrText;
+      if (qrText) {
+        startTransition(() => {
+          updateState({ text: qrText });
+          if (inputRef.current) {
+            inputRef.current.value = qrText;
+          }
+        });
+      }
+    };
+
+    const abortController = new AbortController();
+    window.addEventListener('popstate', handlePopState, {
+      signal: abortController.signal,
+    });
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
+
+  useEffect(() => {
+    if (state.isQuine) {
+      updateState({ isQuine: false, text: window.location.href });
+      if (inputRef.current) {
+        inputRef.current.value = window.location.href;
+      }
+    }
+    window.history.replaceState(
+      { ...window.history.state, qrText: state.text },
+      '',
+      state.linkUrl,
+    );
+  }, [state.linkUrl, state.text, state.isQuine]);
+
+  const setText = useCallback(
+    (newText: string) => {
+      updateState({ text: newText, buttonText: INITIAL_TEXT });
+      if (resetRef.current) {
+        resetRef.current();
+      }
+    },
+    [updateState],
+  );
 
   const resetText = useCallback(() => {
     setText('');
-    setButtonText(INITIAL_TEXT);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
-  }, []);
+  }, [setText]);
 
   const copyToClipboard = useCallback(async () => {
     if (!ref.current) {
@@ -79,8 +174,7 @@ export function QRCodeForm() {
         toBlob(ref.current as unknown as HTMLElement, {
           pixelRatio: 1,
           skipFonts: true,
-          width: dimensions.width * 4,
-          height: dimensions.height * 4,
+          ...state.pxSize,
         }),
         'Failed to render QR code image',
       );
@@ -88,127 +182,61 @@ export function QRCodeForm() {
         new ClipboardItem({ 'image/png': blob }),
       ]);
       startTransition(() => {
-        setButtonText(SUCCESS_TEXT);
+        updateState({ buttonText: SUCCESS_TEXT });
       });
+
+      window.history.pushState(
+        { ...window.history.state, qrText: state.text },
+        '',
+        state.linkUrl,
+      );
     } catch (error) {
       startTransition(() => {
         console.error(error);
-        setButtonText(FAILED_TEXT);
+        updateState({ buttonText: FAILED_TEXT });
       });
     }
-  }, [dimensions]);
+  }, [state, updateState]);
 
   return (
     <form className="flex items-center flex-col">
       <input
         type="text"
-        defaultValue={text}
-        onChange={(e) => startTransition(() => setTextAndReset(e.target.value))}
+        defaultValue={state.initialText}
+        onChange={(e) => startTransition(() => setText(e.target.value))}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
         ref={inputRef}
+        data-testid="qr-code-input"
       />
-      <TextContext.Provider value={{ resetText, resetRef }}>
+      <TextContext
+        value={{
+          resetText,
+          updateResetRef: useCallback((newRef) => {
+            resetRef.current = newRef;
+          }, []),
+        }}
+      >
         <ErrorBoundary errorComponent={QRCodeError}>
           <QRCodeSVGWrapper
-            value={text}
+            value={state.text}
             marginSize={4}
             ref={ref}
             size={512}
-            setDimensions={setDimensions}
+            setDimensions={useCallback(
+              (unitSize: Size) => updateState({ unitSize }),
+              [updateState],
+            )}
           />
           <button
             type="button"
-            onClick={() => startTransition(() => copyToClipboard())}
+            onClick={() => startTransition(copyToClipboard)}
             className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
           >
-            {buttonText}
+            {state.buttonText}
           </button>
         </ErrorBoundary>
-      </TextContext.Provider>
+      </TextContext>
     </form>
   );
-}
-
-const QRCodeError = function QRCodeError({ error, reset }) {
-  const textContext = useContext(TextContext);
-  if (textContext === null || !reset) {
-    throw new Error('No text context or no reset function provided');
-  }
-  const { resetRef, resetText } = textContext;
-  resetRef.current = reset;
-  return (
-    <div className="w-full">
-      <h2 className="text-red-500">Error generating QR code</h2>
-      <p>{error.message}</p>
-      <button
-        type="button"
-        onClick={() => resetText()}
-        className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
-      >
-        Reset
-      </button>
-    </div>
-  );
-} satisfies ErrorComponent;
-
-type QRCodeSVGProps =
-  typeof QRCodeSVG extends React.ForwardRefExoticComponent<infer T> ? T : never;
-
-function QRCodeSVGWrapper({
-  ref: outerRef,
-  setDimensions: outerSetDimensions,
-  ...props
-}: Omit<QRCodeSVGProps, 'ref'> & {
-  ref: RefObject<SVGSVGElement | null>;
-  setDimensions: ({ height, width }: { height: number; width: number }) => void;
-}) {
-  const ref = useRef<SVGSVGElement>(null);
-  const [dimensions, setDimensions] = React.useState({
-    width: 29,
-    height: 29,
-  });
-
-  useEffect(() => {
-    if (outerRef) {
-      outerRef.current = ref.current;
-    }
-    return () => {
-      outerRef.current = null;
-    };
-  });
-
-  useEffect(() => {
-    if (!ref.current) return;
-
-    const callback = (element: SVGSVGElement) => {
-      const viewBox = element.getAttribute('viewBox');
-      const viewBoxValues = viewBox?.split(' ');
-      const width = viewBoxValues ? parseInt(viewBoxValues[2], 10) : 64;
-      const height = viewBoxValues ? parseInt(viewBoxValues[3], 10) : 64;
-      setDimensions({ width, height });
-      outerSetDimensions({ width, height });
-    };
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        callback(mutation.target as SVGSVGElement);
-      });
-    });
-    observer.observe(ref.current, {
-      attributes: true,
-      attributeFilter: ['viewBox'],
-    });
-
-    callback(ref.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [outerSetDimensions]);
-
-  const height = dimensions.height * 4;
-  const width = dimensions.width * 4;
-
-  return <QRCodeSVG {...props} height={height} width={width} ref={ref} />;
 }
