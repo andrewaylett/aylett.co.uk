@@ -26,7 +26,7 @@ export function QRCodeSVGWrapper({
     return () => {
       outerRef.current = null;
     };
-  });
+  }, [outerRef]);
 
   useEffect(() => {
     if (!ref.current) return;
