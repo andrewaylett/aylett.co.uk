@@ -1,9 +1,9 @@
+import 'server-only';
+
 import React, { type ReactNode } from 'react';
 
 import { type Metadata } from 'next';
 import Link from 'next/link';
-
-import 'server-only';
 
 export const metadata: Metadata = {
   verification: {

@@ -1,18 +1,21 @@
 'use client';
+import 'client-only';
 
-import React, { lazy, type PropsWithChildren, Suspense } from 'react';
+import React, { type PropsWithChildren, Suspense } from 'react';
 
 import { type MermaidConfig } from 'mermaid';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-
-import 'client-only';
+import dynamic from 'next/dynamic';
 
 export interface MermaidProps {
   name?: string;
   config?: MermaidConfig;
 }
 
-const MermaidInner = lazy(() => import('./mermaid-inner'));
+const MermaidInner = dynamic({
+  loader: () => import('./mermaid-inner'),
+  ssr: false,
+});
 
 export function Mermaid({ ...props }: PropsWithChildren<MermaidProps>) {
   return (

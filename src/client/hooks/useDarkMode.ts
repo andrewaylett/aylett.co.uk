@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-
 import 'client-only';
+
+import { useEffect, useMemo, useState } from 'react';
 
 export function useDarkMode(): boolean {
   const mediaQuery = useMemo(
@@ -13,7 +13,9 @@ export function useDarkMode(): boolean {
     [],
   );
 
-  const [isDarkMode, setIsDarkMode] = useState(mediaQuery?.matches ?? false);
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => mediaQuery?.matches ?? false,
+  );
 
   useEffect(() => {
     const handleMediaQueryChange = (event: MediaQueryListEvent) => {

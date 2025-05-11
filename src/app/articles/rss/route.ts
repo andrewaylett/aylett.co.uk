@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import RSS from 'rss';
 
-import { asyncSortByKey } from '../../../sort_by';
 import { allArticles } from '../articles';
+
+import { asyncSortByKey } from '@/utilities';
 
 export async function GET() {
   // Create RSS XML

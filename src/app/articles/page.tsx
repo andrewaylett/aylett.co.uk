@@ -1,16 +1,17 @@
+import 'server-only';
+
 import React, { type ReactNode, Suspense, use } from 'react';
 
 import { type Metadata } from 'next';
 
-import { PageStructure, TitleHeader } from '../../page-structure';
-import { type Markdown } from '../../remark/traverse';
-import { asyncSortByKey } from '../../sort_by';
-import { type ArticleSchema } from '../../types';
-
-import { ArticleEntry } from './articleEntry';
 import { allArticles } from './articles';
 
-import 'server-only';
+import { ListingEntry } from '@/components/ListingEntry';
+import { PageStructure } from '@/components/PageStructure';
+import { TitleHeader } from '@/components/TitleHeader';
+import { type Markdown } from '@/remark/traverse';
+import { type ArticleSchema } from '@/types';
+import { asyncSortByKey } from '@/utilities';
 
 export const metadata: Metadata = {
   title: 'Articles',
@@ -46,7 +47,7 @@ function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
     <>
       {sorted.map(({ id: name, metadata }) => (
         <Suspense key={name}>
-          <ArticleEntry name={name} metadata={metadata} />
+          <ListingEntry name={name} metadata={metadata} />
         </Suspense>
       ))}
     </>

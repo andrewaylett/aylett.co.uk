@@ -1,11 +1,11 @@
+import 'server-only';
+
 import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { findMarkdown, type Markdown } from '../../remark/traverse';
-import { ThoughtSchema } from '../../types';
-
-import 'server-only';
+import { findMarkdown, type Markdown } from '@/remark/traverse';
+import { ThoughtSchema } from '@/types';
 
 export async function thoughtForId(
   params: Promise<{ id: string }>,
@@ -15,4 +15,6 @@ export async function thoughtForId(
   return pages.find((page) => page.id === id) ?? notFound();
 }
 
-export const allThoughts = cache(() => findMarkdown('thoughts', ThoughtSchema));
+export const allThoughts = cache(() =>
+  findMarkdown('thoughts/md', ThoughtSchema),
+);

@@ -2,14 +2,13 @@ import React from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { PageStructure, TitleHeader } from '../../../page-structure';
-import { type Markdown } from '../../../remark/traverse';
-import { type ArticleSchema, type ThoughtSchema } from '../../../types';
-import { ArticleEntry } from '../../articles/articleEntry';
-import { allArticles } from '../../articles/articles';
-import { ThoughtEntry } from '../../thoughts/thoughtEntry';
-import { allThoughts } from '../../thoughts/thoughts';
 import { allTags } from '../allTags';
+
+import { allArticles } from '@/app/articles/articles';
+import { TagPageContent } from '@/app/tags/[tag]/TagPageContent';
+import { allThoughts } from '@/app/thoughts/thoughts';
+import { type Markdown } from '@/remark/traverse';
+import { type ArticleSchema, type ThoughtSchema } from '@/types';
 
 export async function generateStaticParams() {
   const tags = await allTags();
@@ -60,59 +59,5 @@ export default async function TagPage({
       filteredThoughts={filteredThoughts}
       unmangledTag={originalTag}
     />
-  );
-}
-
-function TagPageContent({
-  filteredArticles,
-  filteredThoughts,
-  tag,
-  unmangledTag,
-}: {
-  tag: string;
-  filteredArticles: Markdown<ArticleSchema>[];
-  filteredThoughts: Markdown<ThoughtSchema>[];
-  unmangledTag: string;
-}) {
-  const articles =
-    filteredArticles.length > 0 ? (
-      <>
-        <h2>Articles</h2>
-        <ul>
-          {filteredArticles.map((article) => (
-            <li key={article.id}>
-              <ArticleEntry metadata={article.metadata} name={article.id} />
-            </li>
-          ))}
-        </ul>
-      </>
-    ) : (
-      <></>
-    );
-  const thoughts =
-    filteredThoughts.length > 0 ? (
-      <>
-        <h2>Thoughts</h2>
-        <ul>
-          {filteredThoughts.map((thought) => (
-            <li key={thought.id}>
-              <ThoughtEntry metadata={thought.metadata} name={thought.id} />
-            </li>
-          ))}
-        </ul>
-      </>
-    ) : (
-      <></>
-    );
-  return (
-    <PageStructure
-      schemaType="ItemList"
-      resource={`/tags/${tag}`}
-      breadcrumbs={[{ href: '/tags', text: 'Tags' }]}
-      header={<TitleHeader>Tag: {unmangledTag}</TitleHeader>}
-    >
-      {articles}
-      {thoughts}
-    </PageStructure>
   );
 }
