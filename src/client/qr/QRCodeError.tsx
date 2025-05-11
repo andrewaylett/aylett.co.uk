@@ -1,13 +1,8 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import { type ErrorComponent } from 'next/dist/client/components/error-boundary';
 
-export interface TextContextProps {
-  resetText: () => void;
-  updateResetRef: (resetRef: (() => void) | null) => void;
-}
-
-export const TextContext = createContext<null | TextContextProps>(null);
+import { TextContext } from './textContext';
 
 export const QRCodeError = function QRCodeError({ error, reset }) {
   const { resetText, updateResetRef } = useContext(TextContext)!;

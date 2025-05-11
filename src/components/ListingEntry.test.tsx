@@ -3,9 +3,9 @@ import React, { act } from 'react';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react';
 
-import { type ArticleSchema, type TypeFrom } from '../../types';
+import { type ArticleSchema, type TypeFrom } from '../types';
 
-import { ArticleEntry } from './articleEntry';
+import { ListingEntry } from './ListingEntry';
 
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/jest-globals';
@@ -28,7 +28,7 @@ describe('ArticleEntry', () => {
     await act(
       async () =>
         await render(
-          <ArticleEntry metadata={metadata} name="example-article" />,
+          <ListingEntry metadata={metadata} name="example-article" />,
         ),
     );
 
@@ -52,7 +52,7 @@ describe('ArticleEntry', () => {
 
     await act(
       async () =>
-        await render(<ArticleEntry metadata={metadata} name="draft-article" />),
+        await render(<ListingEntry metadata={metadata} name="draft-article" />),
     );
 
     expect(screen.queryByText('Draft:')).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('ArticleEntry', () => {
     await act(
       async () =>
         await render(
-          <ArticleEntry metadata={metadata} name="revised-article" />,
+          <ListingEntry metadata={metadata} name="revised-article" />,
         ),
     );
 
@@ -100,7 +100,7 @@ describe('ArticleEntry', () => {
     await act(
       async () =>
         await render(
-          <ArticleEntry metadata={metadata} name="abstract-article" />,
+          <ListingEntry metadata={metadata} name="abstract-article" />,
         ),
     );
 
@@ -124,7 +124,7 @@ describe('ArticleEntry', () => {
 
     await act(
       async () =>
-        await render(<ArticleEntry metadata={metadata} name="empty-article" />),
+        await render(<ListingEntry metadata={metadata} name="empty-article" />),
     );
 
     expect(screen.queryByText('Draft:')).not.toBeInTheDocument();

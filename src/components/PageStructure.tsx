@@ -8,9 +8,10 @@ import React, {
 import { type JSONSchema7 } from 'json-schema';
 import Link from 'next/link';
 
-import { Footer, type FooterProps } from './app/footer';
-import { type Markdown } from './remark/traverse';
-import { type LifecycleSchema } from './types';
+import { Footer, type FooterProps } from './Footer';
+
+import { type Markdown } from '@/remark/traverse';
+import { type LifecycleSchema } from '@/types';
 
 export interface PageStructureProps<
   T extends Promise<Markdown<JSONSchema7>> | never,
@@ -25,14 +26,6 @@ export interface PageStructureProps<
   lifecycle?: Promise<Schema['properties']['lifecycle']['enum'][number]>;
   schemaType: string;
   resource: string;
-}
-
-export function TitleHeader({ children }: PropsWithChildren): ReactNode {
-  return (
-    <header>
-      <h1 property="name">{children}</h1>
-    </header>
-  );
 }
 
 export function PageStructure<
@@ -63,7 +56,7 @@ export function PageStructure<
       >
         <nav property="breadcrumb" typeof="BreadcrumbList">
           <span property="itemListElement" typeof="ListItem">
-            <Link property="item" typeof="WebPage" href="/">
+            <Link property="item" typeof="WebPage" href="/public">
               <span property="name">Home</span>
             </Link>
             <data property="position" content="1" />

@@ -42,7 +42,7 @@ describe('QRCodeForm', () => {
   });
 
   it('renders the form with input and button', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -55,7 +55,7 @@ describe('QRCodeForm', () => {
   });
 
   it('updates the QR code on change', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -70,7 +70,7 @@ describe('QRCodeForm', () => {
   });
 
   it('displays success text after copying to clipboard', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     const spy = jest.spyOn(navigator.clipboard, 'write').mockResolvedValue();
 
     act(() => {
@@ -88,7 +88,7 @@ describe('QRCodeForm', () => {
   });
 
   it('displays error text if copying to clipboard fails', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     const spy = jest
       .spyOn(navigator.clipboard, 'write')
       .mockRejectedValue(new Error('Clipboard error'));
@@ -108,7 +108,7 @@ describe('QRCodeForm', () => {
   });
 
   it('displays an error when the input is too large to encode', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -121,7 +121,7 @@ describe('QRCodeForm', () => {
   });
 
   it('resets when text is entered', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -143,7 +143,7 @@ describe('QRCodeForm', () => {
   });
 
   it('resets when the button is pushed', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -162,7 +162,7 @@ describe('QRCodeForm', () => {
   });
 
   it('updates the URL and state on pushState', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -176,7 +176,7 @@ describe('QRCodeForm', () => {
   });
 
   it('restores the state on popState', async () => {
-    const { default: QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('./QRCodeForm');
     act(() => {
       render(<QRCodeForm />);
     });
@@ -200,24 +200,5 @@ describe('QRCodeForm', () => {
       'd',
       expect.not.stringMatching(TEST_PATH), // Ensure the QR code updates
     );
-  });
-
-  it('percent-encodes special characters in query component', async () => {
-    const { encodeQueryComponent } = await import('./QRCodeForm');
-    const input = 'a b+c@?/%&';
-    const encoded = encodeQueryComponent(input);
-    expect(encoded).toBe('a%20b%2Bc@?/%25%26');
-  });
-
-  it('throws when promise resolves to null', async () => {
-    const { nullToError } = await import('./QRCodeForm');
-    await expect(nullToError(Promise.resolve(null), 'oops')).rejects.toThrow(
-      'oops',
-    );
-  });
-
-  it('resolves value when not null', async () => {
-    const { nullToError } = await import('./QRCodeForm');
-    await expect(nullToError(Promise.resolve(42))).resolves.toBe(42);
   });
 });

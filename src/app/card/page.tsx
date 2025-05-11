@@ -1,11 +1,12 @@
+import 'server-only';
+
 import React, { type ReactElement } from 'react';
 
 import { type Metadata } from 'next';
 import Link from 'next/link';
 
-import { PageStructure, TitleHeader } from '../../page-structure';
-
-import 'server-only';
+import { PageStructure } from '@/components/PageStructure';
+import { TitleHeader } from '@/components/TitleHeader';
 
 export const metadata: Metadata = {
   title: 'QR Code',

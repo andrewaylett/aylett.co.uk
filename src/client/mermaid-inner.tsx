@@ -1,3 +1,6 @@
+'use client';
+import 'client-only';
+
 import React, {
   type PropsWithChildren,
   useCallback,
@@ -8,7 +11,7 @@ import React, {
 
 import mermaid, { type MermaidConfig } from 'mermaid';
 
-import { useDarkMode } from './darkMode';
+import { useDarkMode } from './hooks/useDarkMode';
 import { type MermaidProps } from './mermaid';
 
 const DEFAULT_CONFIG: MermaidConfig = {

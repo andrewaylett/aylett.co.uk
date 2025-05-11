@@ -1,20 +1,21 @@
-import React, { type ReactNode, Suspense, type Usable, use } from 'react';
+import 'server-only';
+
+import React, { Suspense, use } from 'react';
 
 import { type Metadata } from 'next';
 import Link from 'next/link';
 
-import { gitHubUrl } from '../../../github';
-import { PageStructure } from '../../../page-structure';
-import {
-  Description,
-  Optional,
-  TitleSeparator,
-} from '../../../remark/components';
-import { type Markdown } from '../../../remark/traverse';
-import { type ThoughtSchema, type TypeFrom, useExploded } from '../../../types';
 import { allThoughts, thoughtForId } from '../thoughts';
 
-import 'server-only';
+import { useExploded } from '@/client/hooks/useExploded';
+import { Description } from '@/components/Description';
+import { Optional } from '@/components/Optional';
+import { PageStructure } from '@/components/PageStructure';
+import { TitleSeparator } from '@/components/TitleSeparator';
+import { Use } from '@/components/Use';
+import { type Markdown } from '@/remark/traverse';
+import { type ThoughtSchema, type TypeFrom } from '@/types';
+import { gitHubUrl } from '@/utilities';
 
 export const dynamicParams = false;
 export const dynamic = 'error';
@@ -57,7 +58,7 @@ export async function generateStaticParams() {
 function Revisions({ date, url }: { date: string; url: string }) {
   return (
     <div className="flex flex-row flex-wrap gap-x-[1ch]">
-      <Optional text={date}>
+      <Optional condition={date}>
         <a
           className="text-inherit"
           property="subjectOf"
@@ -123,8 +124,4 @@ function ThoughtHeader({
       <TitleSeparator />
     </header>
   );
-}
-
-function Use<T extends ReactNode>({ el }: { el: Usable<T> }): T {
-  return use(el);
 }

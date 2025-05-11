@@ -1,5 +1,7 @@
 'use client';
 
+import 'client-only';
+
 import React, {
   type ReactElement,
   useCallback,
@@ -14,39 +16,15 @@ import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useSearchParams } from 'next/navigation';
 
-import { QRCodeError, TextContext } from './QRCodeError';
-import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
+import { encodeQueryComponent, nullToError } from '../../utilities';
 
-import 'client-only';
+import { QRCodeError } from './QRCodeError';
+import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
+import { TextContext } from './textContext';
 
 const INITIAL_TEXT = 'Copy to clipboard';
 const FAILED_TEXT = 'Failed to copy';
 const SUCCESS_TEXT = 'Copied to clipboard!';
-
-export async function nullToError<T>(
-  value: Promise<T | null>,
-  message?: string,
-): Promise<T> {
-  const result = await value;
-  if (result === null) {
-    throw new Error(message ?? 'value is null');
-  }
-  return result;
-}
-
-/**
- * RFC 3986 allows:
- *   pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
- *   query = *( pchar / "/" / "?" )
- * So we replace everything else with its percent-encoded value.
- * @param component
- */
-export function encodeQueryComponent(component: string): string {
-  return component.replace(
-    /[^a-zA-Z0-9:@/?]/g,
-    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
-  );
-}
 
 interface Size {
   width: number;
@@ -63,7 +41,7 @@ interface QRCodeState {
   linkUrl: string;
 }
 
-export default function QRCodeForm(): ReactElement {
+export function QRCodeForm(): ReactElement {
   const [_isPending, startTransition] = useTransition();
   const ref = useRef<SVGSVGElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +103,7 @@ export default function QRCodeForm(): ReactElement {
 
     const abortController = new AbortController();
     window.addEventListener('popstate', handlePopState, {
+      passive: true,
       signal: abortController.signal,
     });
 

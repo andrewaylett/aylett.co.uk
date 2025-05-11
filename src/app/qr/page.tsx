@@ -1,11 +1,12 @@
+import 'server-only';
+
 import React from 'react';
 
 import { type Metadata } from 'next';
 
-import QRCodeForm from '../../client/QRCodeForm';
-import { PageStructure, TitleHeader } from '../../page-structure';
-
-import 'server-only';
+import { QRCodeForm } from '@/client/qr/QRCodeForm';
+import { PageStructure } from '@/components/PageStructure';
+import { TitleHeader } from '@/components/TitleHeader';
 
 export const metadata = {
   title: 'QR Code Generator',

@@ -6,9 +6,9 @@ import { write } from 'to-vfile';
 import { type VFile } from 'vfile';
 import { parse, stringify } from 'yaml';
 
-import { baseProcessor, intoText } from '../../../remark/process_markdown';
-import { traverse } from '../../../remark/traverse';
-import { assertSchema, type TypeFrom } from '../../../types';
+import { baseProcessor, intoText } from '@/remark/process_markdown';
+import { traverse } from '@/remark/traverse';
+import { assertSchema, type TypeFrom } from '@/types';
 
 export const EntrySchema = {
   type: 'object',
@@ -69,7 +69,10 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
   }
 }
 
-type Accum<T> = [null | VisiblePromise<T>, VisiblePromise<T>[]];
+interface Accum<T> {
+  next: null | VisiblePromise<T>;
+  rest: VisiblePromise<T>[];
+}
 
 function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
   if (orig instanceof VisiblePromise) {
@@ -97,23 +100,23 @@ async function nextResolvedImpl<T>(
 
   const visible = input.map(makeVisible);
 
-  const [val, rest] = visible.reduce(
-    ([val, rest]: Accum<T>, next): Accum<T> => {
-      if (val) {
-        return [val, [...rest, next]];
+  const { next, rest } = visible.reduce(
+    ({ next, rest }: Accum<T>, el): Accum<T> => {
+      if (next) {
+        return { next, rest: [...rest, el] };
       }
 
-      if (next.resolved) {
-        return [next, rest];
+      if (el.resolved) {
+        return { next: el, rest };
       }
 
-      return [null, [...rest, next]];
+      return { next: null, rest: [...rest, el] };
     },
-    [null, []],
+    { next: null, rest: [] },
   );
 
-  if (val) {
-    return [await val, rest];
+  if (next) {
+    return [await next, rest];
   }
 
   // Safety check

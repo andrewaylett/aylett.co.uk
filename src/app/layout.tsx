@@ -1,3 +1,5 @@
+import 'server-only';
+
 import React, { type PropsWithChildren, type ReactNode, useMemo } from 'react';
 
 import { type Metadata, type Viewport } from 'next';
@@ -5,8 +7,6 @@ import localFont from 'next/font/local';
 import PlausibleProvider from 'next-plausible';
 
 import './styles/global.css';
-
-import 'server-only';
 
 export const metadata: Metadata = {
   metadataBase: new URL(

@@ -14,7 +14,7 @@ tags:
 ---
 
 In a similar vein to [Simon Wilison's TIL](https://til.simonwillison.net/), I've
-decided to start trying to note some [thoughts](/thoughts) in shorter and
+decided to start trying to note some [thoughts](/articles/md/thoughts.md) in shorter and
 less-well-formed form than my articles. They're also not attributed with the
 same revision/revised/expires metadata that my articles have -- they have a date
 attached, and that's it.

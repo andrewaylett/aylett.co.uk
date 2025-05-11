@@ -2,9 +2,10 @@ import React from 'react';
 
 import Link from 'next/link';
 
-import { PageStructure, TitleHeader } from '../../page-structure';
-
 import { allTags } from './allTags';
+
+import { PageStructure } from '@/components/PageStructure';
+import { TitleHeader } from '@/components/TitleHeader';
 
 export default async function TagsPage() {
   const tags = await allTags();
