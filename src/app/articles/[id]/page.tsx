@@ -59,6 +59,6 @@ export default async function Page({
   params,
 }: ArticleProps): Promise<ReactNode> {
   const { id } = await params;
-  const page = articleForId(await params);
+  const page = articleForId({ id });
   return <ArticlePage page={page} id={id} />;
 }
