@@ -11,7 +11,7 @@ export async function thoughtForId(
   params: Promise<{ id: string }>,
 ): Promise<Markdown<ThoughtSchema>> {
   const pages = await allThoughts();
-  const id = (await params).id;
+  const { id } = await params;
   return pages.find((page) => page.id === id) ?? notFound();
 }
 

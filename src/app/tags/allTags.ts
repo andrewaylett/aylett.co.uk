@@ -8,11 +8,11 @@ export async function allTags() {
   const tags = new Set<string>();
   for (const article of articles) {
     const metadata = await article.metadata;
-    metadata.tags.forEach((tag) => tags.add(tag));
+    for (const tag of metadata.tags) tags.add(tag);
   }
   for (const thought of thoughts) {
     const metadata = await thought.metadata;
-    metadata.tags.forEach((tag) => tags.add(tag));
+    for (const tag of metadata.tags) tags.add(tag);
   }
   return tags;
 }

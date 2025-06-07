@@ -41,7 +41,10 @@ export default function articles(): ReactNode {
 function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
   const resolved = use(pages);
   const sorted = use(
-    asyncSortByKey(resolved, async (page) => (await page.metadata).title),
+    asyncSortByKey(resolved, async (page) => {
+      const { title } = await page.metadata;
+      return title;
+    }),
   );
   return (
     <>

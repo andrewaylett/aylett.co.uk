@@ -6,14 +6,14 @@ import { Description } from '@/components/Description';
 import { type ArticleSchema, type ThoughtSchema, type TypeFrom } from '@/types';
 
 export function ListingEntry({
-  metadata,
-  name,
-}: {
+                               metadata,
+                               name,
+                             }: {
   metadata: Promise<TypeFrom<ArticleSchema | ThoughtSchema>>;
   name: string;
 }) {
   const data = use(metadata);
-  const isArticle = 'lifecycle' in data;
+  const isArticle = data.tag === 'article';
 
   const path = isArticle ? 'articles' : 'thoughts';
   const href = `/${path}/${name}`;

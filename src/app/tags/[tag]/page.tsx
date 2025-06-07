@@ -12,7 +12,7 @@ import { type ArticleSchema, type ThoughtSchema } from '@/types';
 
 export async function generateStaticParams() {
   const tags = await allTags();
-  return Array.from(tags).map((tag) => ({
+  return [...tags].map((tag) => ({
     tag: encodeURIComponent(tag.toLowerCase()),
   }));
 }

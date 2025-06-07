@@ -32,21 +32,21 @@ export function QRCodeSVGWrapper({
     if (!ref.current) return;
 
     const svg = ref.current;
-    svg.setAttribute('data-testid', 'qr-code');
+    svg.dataset.testid = 'qr-code';
 
     const callback = (element: SVGSVGElement) => {
       const viewBox = element.getAttribute('viewBox');
       const viewBoxValues = viewBox?.split(' ');
-      const width = viewBoxValues ? parseInt(viewBoxValues[2], 10) : 64;
-      const height = viewBoxValues ? parseInt(viewBoxValues[3], 10) : 64;
+      const width = viewBoxValues ? Number.parseInt(viewBoxValues[2], 10) : 64;
+      const height = viewBoxValues ? Number.parseInt(viewBoxValues[3], 10) : 64;
       setDimensions({ width, height });
       outerSetDimensions({ width, height });
     };
 
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+      for (const mutation of mutations) {
         callback(mutation.target as SVGSVGElement);
-      });
+      }
     });
     observer.observe(ref.current, {
       attributes: true,
@@ -57,7 +57,7 @@ export function QRCodeSVGWrapper({
 
     return () => {
       observer.disconnect();
-      svg.removeAttribute('data-testid');
+      delete svg.dataset.testid;
     };
   }, [outerSetDimensions]);
 

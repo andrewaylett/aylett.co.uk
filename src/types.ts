@@ -1,6 +1,10 @@
 import { type JSONSchema7 } from 'json-schema';
 import { validate } from 'revalidator';
 
+export interface TaggedSchema {
+  tag: string
+}
+
 export interface LifecycleSchema {
   properties: {
     lifecycle: {
@@ -29,7 +33,8 @@ export const ArticleSchema = {
     },
     tags: { type: 'array', items: { type: 'string' } },
   },
-} as const satisfies JSONSchema7 & LifecycleSchema;
+  tag: 'article',
+} as const satisfies JSONSchema7 & LifecycleSchema & TaggedSchema;
 export type ArticleSchema = typeof ArticleSchema;
 
 export const ThoughtSchema = {
@@ -40,10 +45,13 @@ export const ThoughtSchema = {
     tags: { type: 'array', items: { type: 'string' } },
     description: { type: 'string' },
   },
-} as const satisfies JSONSchema7;
+  tag: 'thought',
+} as const satisfies JSONSchema7 & TaggedSchema;
 export type ThoughtSchema = typeof ThoughtSchema;
 
-export type TypeFrom<Schema> = Schema extends {
+export type TypeFrom<Schema> = Schema extends { tag: infer T } ?
+  TypeFrom<Omit<Schema, 'tag'>> & { tag: T } :
+  Schema extends {
   type: 'object';
   properties: infer Properties;
 }
@@ -58,7 +66,7 @@ export type TypeFrom<Schema> = Schema extends {
         ? number
         : never;
 
-export function assertSchema<T extends JSONSchema7>(
+export function assertSchema<T extends JSONSchema7 & TaggedSchema>(
   parsed: unknown,
   schema: T,
 ): asserts parsed is TypeFrom<T> {
@@ -68,5 +76,11 @@ export function assertSchema<T extends JSONSchema7>(
   );
   if (!valid) {
     throw new Error(`Invalid YAML: ${errors.map((e) => e.message).join(', ')}`);
+  }
+  if (parsed && typeof parsed === 'object' && 'tag' in parsed) {
+    const tag = (parsed as { tag: string }).tag;
+    if (tag !== schema.tag) {
+      throw new Error(`Invalid tag: expected ${schema.tag}, got ${tag}`);
+    }
   }
 }

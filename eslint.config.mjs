@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import andrewaylett from 'eslint-config-andrewaylett';
-import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -34,120 +32,45 @@ export default tseslint.config(
             },
         },
     },
-    ...compat.config({
-        plugins: ['@next/next'],
-        extends: ['plugin:@next/next/recommended', 'plugin:import/typescript'],
-        settings: {
-            'import/resolver': {
-                typescript: {
-                    alwaysTryTypes: true,
-                },
-                node: true,
-            },
-        },
-    }),
-    ...andrewaylett,
-    ...tseslint.configs.stylisticTypeChecked,
-    {
-        ...react.configs.flat.recommended,
-        settings: { react: { version: 'detect' } },
-    },
-    reactHooks.configs['recommended-latest'],
-    {
-        rules: {
-            '@typescript-eslint/restrict-template-expressions': [
-                'error',
-                {
-                    allowNumber: true,
-                    allowBoolean: true,
-                },
-            ],
-            'react/no-unescaped-entities': [
-                'error',
-                {
-                    forbid: [
-                        {
-                            char: '>',
-                            alternatives: ['&gt;'],
-                        },
-                        {
-                            char: '}',
-                            alternatives: ['&#125;'],
-                        },
-                    ],
-                },
-            ],
-            'react/no-unknown-property': [
-                'error',
-                { ignore: ['property', 'resource', 'typeof', 'vocab'] },
-            ],
-            'import/no-extraneous-dependencies': [
-                'error',
-                {
-                    devDependencies: [
-                        '**/*.{test,spec}.{m,}{t,j}s{x,}',
-                        '*.{m,}{t,j}s',
-                        '**/test/**',
-                    ],
-                },
-            ],
-            'import/consistent-type-specifier-style': [
-                'error',
-                'prefer-inline',
-            ],
-            'import/order': [
-                'error',
-                {
-                    groups: [
-                        'builtin',
-                        'external',
-                        'parent',
-                        'sibling',
-                        'index',
-                        'type',
-                    ],
-                    'newlines-between': 'always',
-                    pathGroups: [
-                        {
-                            pattern:
-                                '{react,react-dom,react-dom/server,prop-types}',
-                            group: 'external',
-                            position: 'before',
-                        },
-                        {
-                            pattern: '{*.scss,*.css}',
-                            group: 'type',
-                            patternOptions: { matchBase: true },
-                            position: 'after',
-                        },
-                    ],
-                    pathGroupsExcludedImportTypes: [
-                        'react',
-                        'react-dom',
-                        'prop-types',
-                    ],
-                    alphabetize: {
-                        order: 'asc',
-                        caseInsensitive: true,
-                    },
-                    named: true,
-                },
-            ],
-            '@typescript-eslint/consistent-type-exports': 'error',
-            '@typescript-eslint/consistent-type-imports': [
-                'error',
-                { fixStyle: 'inline-type-imports' },
-            ],
-            'no-duplicate-imports': ['error', { includeExports: true }],
-            'react-hooks/exhaustive-deps': 'error',
-        },
-    },
     {
         files: ['*.js', '*.mjs', '*.ts', '*.mts'],
         languageOptions: {
             globals: {
                 ...globals.node,
             },
+        },
+    },
+    ...compat.config({
+        plugins: ['@next/next'],
+        extends: ['plugin:@next/next/recommended'],
+        settings: {
+            'import/resolver': {
+                node: true,
+            },
+        },
+    }),
+    {
+        files: ['**.ts', '**.mts', '**.tsx', '**.mtsx'],
+        ...andrewaylett.configs.recommendedWithJestWithReactWithTypes,
+    },
+    andrewaylett.configs.recommendedWithJestWithReact,
+    {
+        settings: {
+            react: {
+                version: 'detect',
+            },
+        },
+        rules: {
+            'unicorn/filename-case': [
+                'error',
+                {
+                    cases: {
+                        kebabCase: true,
+                        pascalCase: true,
+                    },
+                },
+            ],
+            'unicorn/no-await-expression-member': 'off',
         },
     },
 );

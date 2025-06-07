@@ -31,7 +31,9 @@ export function useDarkMode(): boolean {
       });
     }
 
-    return () => abortController.abort();
+    return () => {
+      abortController.abort();
+    };
   }, [mediaQuery]);
 
   return isDarkMode;

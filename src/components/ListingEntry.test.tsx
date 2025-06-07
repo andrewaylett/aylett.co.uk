@@ -23,13 +23,11 @@ describe('ArticleEntry', () => {
       copyright: '',
       description: '',
       tags: [''],
+      tag: 'article',
     } satisfies TypeFrom<ArticleSchema>);
 
-    await act(
-      async () =>
-        await render(
-          <ListingEntry metadata={metadata} name="example-article" />,
-        ),
+    await act(async () =>
+      render(<ListingEntry metadata={metadata} name="example-article" />),
     );
 
     expect(screen.queryByText('Example Article')).toBeInTheDocument();
@@ -48,11 +46,11 @@ describe('ArticleEntry', () => {
       copyright: '',
       description: '',
       tags: [''],
+      tag: 'article',
     } satisfies TypeFrom<ArticleSchema>);
 
-    await act(
-      async () =>
-        await render(<ListingEntry metadata={metadata} name="draft-article" />),
+    await act(async () =>
+      render(<ListingEntry metadata={metadata} name="draft-article" />),
     );
 
     expect(screen.queryByText('Draft:')).toBeInTheDocument();
@@ -71,13 +69,11 @@ describe('ArticleEntry', () => {
       copyright: '',
       description: '',
       tags: [''],
+      tag: 'article',
     } satisfies TypeFrom<ArticleSchema>);
 
-    await act(
-      async () =>
-        await render(
-          <ListingEntry metadata={metadata} name="revised-article" />,
-        ),
+    await act(async () =>
+      render(<ListingEntry metadata={metadata} name="revised-article" />),
     );
 
     expect(screen.queryByText('v3, 2023')).toBeInTheDocument();
@@ -95,13 +91,11 @@ describe('ArticleEntry', () => {
       copyright: '',
       description: '',
       tags: [''],
+      tag: 'article',
     } satisfies TypeFrom<ArticleSchema>);
 
-    await act(
-      async () =>
-        await render(
-          <ListingEntry metadata={metadata} name="abstract-article" />,
-        ),
+    await act(async () =>
+      render(<ListingEntry metadata={metadata} name="abstract-article" />),
     );
 
     expect(screen.queryByText(':')).toBeInTheDocument();
@@ -120,11 +114,11 @@ describe('ArticleEntry', () => {
       copyright: '',
       description: '',
       tags: [''],
+      tag: 'article',
     } satisfies TypeFrom<ArticleSchema>);
 
-    await act(
-      async () =>
-        await render(<ListingEntry metadata={metadata} name="empty-article" />),
+    await act(async () =>
+      render(<ListingEntry metadata={metadata} name="empty-article" />),
     );
 
     expect(screen.queryByText('Draft:')).not.toBeInTheDocument();

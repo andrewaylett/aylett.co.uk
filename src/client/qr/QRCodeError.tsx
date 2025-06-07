@@ -6,7 +6,9 @@ import { TextContext } from './textContext';
 
 export const QRCodeError = function QRCodeError({ error, reset }) {
   const { resetText, updateResetRef } = useContext(TextContext)!;
-  useEffect(() => updateResetRef(reset ?? null), [reset, updateResetRef]);
+  useEffect(() => {
+    updateResetRef(reset ?? null);
+  }, [reset, updateResetRef]);
 
   return (
     <div className="w-full">

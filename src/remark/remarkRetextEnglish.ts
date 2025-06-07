@@ -61,7 +61,7 @@ const remarkRetextEnglish: Plugin<
   this: Processor,
   options: Readonly<Options> | null | undefined,
 ): (value: MdastRoot) => NlcstRoot {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
+   
   const processor = this;
 
   function transformer(value: MdastRoot): NlcstRoot {

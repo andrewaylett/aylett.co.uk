@@ -77,7 +77,9 @@ function MermaidInner({ children, config }: PropsWithChildren<MermaidProps>) {
     void runMermaid().then(() => {
       setIsRendered(true);
     });
-    return () => setIsRendered(false);
+    return () => {
+      setIsRendered(false);
+    };
   }, [runMermaid]);
 
   return (

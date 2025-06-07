@@ -30,10 +30,8 @@ declare module 'vfile' {
 /// If the consumer returns `true`, the value is removed from the array.
 function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
   const first = array.shift();
-  if (first !== undefined) {
-    if (!consumer(first)) {
-      array.unshift(first);
-    }
+  if (first !== undefined && !consumer(first)) {
+    array.unshift(first);
   }
 }
 

@@ -17,7 +17,7 @@ export async function nullToError<T>(
  * @param component
  */
 export function encodeQueryComponent(component: string): string {
-  return component.replace(
+  return component.replaceAll(
     /[^a-zA-Z0-9:@/?]/g,
     (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
   );

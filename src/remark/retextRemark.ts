@@ -18,7 +18,7 @@ export type Options = Omit<
 
 // See `remark-parse`.
 declare module 'unified' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+   
   interface Settings extends Options {}
 
   interface Data {
@@ -57,7 +57,7 @@ const retextRemark: Plugin<
   this: Processor,
   options: Readonly<Options> | null | undefined,
 ): (doc: NclstRoot) => MdastRoot {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
+   
   const self = this;
 
   function transformer(doc: NclstRoot): MdastRoot {

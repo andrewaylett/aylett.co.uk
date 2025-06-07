@@ -102,7 +102,7 @@ export function QRCodeForm(): ReactElement {
     };
 
     const abortController = new AbortController();
-    window.addEventListener('popstate', handlePopState, {
+    globalThis.addEventListener('popstate', handlePopState, {
       passive: true,
       signal: abortController.signal,
     });
@@ -114,13 +114,13 @@ export function QRCodeForm(): ReactElement {
 
   useEffect(() => {
     if (state.isQuine) {
-      updateState({ isQuine: false, text: window.location.href });
+      updateState({ isQuine: false, text: globalThis.location.href });
       if (inputRef.current) {
-        inputRef.current.value = window.location.href;
+        inputRef.current.value = globalThis.location.href;
       }
     }
-    window.history.replaceState(
-      { ...window.history.state, qrText: state.text },
+    globalThis.history.replaceState(
+      { ...globalThis.history.state, qrText: state.text },
       '',
       state.linkUrl,
     );
@@ -164,8 +164,8 @@ export function QRCodeForm(): ReactElement {
         updateState({ buttonText: SUCCESS_TEXT });
       });
 
-      window.history.pushState(
-        { ...window.history.state, qrText: state.text },
+      globalThis.history.pushState(
+        { ...globalThis.history.state, qrText: state.text },
         '',
         state.linkUrl,
       );
@@ -182,7 +182,11 @@ export function QRCodeForm(): ReactElement {
       <input
         type="text"
         defaultValue={state.initialText}
-        onChange={(e) => startTransition(() => setText(e.target.value))}
+        onChange={(e) => {
+          startTransition(() => {
+            setText(e.target.value);
+          });
+        }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
         ref={inputRef}
@@ -203,13 +207,17 @@ export function QRCodeForm(): ReactElement {
             ref={ref}
             size={512}
             setDimensions={useCallback(
-              (unitSize: Size) => updateState({ unitSize }),
+              (unitSize: Size) => {
+                updateState({ unitSize });
+              },
               [updateState],
             )}
           />
           <button
             type="button"
-            onClick={() => startTransition(copyToClipboard)}
+            onClick={() => {
+              startTransition(copyToClipboard);
+            }}
             className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
           >
             {state.buttonText}

@@ -10,7 +10,7 @@ import { TitleHeader } from '@/components/TitleHeader';
 export default async function TagsPage() {
   const tags = await allTags();
 
-  const sortedTags = Array.from(tags).sort();
+  const sortedTags = [...tags].sort();
 
   return (
     <PageStructure

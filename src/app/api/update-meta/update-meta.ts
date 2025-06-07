@@ -8,7 +8,7 @@ import { parse, stringify } from 'yaml';
 
 import { baseProcessor, intoText } from '@/remark/process_markdown';
 import { traverse } from '@/remark/traverse';
-import { assertSchema, type TypeFrom } from '@/types';
+import { assertSchema, TaggedSchema, type TypeFrom } from '@/types';
 
 export const EntrySchema = {
   type: 'object',
@@ -18,7 +18,8 @@ export const EntrySchema = {
     description: { type: 'string' },
     tags: { type: 'array', items: { type: 'string' } },
   },
-} as const satisfies JSONSchema7;
+  tag: 'entry',
+} as const satisfies JSONSchema7 & TaggedSchema;
 export type EntrySchema = typeof EntrySchema;
 
 export type Entry = {
@@ -53,6 +54,7 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
     this.#resolved = true;
   }
 
+
   readonly then: (typeof Promise<T>)['prototype']['then'];
   readonly catch: (typeof Promise<T>)['prototype']['catch'];
   readonly finally: (typeof Promise<T>)['prototype']['finally'];
@@ -63,6 +65,7 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
     // if every promise passed in has rejected
     void this.#promise.then(this.#resolve.bind(this));
 
+
     this.then = this.#promise.then.bind(this.#promise);
     this.catch = this.#promise.catch.bind(this.#promise);
     this.finally = this.#promise.finally.bind(this.#promise);
@@ -70,16 +73,8 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
 }
 
 interface Accum<T> {
-  next: null | VisiblePromise<T>;
+  next: undefined | VisiblePromise<T>;
   rest: VisiblePromise<T>[];
-}
-
-function makeVisible<T>(orig: PromiseLike<T>): VisiblePromise<T> {
-  if (orig instanceof VisiblePromise) {
-    return orig as VisiblePromise<T>;
-  } else {
-    return new VisiblePromise<T>(orig);
-  }
 }
 
 async function nextResolved<T>(
@@ -93,12 +88,18 @@ async function nextResolvedImpl<T>(
   recursing: boolean,
 ): Promise<[T, Promise<T>[]]> {
   // Safety check
-  if (input.length == 0) {
+  if (input.length === 0) {
     // Match the behaviour of Promise.any()
     throw new AggregateError([], 'No promises were passed in');
   }
 
-  const visible = input.map(makeVisible);
+  const visible = input.map(
+    <T>(orig: PromiseLike<T>): VisiblePromise<T> =>
+      orig instanceof VisiblePromise
+        ? (orig as VisiblePromise<T>)
+        : new VisiblePromise<T>(orig),
+  );
+
 
   const { next, rest } = visible.reduce(
     ({ next, rest }: Accum<T>, el): Accum<T> => {
@@ -110,9 +111,9 @@ async function nextResolvedImpl<T>(
         return { next: el, rest };
       }
 
-      return { next: null, rest: [...rest, el] };
+      return { next: undefined, rest: [...rest, el] };
     },
-    { next: null, rest: [] },
+    { next: undefined, rest: [] },
   );
 
   if (next) {
@@ -151,6 +152,7 @@ async function* processDirectory(
     const vfile = await intoText.process(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
+
     const metadata: Partial<Entry> = parse(frontMatter?.value ?? '');
     metadata.url = `/${dir}/${mdFile.id}`;
 
@@ -188,7 +190,7 @@ async function* processDirectory(
       });
 
       const choice = completion.choices.pop();
-      if (!choice || completion.choices.length !== 0) {
+      if (!choice || completion.choices.length > 0) {
         const length = completion.choices.length + (choice ? 1 : 0);
         throw new Error(
           `Unexpected response, expected 1 choice, got ${length}`,
@@ -200,10 +202,11 @@ async function* processDirectory(
       const yamlLines = lines.filter((line) => !line.startsWith('```'));
       let yaml: Partial<Entry>;
       try {
+
         yaml = parse(yamlLines.join('\n'));
-      } catch (e) {
+      } catch (error) {
         throw new Error(`Could not parse YAML from:\n${yamlLines.join('\n')}`, {
-          cause: e,
+          cause: error,
         });
       }
       const replacementMetadata: Partial<Entry> = {

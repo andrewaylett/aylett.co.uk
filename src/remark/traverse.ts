@@ -8,7 +8,7 @@ import { read } from 'to-vfile';
 import { type VFile } from 'vfile';
 import { parse } from 'yaml';
 
-import { assertSchema, type TypeFrom } from '../types';
+import { assertSchema, TaggedSchema, type TypeFrom } from '../types';
 
 import { intoReact } from './process_markdown';
 
@@ -58,7 +58,7 @@ export async function traverse(dir: string): Promise<MDFile[]> {
   return [...gen()];
 }
 
-export class Markdown<Schema extends JSONSchema7> {
+export class Markdown<Schema extends JSONSchema7 & TaggedSchema> {
   constructor(mdFile: MDFile, schema: Schema) {
     this.id = mdFile.id;
     const vfile = mdFile.vfile.then((v) => intoReact.process(v));
@@ -68,6 +68,9 @@ export class Markdown<Schema extends JSONSchema7> {
 
       if (node) {
         const parsed: unknown = parse(node.value);
+        if (typeof parsed === 'object') {
+          (parsed as TaggedSchema).tag = schema.tag;
+        }
         assertSchema(parsed, schema);
         return parsed;
       } else {
@@ -81,7 +84,7 @@ export class Markdown<Schema extends JSONSchema7> {
   metadata: Promise<TypeFrom<Schema>>;
 }
 
-export async function findMarkdown<T extends JSONSchema7>(
+export async function findMarkdown<T extends JSONSchema7 & TaggedSchema>(
   dir: string,
   schema: T,
 ): Promise<Markdown<T>[]> {
