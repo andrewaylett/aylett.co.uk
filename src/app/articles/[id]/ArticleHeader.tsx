@@ -16,23 +16,24 @@ export function ArticleHeader({
   page: Promise<Markdown<ArticleSchema>>;
 }) {
   const { metadata } = useExploded(page);
+  const data = use(metadata);
 
   return (
     <header>
-      <h1 property="headline">{use(metadata).title}</h1>
-      {use(metadata).abstract ? (
-        <p property="alternativeHeadline">{use(metadata).abstract}</p>
+      <h1 property="headline">{data.title}</h1>
+      {data.abstract ? (
+        <p property="alternativeHeadline">{data.abstract}</p>
       ) : (
         ''
       )}
       <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex] my-[0.5lh]">
-        {use(metadata).author && (
+        {data.author && (
           <div className="author" property="author" typeof="Person">
-            Author: <span property="name">{use(metadata).author}</span>
+            Author: <span property="name">{data.author}</span>
           </div>
         )}
-        <Revisions url={`/articles/${id}`} {...use(metadata)} />
-        <Description metadata={metadata} />
+        <Revisions url={`/articles/${id}`} {...data} />
+        <Description data={data} />
       </div>
       <TitleSeparator />
     </header>

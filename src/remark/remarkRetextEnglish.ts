@@ -16,7 +16,7 @@ import { type Plugin, type Processor } from 'unified';
 export type Options = Omit<ToMarkdownExtension, 'extensions'>;
 
 // See `parse-latin`.
-type Extension<Node extends Nodes> = (node: Node) => undefined | void;
+type Extension<Node extends Nodes> = (node: Node) => undefined;
 
 // See `retext-english` and `remark-stringify`.
 declare module 'unified' {
@@ -61,33 +61,22 @@ const remarkRetextEnglish: Plugin<
   this: Processor,
   options: Readonly<Options> | null | undefined,
 ): (value: MdastRoot) => NlcstRoot {
-   
-  const processor = this;
-
-  function transformer(value: MdastRoot): NlcstRoot {
+  return (value: MdastRoot): NlcstRoot => {
     const parser = new ParseEnglish();
-    add(
-      parser.tokenizeParagraphPlugins,
-      processor.data('nlcstParagraphExtensions'),
-    );
-    add(parser.tokenizeRootPlugins, processor.data('nlcstRootExtensions'));
-    add(
-      parser.tokenizeSentencePlugins,
-      processor.data('nlcstSentenceExtensions'),
-    );
+    add(parser.tokenizeParagraphPlugins, this.data('nlcstParagraphExtensions'));
+    add(parser.tokenizeRootPlugins, this.data('nlcstRootExtensions'));
+    add(parser.tokenizeSentencePlugins, this.data('nlcstSentenceExtensions'));
     return parser.parse(
       toMarkdown(value, {
-        ...processor.data('settings'),
+        ...this.data('settings'),
         ...options,
         // Note: this option is not in the readme.
         // The goal is for it to be set by plugins on `data` instead of being
         // passed by users.
-        extensions: processor.data('toMarkdownExtensions') ?? [],
+        extensions: this.data('toMarkdownExtensions') ?? [],
       }),
     );
-  }
-
-  return transformer;
+  };
 };
 
 function add<T>(list: T[], values: T[] | undefined) {

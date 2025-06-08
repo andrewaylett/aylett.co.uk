@@ -1,15 +1,15 @@
-import React, { use } from 'react';
+import React from 'react';
 
 import Link from 'next/link';
 
 export function Description({
-  metadata,
+  data,
 }: {
-  metadata: Promise<{ description: string }>;
+  data: { description: string };
 }): React.JSX.Element {
   return (
     <blockquote>
-      <span property="abstract">{use(metadata).description}</span>
+      <span property="abstract">{data.description}</span>
       <sup>
         <Link href="/thoughts/descriptions">?</Link>
       </sup>

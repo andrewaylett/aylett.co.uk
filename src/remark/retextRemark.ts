@@ -18,7 +18,7 @@ export type Options = Omit<
 
 // See `remark-parse`.
 declare module 'unified' {
-   
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Settings extends Options {}
 
   interface Data {
@@ -57,22 +57,17 @@ const retextRemark: Plugin<
   this: Processor,
   options: Readonly<Options> | null | undefined,
 ): (doc: NclstRoot) => MdastRoot {
-   
-  const self = this;
-
-  function transformer(doc: NclstRoot): MdastRoot {
+  return (doc: NclstRoot): MdastRoot => {
     return fromMarkdown(toString(doc), {
-      ...self.data('settings'),
+      ...this.data('settings'),
       ...options,
       // Note: these options are not in the readme.
       // The goal is for them to be set by plugins on `data` instead of being
       // passed by users.
-      extensions: self.data('micromarkExtensions') ?? [],
-      mdastExtensions: self.data('fromMarkdownExtensions') ?? [],
+      extensions: this.data('micromarkExtensions') ?? [],
+      mdastExtensions: this.data('fromMarkdownExtensions') ?? [],
     });
-  }
-
-  return transformer;
+  };
 };
 
 export default retextRemark;

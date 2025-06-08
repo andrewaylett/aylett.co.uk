@@ -1,4 +1,4 @@
-import path from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { FlatCompat } from '@eslint/eslintrc';
@@ -8,7 +8,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 const compat = new FlatCompat({
     baseDirectory: __dirname,
     recommendedConfig: js.configs.recommended,
@@ -50,7 +50,7 @@ export default tseslint.config(
         },
     }),
     {
-        files: ['**.ts', '**.mts', '**.tsx', '**.mtsx'],
+        files: ['**/*.ts', '**/*.mts', '**/*.tsx', '**/*.mtsx'],
         ...andrewaylett.configs.recommendedWithJestWithReactWithTypes,
     },
     andrewaylett.configs.recommendedWithJestWithReact,
@@ -61,16 +61,17 @@ export default tseslint.config(
             },
         },
         rules: {
-            'unicorn/filename-case': [
+            'unicorn/filename-case': ['off'],
+            'unicorn/no-null': ['off'],
+            'unicorn/no-await-expression-member': ['off'],
+            '@typescript-eslint/restrict-template-expressions': [
                 'error',
                 {
-                    cases: {
-                        kebabCase: true,
-                        pascalCase: true,
-                    },
+                    allowBoolean: true,
+                    allowNumber: true,
                 },
             ],
-            'unicorn/no-await-expression-member': 'off',
+            'unicorn/import-style': ['off'],
         },
     },
 );

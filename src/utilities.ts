@@ -17,10 +17,10 @@ export async function nullToError<T>(
  * @param component
  */
 export function encodeQueryComponent(component: string): string {
-  return component.replaceAll(
-    /[^a-zA-Z0-9:@/?]/g,
-    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
-  );
+  return component.replaceAll(/[^a-zA-Z0-9:@/?]/g, (c) => {
+    const codePoint = c.codePointAt(0);
+    return codePoint ? `%${codePoint.toString(16).toUpperCase()}` : c;
+  });
 }
 
 export const gitHubUrl = (pageName: string): string =>

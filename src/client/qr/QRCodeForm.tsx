@@ -16,11 +16,11 @@ import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useSearchParams } from 'next/navigation';
 
-import { encodeQueryComponent, nullToError } from '../../utilities';
-
 import { QRCodeError } from './QRCodeError';
 import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
 import { TextContext } from './textContext';
+
+import { encodeQueryComponent, nullToError } from '@/utilities';
 
 const INITIAL_TEXT = 'Copy to clipboard';
 const FAILED_TEXT = 'Failed to copy';
@@ -45,8 +45,9 @@ export function QRCodeForm(): ReactElement {
   const [_isPending, startTransition] = useTransition();
   const ref = useRef<SVGSVGElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const resetRef = useRef<() => void>(null);
+  const resetRef = useRef<() => void>(undefined);
 
+  const searchParams = useSearchParams();
   const [state, updateState] = useReducer<
     QRCodeState,
     Pick<QRCodeState, 'initialText' | 'isQuine'>,
@@ -63,8 +64,8 @@ export function QRCodeForm(): ReactElement {
       };
     }),
     {
-      initialText: decodeURIComponent(useSearchParams()?.get('text') ?? ''),
-      isQuine: useSearchParams()?.get('quine') === 'true',
+      initialText: decodeURIComponent(searchParams.get('text') ?? ''),
+      isQuine: searchParams.get('quine') === 'true',
     },
     (init) => {
       const unitSize = {
@@ -90,7 +91,13 @@ export function QRCodeForm(): ReactElement {
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      const qrText = event.state?.qrText;
+      function isQRCodeState(state: unknown): state is { qrText: string } {
+        return typeof state === 'object' && state !== null && 'qrText' in state;
+      }
+      if (!isQRCodeState(event.state)) {
+        return;
+      }
+      const qrText = event.state.qrText;
       if (qrText) {
         startTransition(() => {
           updateState({ text: qrText });
@@ -143,38 +150,40 @@ export function QRCodeForm(): ReactElement {
     }
   }, [setText]);
 
-  const copyToClipboard = useCallback(async () => {
-    if (!ref.current) {
-      return;
-    }
+  const copyToClipboard = useCallback(() => {
+    startTransition(async () => {
+      if (!ref.current) {
+        return;
+      }
 
-    try {
-      const blob = nullToError(
-        toBlob(ref.current as unknown as HTMLElement, {
-          pixelRatio: 1,
-          skipFonts: true,
-          ...state.pxSize,
-        }),
-        'Failed to render QR code image',
-      );
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ]);
-      startTransition(() => {
-        updateState({ buttonText: SUCCESS_TEXT });
-      });
+      try {
+        const blob = nullToError(
+          toBlob(ref.current as unknown as HTMLElement, {
+            pixelRatio: 1,
+            skipFonts: true,
+            ...state.pxSize,
+          }),
+          'Failed to render QR code image',
+        );
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob }),
+        ]);
+        startTransition(() => {
+          updateState({ buttonText: SUCCESS_TEXT });
 
-      globalThis.history.pushState(
-        { ...globalThis.history.state, qrText: state.text },
-        '',
-        state.linkUrl,
-      );
-    } catch (error) {
-      startTransition(() => {
-        console.error(error);
-        updateState({ buttonText: FAILED_TEXT });
-      });
-    }
+          globalThis.history.pushState(
+            { ...globalThis.history.state, qrText: state.text },
+            '',
+            state.linkUrl,
+          );
+        });
+      } catch (error) {
+        startTransition(() => {
+          console.error(error);
+          updateState({ buttonText: FAILED_TEXT });
+        });
+      }
+    });
   }, [state, updateState]);
 
   return (

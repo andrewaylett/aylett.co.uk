@@ -49,7 +49,7 @@ export default async function TagPage({
 
   if (!originalTag) {
     // Didn't find the tag, so why are we trying to render the page?
-    throw notFound();
+    notFound();
   }
 
   return (

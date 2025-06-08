@@ -2,7 +2,7 @@ import { type JSONSchema7 } from 'json-schema';
 import { validate } from 'revalidator';
 
 export interface TaggedSchema {
-  tag: string
+  tag: string;
 }
 
 export interface LifecycleSchema {
@@ -49,22 +49,22 @@ export const ThoughtSchema = {
 } as const satisfies JSONSchema7 & TaggedSchema;
 export type ThoughtSchema = typeof ThoughtSchema;
 
-export type TypeFrom<Schema> = Schema extends { tag: infer T } ?
-  TypeFrom<Omit<Schema, 'tag'>> & { tag: T } :
-  Schema extends {
-  type: 'object';
-  properties: infer Properties;
-}
-  ? { [k in keyof Properties]: TypeFrom<Properties[k]> }
-  : Schema extends { type: 'string' }
-    ? Schema extends { type: 'string'; enum: infer T extends string[] }
-      ? T[number]
-      : string
-    : Schema extends { type: 'array'; items: infer Items }
-      ? TypeFrom<Items>[]
-      : Schema extends { type: 'number' }
-        ? number
-        : never;
+export type TypeFrom<Schema> = Schema extends { tag: infer T }
+  ? TypeFrom<Omit<Schema, 'tag'>> & { tag: T }
+  : Schema extends {
+        type: 'object';
+        properties: infer Properties;
+      }
+    ? { [k in keyof Properties]: TypeFrom<Properties[k]> }
+    : Schema extends { type: 'string' }
+      ? Schema extends { type: 'string'; enum: infer T extends string[] }
+        ? T[number]
+        : string
+      : Schema extends { type: 'array'; items: infer Items }
+        ? TypeFrom<Items>[]
+        : Schema extends { type: 'number' }
+          ? number
+          : never;
 
 export function assertSchema<T extends JSONSchema7 & TaggedSchema>(
   parsed: unknown,

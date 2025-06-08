@@ -20,9 +20,7 @@ export function QRCodeSVGWrapper({
   });
 
   useEffect(() => {
-    if (outerRef) {
-      outerRef.current = ref.current;
-    }
+    outerRef.current = ref.current;
     return () => {
       outerRef.current = null;
     };

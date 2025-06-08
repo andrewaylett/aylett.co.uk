@@ -8,7 +8,7 @@ import { parse, stringify } from 'yaml';
 
 import { baseProcessor, intoText } from '@/remark/process_markdown';
 import { traverse } from '@/remark/traverse';
-import { assertSchema, TaggedSchema, type TypeFrom } from '@/types';
+import { assertSchema, type TaggedSchema, type TypeFrom } from '@/types';
 
 export const EntrySchema = {
   type: 'object',
@@ -54,7 +54,7 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
     this.#resolved = true;
   }
 
-
+  // eslint-disable-next-line unicorn/no-thenable
   readonly then: (typeof Promise<T>)['prototype']['then'];
   readonly catch: (typeof Promise<T>)['prototype']['catch'];
   readonly finally: (typeof Promise<T>)['prototype']['finally'];
@@ -65,7 +65,7 @@ class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
     // if every promise passed in has rejected
     void this.#promise.then(this.#resolve.bind(this));
 
-
+    // eslint-disable-next-line unicorn/no-thenable
     this.then = this.#promise.then.bind(this.#promise);
     this.catch = this.#promise.catch.bind(this.#promise);
     this.finally = this.#promise.finally.bind(this.#promise);
@@ -100,7 +100,7 @@ async function nextResolvedImpl<T>(
         : new VisiblePromise<T>(orig),
   );
 
-
+  // eslint-disable-next-line unicorn/no-array-reduce
   const { next, rest } = visible.reduce(
     ({ next, rest }: Accum<T>, el): Accum<T> => {
       if (next) {
@@ -152,8 +152,9 @@ async function* processDirectory(
     const vfile = await intoText.process(await mdFile.vfile);
     const { frontMatter } = vfile.data;
 
-
-    const metadata: Partial<Entry> = parse(frontMatter?.value ?? '');
+    const metadata: Partial<Entry> = parse(
+      frontMatter?.value ?? '',
+    ) as Partial<Entry>;
     metadata.url = `/${dir}/${mdFile.id}`;
 
     if (
@@ -202,8 +203,7 @@ async function* processDirectory(
       const yamlLines = lines.filter((line) => !line.startsWith('```'));
       let yaml: Partial<Entry>;
       try {
-
-        yaml = parse(yamlLines.join('\n'));
+        yaml = parse(yamlLines.join('\n')) as Partial<Entry>;
       } catch (error) {
         throw new Error(`Could not parse YAML from:\n${yamlLines.join('\n')}`, {
           cause: error,

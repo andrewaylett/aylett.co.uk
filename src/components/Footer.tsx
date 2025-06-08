@@ -16,7 +16,7 @@ export function Footer({ author, copyright, keywords }: FooterProps) {
 
   return (
     <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex] pb-1">
-      {resolvedKeywords && resolvedKeywords.length > 0 && (
+      {resolvedKeywords.length > 0 && (
         <div property="keywords">
           {resolvedKeywords
             .map((s) => s.trim())

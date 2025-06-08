@@ -113,14 +113,15 @@ function ThoughtHeader({
   id: string;
   metadata: Promise<TypeFrom<ThoughtSchema>>;
 }) {
+  const data = use(metadata);
   return (
     <header>
-      <h1 property="headline">{use(metadata).title}</h1>
+      <h1 property="headline">{data.title}</h1>
       <div className="meta">
         <Link href="/articles/thoughts">What is this?</Link>
-        <Revisions url={`/thoughts/${id}`} {...use(metadata)} />
+        <Revisions url={`/thoughts/${id}`} {...data} />
       </div>
-      <Description metadata={metadata} />
+      <Description data={data} />
       <TitleSeparator />
     </header>
   );

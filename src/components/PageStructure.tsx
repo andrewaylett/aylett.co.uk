@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { Footer, type FooterProps } from './Footer';
 
 import { type Markdown } from '@/remark/traverse';
-import { type LifecycleSchema, TaggedSchema } from '@/types';
+import { type LifecycleSchema, type TaggedSchema } from '@/types';
 
 export interface PageStructureProps<
-  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>> | never,
+  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>>,
   Schema extends LifecycleSchema = T extends Promise<
     Markdown<infer S extends LifecycleSchema & TaggedSchema>
   >
@@ -29,7 +29,7 @@ export interface PageStructureProps<
 }
 
 export function PageStructure<
-  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>> | never,
+  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>>,
 >({
   author,
   breadcrumbs,

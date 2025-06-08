@@ -5,9 +5,13 @@ import { type ErrorComponent } from 'next/dist/client/components/error-boundary'
 import { TextContext } from './textContext';
 
 export const QRCodeError = function QRCodeError({ error, reset }) {
-  const { resetText, updateResetRef } = useContext(TextContext)!;
+  const context = useContext(TextContext);
+  if (!context) {
+    throw new Error('QRCodeError must be used within a TextContext provider');
+  }
+  const { resetText, updateResetRef } = context;
   useEffect(() => {
-    updateResetRef(reset ?? null);
+    updateResetRef(reset);
   }, [reset, updateResetRef]);
 
   return (
