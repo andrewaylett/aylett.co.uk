@@ -1,7 +1,8 @@
 import { type Config } from '@jest/types';
-import nextJest from 'next/jest.js';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import nextJest = require('next/jest.js');
 
-const createJestConfig = nextJest({
+const createJestConfig = nextJest.default({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: './',
 });
@@ -14,4 +15,4 @@ const config = {
 } satisfies Config.InitialProjectOptions;
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config);
+export = createJestConfig(config);
