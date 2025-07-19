@@ -12,8 +12,7 @@
     "sourceMap": true,
     "declarationMap": true,
     "declaration": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "preserve",
     "isolatedModules": true,
     "jsx": "preserve",
     "typeRoots": [
@@ -23,6 +22,8 @@
     "allowJs": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
     "plugins": [
       {
         "name": "next"

@@ -2,7 +2,7 @@
 title: Jujutsu makes things easier
 description: The easy things are easy, and the hard things are also easy.
 tags:
-    - Software Development
+    - Technology
 date: 2025/07/22
 ---
 
