@@ -68,10 +68,10 @@
     "babel-plugin-react-compiler": "19.1.0-rc.1",
     "encoding": "0.1.13",
     "eslint": "9.30.1",
-    "eslint-config-andrewaylett": "6.0.0",
+    "eslint-config-andrewaylett": "6.1.0",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jest": "28.14.0",
+    "eslint-plugin-jest": "29.0.1",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-compiler": "19.1.0-rc.1",
     "eslint-plugin-react-hooks": "5.2.0",
@@ -87,7 +87,7 @@
     "tailwindcss": "4.1.11",
     "ts-node": "10.9.2",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.35.1"
+    "typescript-eslint": "8.38.0"
   },
   "overrides": {
     "react": "$react",
