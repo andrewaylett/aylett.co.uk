@@ -54,7 +54,7 @@
     "@jest/globals": "30.0.4",
     "@next/eslint-plugin-next": "15.3.5",
     "@prettier/plugin-xml": "3.4.2",
-    "@swc/jest": "0.2.38",
+    "@swc/jest": "0.2.39",
     "@tailwindcss/postcss": "4.1.11",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
