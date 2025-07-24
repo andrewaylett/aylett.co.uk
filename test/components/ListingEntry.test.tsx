@@ -3,8 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it } from '@jest/globals';
 import { cleanup, render, screen, act } from '@testing-library/react';
 
-import { ListingEntry } from './ListingEntry';
-
+import { ListingEntry } from '@/components/ListingEntry';
 import { type ArticleSchema, type TypeFrom } from '@/types';
 
 import '@testing-library/jest-dom';
@@ -29,11 +28,11 @@ describe('ArticleEntry', () => {
     const { resolve, promise: metadata } =
       resolvablePromise<TypeFrom<ArticleSchema>>();
 
-    await act(() =>
+    await act(async () =>
       render(<ListingEntry metadata={metadata} name="example-article" />),
     );
 
-    act(() => {
+    await act(async () => {
       resolve({
         abstract: 'An example abstract',
         author: 'John Doe',
@@ -59,11 +58,11 @@ describe('ArticleEntry', () => {
     const { resolve, promise: metadata } =
       resolvablePromise<TypeFrom<ArticleSchema>>();
 
-    await act(() =>
+    await act(async () =>
       render(<ListingEntry metadata={metadata} name="draft-article" />),
     );
 
-    act(() => {
+    await act(async () => {
       resolve({
         abstract: '',
         author: '',
@@ -89,11 +88,11 @@ describe('ArticleEntry', () => {
     const { resolve, promise: metadata } =
       resolvablePromise<TypeFrom<ArticleSchema>>();
 
-    await act(() =>
+    await act(async () =>
       render(<ListingEntry metadata={metadata} name="revised-article" />),
     );
 
-    act(() => {
+    await act(async () => {
       resolve({
         abstract: '',
         author: '',
@@ -116,11 +115,11 @@ describe('ArticleEntry', () => {
     const { resolve, promise: metadata } =
       resolvablePromise<TypeFrom<ArticleSchema>>();
 
-    await act(() =>
+    await act(async () =>
       render(<ListingEntry metadata={metadata} name="abstract-article" />),
     );
 
-    act(() => {
+    await act(async () => {
       resolve({
         abstract: 'This is an abstract.',
         author: '',
@@ -146,11 +145,11 @@ describe('ArticleEntry', () => {
     const { resolve, promise: metadata } =
       resolvablePromise<TypeFrom<ArticleSchema>>();
 
-    await act(() =>
+    await act(async () =>
       render(<ListingEntry metadata={metadata} name="empty-article" />),
     );
 
-    act(() => {
+    await act(async () => {
       resolve({
         abstract: '',
         author: '',

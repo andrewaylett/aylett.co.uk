@@ -17,7 +17,13 @@ const compat = new FlatCompat({
 
 export default tseslint.config(
     {
-        ignores: ['**/node_modules/*', '**/out/*', '**/.next/*', '**/*.scss'],
+        ignores: [
+            '**/node_modules/*',
+            '**/out/*',
+            '**/.next/*',
+            '**/*.scss',
+            '**/build/*',
+        ],
     },
     {
         languageOptions: {
@@ -72,6 +78,13 @@ export default tseslint.config(
                 },
             ],
             'unicorn/import-style': ['off'],
+        },
+    },
+    {
+        files: ['test/**'],
+        rules: {
+            'require-await': ['off'],
+            '@typescript-eslint/require-await': ['off'],
         },
     },
 );
