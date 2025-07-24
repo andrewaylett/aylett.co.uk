@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { encodeQueryComponent, nullToError } from './utilities';
+import { encodeQueryComponent, nullToError } from '@/utilities';
 
 describe('encodeQueryComponent', () => {
   it('percent-encodes special characters in query component', () => {

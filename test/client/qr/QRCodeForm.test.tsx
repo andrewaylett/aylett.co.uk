@@ -37,8 +37,8 @@ const TEST_PATH =
 
 async function setFormText(text: string, user: UserEvent) {
   const input: HTMLInputElement = await screen.findByTestId('qr-code-input');
-  await act(() => user.click(input));
-  await act(() => user.paste(text));
+  await act(async () => user.click(input));
+  await act(async () => user.paste(text));
   return input;
 }
 
@@ -61,8 +61,8 @@ describe('QRCodeForm', () => {
   afterEach(cleanup);
 
   it('renders the form with input and button', async () => {
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const input = screen.getByPlaceholderText('Paste your text here');
     const button = screen.getByText('Copy to clipboard');
@@ -73,8 +73,8 @@ describe('QRCodeForm', () => {
 
   it('updates the QR code on change', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const input = await setFormText(TEST_VALUE, user);
 
@@ -87,14 +87,14 @@ describe('QRCodeForm', () => {
 
   it('displays success text after copying to clipboard', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
     const spy = jest.spyOn(navigator.clipboard, 'write').mockResolvedValue();
 
-    await act(() => render(<QRCodeForm />));
+    await act(async () => render(<QRCodeForm />));
 
     const button = await screen.findByText('Copy to clipboard');
 
-    await act(() => user.click(button));
+    await act(async () => user.click(button));
 
     await expect(
       screen.findByText('Copied to clipboard!'),
@@ -103,16 +103,16 @@ describe('QRCodeForm', () => {
   });
 
   it('displays error text if copying to clipboard fails', async () => {
-    const { QRCodeForm } = await import('./QRCodeForm');
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
     const spy = jest
       .spyOn(navigator.clipboard, 'write')
       .mockRejectedValue(new Error('Clipboard error'));
 
-    await act(() => render(<QRCodeForm />));
+    await act(async () => render(<QRCodeForm />));
 
     const button = await screen.findByText('Copy to clipboard');
 
-    await act(() => fireEvent.click(button));
+    await act(async () => fireEvent.click(button));
 
     await expect(
       screen.findByText('Failed to copy'),
@@ -122,8 +122,8 @@ describe('QRCodeForm', () => {
 
   it('displays an error when the input is too large to encode', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const largeInput = 'A'.repeat(5000); // Exceeds QR code capacity
 
@@ -136,8 +136,8 @@ describe('QRCodeForm', () => {
 
   it('resets when text is entered', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const largeInput = 'A'.repeat(5000); // Exceeds QR code capacity
 
@@ -146,7 +146,9 @@ describe('QRCodeForm', () => {
     await expect(
       screen.findByText('Error generating QR code'),
     ).resolves.toBeInTheDocument();
-    await act(() => fireEvent.change(input, { target: { value: TEST_VALUE } }));
+    await act(async () =>
+      fireEvent.change(input, { target: { value: TEST_VALUE } }),
+    );
 
     const qrCode = await screen.findByTestId('qr-code');
     const path = qrCode.lastElementChild;
@@ -157,8 +159,8 @@ describe('QRCodeForm', () => {
 
   it('resets when the button is pushed', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const largeInput = 'A'.repeat(5000); // Exceeds QR code capacity
     const input = await setFormText(largeInput, user);
@@ -168,15 +170,15 @@ describe('QRCodeForm', () => {
     ).resolves.toBeInTheDocument();
 
     const resetButton = await screen.findByText('Reset');
-    await act(() => fireEvent.click(resetButton));
+    await act(async () => fireEvent.click(resetButton));
 
     expect(input.value).toBe('');
   });
 
   it('updates the URL and state on pushState', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     await setFormText(TEST_VALUE, user);
 
@@ -189,8 +191,8 @@ describe('QRCodeForm', () => {
 
   it('restores the state on popState', async () => {
     const user = userEvent.setup();
-    const { QRCodeForm } = await import('./QRCodeForm');
-    await act(() => render(<QRCodeForm />));
+    const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
+    await act(async () => render(<QRCodeForm />));
 
     const input = await setFormText(TEST_VALUE, user);
 
@@ -199,7 +201,7 @@ describe('QRCodeForm', () => {
       (await screen.findByTestId('qr-code')).lastElementChild,
     ).toHaveAttribute('d', TEST_PATH);
 
-    await act(() =>
+    await act(async () =>
       globalThis.dispatchEvent(
         new PopStateEvent('popstate', { state: { qrText: 'Previous Text' } }),
       ),
