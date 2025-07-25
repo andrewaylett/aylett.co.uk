@@ -7,17 +7,17 @@ import rehypeSlug from 'rehype-slug';
 import remarkFrontmatter from 'remark-frontmatter';
 import gfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
+import retextSmartypants from 'retext-smartypants';
 import remarkRehype from 'remark-rehype';
 import remarkStringify from 'remark-stringify';
-import retextSmartypants from 'retext-smartypants';
 import { type Processor, unified } from 'unified';
 import { is } from 'unist-util-is';
 import { visit } from 'unist-util-visit';
 import { type VFile } from 'vfile';
 
 import { components } from './components';
-import remarkRetextEnglish from './remarkRetextEnglish';
 import retextRemark from './retextRemark';
+import remarkRetextEnglish from './remarkRetextEnglish';
 
 declare module 'vfile' {
   // Extends the interface used by Unified, so we can use it for our own data
