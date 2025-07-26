@@ -25,10 +25,16 @@ import '@testing-library/jest-dom/jest-globals';
 jest.mock('html-to-image', () => ({
   toBlob: jest.fn<() => Promise<Blob>>().mockResolvedValue(new Blob()),
 }));
+
+const mockSearchParamsGet = jest.fn<(param: string) => string | null>(
+  () => null,
+);
+const mockUseSearchParams = jest.fn(() => ({
+  get: mockSearchParamsGet,
+}));
+
 jest.mock('next/navigation', () => ({
-  useSearchParams: jest.fn(() => ({
-    get: jest.fn(() => null),
-  })),
+  useSearchParams: mockUseSearchParams,
 }));
 
 const TEST_VALUE = 'Test QR Code';
@@ -175,7 +181,7 @@ describe('QRCodeForm', () => {
     expect(input.value).toBe('');
   });
 
-  it('updates the URL and state on pushState', async () => {
+  it('updates the URL when text entered', async () => {
     const user = userEvent.setup();
     const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
     await act(async () => render(<QRCodeForm />));
@@ -183,7 +189,6 @@ describe('QRCodeForm', () => {
     await setFormText(TEST_VALUE, user);
 
     await screen.findByTestId('qr-code');
-    expect(globalThis.history.state).toHaveProperty('qrText', TEST_VALUE);
     expect(globalThis.location.search).toBe(
       `?text=${encodeURIComponent(TEST_VALUE)}`,
     );
@@ -201,11 +206,16 @@ describe('QRCodeForm', () => {
       (await screen.findByTestId('qr-code')).lastElementChild,
     ).toHaveAttribute('d', TEST_PATH);
 
-    await act(async () =>
-      globalThis.dispatchEvent(
-        new PopStateEvent('popstate', { state: { qrText: 'Previous Text' } }),
-      ),
-    );
+    await act(async () => {
+      globalThis.history.replaceState({}, '', '?text=Previous Text');
+      mockSearchParamsGet.mockImplementation((param: unknown) =>
+        param === 'text' ? 'Previous Text' : null,
+      );
+    });
+
+    await act(async () => {
+      globalThis.dispatchEvent(new PopStateEvent('popstate', {}));
+    });
 
     expect(input.value).toBe('Previous Text');
     expect(

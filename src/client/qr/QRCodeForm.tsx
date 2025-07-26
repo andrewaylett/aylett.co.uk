@@ -1,7 +1,5 @@
 'use client';
 
-import 'client-only';
-
 import React, {
   type ReactElement,
   useCallback,
@@ -14,11 +12,11 @@ import React, {
 import { toBlob } from 'html-to-image';
 import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-import { useSearchParams } from 'next/navigation';
+import { type ReadonlyURLSearchParams, useSearchParams } from 'next/navigation';
 
 import { QRCodeError } from './QRCodeError';
-import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
-import { TextContext } from './textContext';
+import { QRCodeSVGWrapper, type Size } from './QRCodeSVGWrapper';
+import { QRCodeErrorContext } from './QRCodeErrorContext';
 
 import { encodeQueryComponent, nullToError } from '@/utilities';
 
@@ -26,86 +24,84 @@ const INITIAL_TEXT = 'Copy to clipboard';
 const FAILED_TEXT = 'Failed to copy';
 const SUCCESS_TEXT = 'Copied to clipboard!';
 
-interface Size {
-  width: number;
-  height: number;
+interface QRCodeState {
+  text: string;
+  buttonText: string;
+  nextPushStateText?: string;
+  previousPushStateText?: string;
+  generation: number;
 }
 
-interface QRCodeState {
-  unitSize: Size;
-  pxSize: Size;
-  text: string;
-  initialText: string;
-  isQuine: boolean;
-  buttonText: string;
-  linkUrl: string;
+interface QRCodeStateUpdate {
+  text?: string;
+  buttonText?: string;
+  shouldPushState?: boolean;
+  updateGeneration?: boolean;
+  resetNextPushStateText?: boolean;
 }
 
 export function QRCodeForm(): ReactElement {
   const [_isPending, startTransition] = useTransition();
   const ref = useRef<SVGSVGElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const resetRef = useRef<() => void>(undefined);
+  const dimensionsRef = useRef<Size>({
+    width: 29,
+    height: 29,
+  });
 
   const searchParams = useSearchParams();
   const [state, updateState] = useReducer<
     QRCodeState,
-    Pick<QRCodeState, 'initialText' | 'isQuine'>,
-    [Partial<QRCodeState>]
+    ReadonlyURLSearchParams,
+    [QRCodeStateUpdate]
   >(
-    produce((draft, newState) => {
-      Object.assign(draft, newState);
-      draft.linkUrl = draft.text
-        ? `?text=${encodeQueryComponent(draft.text)}`
-        : './qr';
-      draft.pxSize = {
-        width: draft.unitSize.width * 4,
-        height: draft.unitSize.height * 4,
-      };
-    }),
-    {
-      initialText: decodeURIComponent(searchParams.get('text') ?? ''),
-      isQuine: searchParams.get('quine') === 'true',
-    },
-    (init) => {
-      const unitSize = {
-        width: 29,
-        height: 29,
-      };
-      const pxSize = {
-        width: unitSize.width * 4,
-        height: unitSize.height * 4,
-      };
+    useCallback(
+      (original, instructions) =>
+        produce(original, (draft) => {
+          if (
+            instructions.shouldPushState &&
+            draft.previousPushStateText !== draft.text
+          ) {
+            draft.nextPushStateText = draft.text;
+          }
+          if (instructions.resetNextPushStateText) {
+            draft.previousPushStateText = draft.nextPushStateText;
+            draft.nextPushStateText = undefined;
+          }
+          if (instructions.text) {
+            draft.text = instructions.text;
+          }
+          if (instructions.buttonText) {
+            draft.buttonText = instructions.buttonText;
+          }
+          if (instructions.updateGeneration) {
+            draft.generation = draft.generation + 1;
+            if (!instructions.text) {
+              draft.text = searchParams.get('text') ?? '';
+              draft.previousPushStateText = undefined;
+              draft.nextPushStateText = undefined;
+            }
+          }
+        }),
+      [searchParams],
+    ),
+    searchParams,
+    (searchParams) => {
+      const isQuine = searchParams.get('quine') === 'true';
+      const paramText = searchParams.get('text') ?? '';
       return {
-        unitSize,
-        pxSize,
-        text: init.initialText,
+        text: isQuine
+          ? `https://www.aylett.co.uk/qr/?text=${paramText}`
+          : paramText,
         buttonText: INITIAL_TEXT,
-        linkUrl: init.initialText
-          ? '?text=' + encodeQueryComponent(init.initialText)
-          : './qr',
-        ...init,
+        generation: 0,
       };
     },
   );
 
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      function isQRCodeState(state: unknown): state is { qrText: string } {
-        return typeof state === 'object' && state !== null && 'qrText' in state;
-      }
-      if (!isQRCodeState(event.state)) {
-        return;
-      }
-      const qrText = event.state.qrText;
-      if (qrText) {
-        startTransition(() => {
-          updateState({ text: qrText });
-          if (inputRef.current) {
-            inputRef.current.value = qrText;
-          }
-        });
-      }
+    const handlePopState = () => {
+      updateState({ updateGeneration: true });
     };
 
     const abortController = new AbortController();
@@ -120,35 +116,34 @@ export function QRCodeForm(): ReactElement {
   }, []);
 
   useEffect(() => {
-    if (state.isQuine) {
-      updateState({ isQuine: false, text: globalThis.location.href });
-      if (inputRef.current) {
-        inputRef.current.value = globalThis.location.href;
-      }
+    if (state.nextPushStateText && state.nextPushStateText !== state.text) {
+      const pushStateUrl = `?text=${encodeQueryComponent(state.nextPushStateText)}`;
+      globalThis.history.pushState({}, '', pushStateUrl);
+      updateState({ resetNextPushStateText: true });
     }
-    globalThis.history.replaceState(
-      { ...globalThis.history.state, qrText: state.text },
-      '',
-      state.linkUrl,
-    );
-  }, [state.linkUrl, state.text, state.isQuine]);
+  }, [state.nextPushStateText, state.text]);
+
+  useEffect(() => {
+    const linkUrl = state.text
+      ? `?text=${encodeQueryComponent(state.text)}`
+      : './qr';
+
+    globalThis.history.replaceState({}, '', linkUrl);
+  }, [state.text]);
 
   const setText = useCallback(
-    (newText: string) => {
-      updateState({ text: newText, buttonText: INITIAL_TEXT });
+    (newText: string, updateGeneration?: boolean) => {
+      updateState({
+        text: newText,
+        buttonText: INITIAL_TEXT,
+        updateGeneration,
+      });
       if (resetRef.current) {
         resetRef.current();
       }
     },
     [updateState],
   );
-
-  const resetText = useCallback(() => {
-    setText('');
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
-  }, [setText]);
 
   const copyToClipboard = useCallback(() => {
     startTransition(async () => {
@@ -161,7 +156,8 @@ export function QRCodeForm(): ReactElement {
           toBlob(ref.current as unknown as HTMLElement, {
             pixelRatio: 1,
             skipFonts: true,
-            ...state.pxSize,
+            width: dimensionsRef.current.width * 4,
+            height: dimensionsRef.current.height * 4,
           }),
           'Failed to render QR code image',
         );
@@ -169,13 +165,7 @@ export function QRCodeForm(): ReactElement {
           new ClipboardItem({ 'image/png': blob }),
         ]);
         startTransition(() => {
-          updateState({ buttonText: SUCCESS_TEXT });
-
-          globalThis.history.pushState(
-            { ...globalThis.history.state, qrText: state.text },
-            '',
-            state.linkUrl,
-          );
+          updateState({ buttonText: SUCCESS_TEXT, shouldPushState: true });
         });
       } catch (error) {
         startTransition(() => {
@@ -184,26 +174,31 @@ export function QRCodeForm(): ReactElement {
         });
       }
     });
-  }, [state, updateState]);
+  }, [updateState]);
 
   return (
     <form className="flex items-center flex-col">
       <input
+        key={state.generation}
         type="text"
-        defaultValue={state.initialText}
+        defaultValue={state.text}
         onChange={(e) => {
           startTransition(() => {
             setText(e.target.value);
           });
         }}
+        onBlur={() => {
+          updateState({ shouldPushState: true });
+        }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
-        ref={inputRef}
         data-testid="qr-code-input"
       />
-      <TextContext
+      <QRCodeErrorContext
         value={{
-          resetText,
+          resetText: useCallback(() => {
+            setText('', true);
+          }, [setText]),
           updateResetRef: useCallback((newRef) => {
             resetRef.current = newRef;
           }, []),
@@ -215,12 +210,7 @@ export function QRCodeForm(): ReactElement {
             marginSize={4}
             ref={ref}
             size={512}
-            setDimensions={useCallback(
-              (unitSize: Size) => {
-                updateState({ unitSize });
-              },
-              [updateState],
-            )}
+            dimensionsRef={dimensionsRef}
           />
           <button
             type="button"
@@ -232,7 +222,7 @@ export function QRCodeForm(): ReactElement {
             {state.buttonText}
           </button>
         </ErrorBoundary>
-      </TextContext>
+      </QRCodeErrorContext>
     </form>
   );
 }
