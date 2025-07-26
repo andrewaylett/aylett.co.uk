@@ -1,40 +1,22 @@
-'use client';
-
-import 'client-only';
-
-import { useEffect, useMemo, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 export function useDarkMode(): boolean {
-  const mediaQuery = useMemo(
-    () =>
-      typeof globalThis.matchMedia === 'function'
-        ? globalThis.matchMedia('(prefers-color-scheme: dark)')
-        : undefined,
-    [],
-  );
+  return useSyncExternalStore(
+    (callback) => {
+      const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
 
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => mediaQuery?.matches ?? false,
-  );
+      const abortController = new AbortController();
 
-  useEffect(() => {
-    const handleMediaQueryChange = (event: MediaQueryListEvent) => {
-      setIsDarkMode(event.matches);
-    };
-
-    const abortController = new AbortController();
-
-    if (mediaQuery) {
-      mediaQuery.addEventListener('change', handleMediaQueryChange, {
+      mediaQuery.addEventListener('change', callback, {
         passive: true,
         signal: abortController.signal,
       });
-    }
 
-    return () => {
-      abortController.abort();
-    };
-  }, [mediaQuery]);
-
-  return isDarkMode;
+      return () => {
+        abortController.abort();
+      };
+    },
+    () => globalThis.matchMedia('(prefers-color-scheme: dark)').matches,
+    () => false,
+  );
 }
