@@ -1,8 +1,13 @@
 import React from 'react';
 
 import { type Components } from 'rehype-react';
+import dynamic from 'next/dynamic';
 
-import { Mermaid } from '@/client/mermaid';
+import { LoadingComponent } from '@/client/mermaid/LoadingComponent';
+
+const Mermaid = dynamic(() => import('@/client/mermaid/Mermaid'), {
+  loading: LoadingComponent,
+});
 
 export const components = {
   code: ({ children, ...props }: React.JSX.IntrinsicElements['code']) => {

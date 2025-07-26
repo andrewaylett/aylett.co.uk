@@ -6,12 +6,12 @@ import React, {
 } from 'react';
 
 import { type JSONSchema7 } from 'json-schema';
-import Link from 'next/link';
 
 import { Footer, type FooterProps } from './Footer';
 
 import { type Markdown } from '@/remark/traverse';
 import { type LifecycleSchema, type TaggedSchema } from '@/types';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export interface PageStructureProps<
   T extends Promise<Markdown<JSONSchema7 & TaggedSchema>>,
@@ -21,7 +21,7 @@ export interface PageStructureProps<
     ? S
     : never,
 > extends FooterProps {
-  breadcrumbs: { href: string; text: string }[];
+  breadcrumbs: Breadcrumbs;
   header: ReactNode;
   lifecycle?: Promise<Schema['properties']['lifecycle']['enum'][number]>;
   schemaType: string;
@@ -54,22 +54,7 @@ export function PageStructure<
         resource={resource}
         typeof={schemaType}
       >
-        <nav property="breadcrumb" typeof="BreadcrumbList">
-          <span property="itemListElement" typeof="ListItem">
-            <Link property="item" typeof="WebPage" href="/">
-              <span property="name">Home</span>
-            </Link>
-            <data property="position" content="1" />
-          </span>
-          {breadcrumbs.map(({ href, text }, idx) => (
-            <span property="itemListElement" typeof="ListItem" key={idx}>
-              <Link property="item" typeof="WebPage" href={href}>
-                <span property="name">{text}</span>
-              </Link>
-              <data property="position" content={`${idx + 2}`} />
-            </span>
-          ))}
-        </nav>
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
         {header}
         <main className="hyphens-manual">
           <Suspense fallback="Rendering...">{children}</Suspense>

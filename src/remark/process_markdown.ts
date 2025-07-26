@@ -13,7 +13,9 @@ import retextSmartypants from 'retext-smartypants';
 import { type Processor, unified } from 'unified';
 import { is } from 'unist-util-is';
 import { visit } from 'unist-util-visit';
+import { visitParents, SKIP } from 'unist-util-visit-parents';
 import { type VFile } from 'vfile';
+import { type Element } from 'hast';
 
 import { components } from './components';
 import remarkRetextEnglish from './remarkRetextEnglish';
@@ -76,6 +78,42 @@ const devJsx = { jsxDEV: dev.jsxDEV };
 export const intoReact: Processor = baseProcessor()
   .use([
     remarkRehype,
+    () =>
+      (tree: Root): Root => {
+        visitParents(
+          tree,
+          { type: 'element', tagName: 'code' },
+          (node: Element, parents: Element[]) => {
+            // A `language-mermaid` code block will be transformed by `rehype-react` into a
+            // `Mermaid` component, so the parent `<pre>` element is redundant.
+            const className = node.properties.className;
+            if (className === undefined || !Array.isArray(className)) {
+              return;
+            }
+            if (!className.includes('language-mermaid')) {
+              return;
+            }
+            const parent = parents.at(-1);
+            if (!is(parent, { type: 'element', tagName: 'pre' })) {
+              return;
+            }
+            if (parent.children.length !== 1) {
+              // We expect the parent to only have one child, the code block.
+              return;
+            }
+            const grandParent = parents.at(-2);
+            if (!is(grandParent, {})) {
+              return;
+            }
+            const index = grandParent.children.indexOf(parent);
+            if (index !== -1) {
+              grandParent.children.splice(index, 1, node);
+            }
+            return [SKIP, -1];
+          },
+        );
+        return tree;
+      },
     rehypeSlug,
     rehypeFormat,
     [
