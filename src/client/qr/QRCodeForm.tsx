@@ -1,110 +1,162 @@
 'use client';
 
-import 'client-only';
-
 import React, {
-  type ReactElement,
+  startTransition,
   useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
-  useTransition,
 } from 'react';
 
-import { toBlob } from 'html-to-image';
+import { type ReadonlyURLSearchParams, useSearchParams } from 'next/navigation';
 import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-import { useSearchParams } from 'next/navigation';
+import { toBlob, toPng } from 'html-to-image';
 
 import { QRCodeError } from './QRCodeError';
-import { QRCodeSVGWrapper } from './QRCodeSVGWrapper';
-import { TextContext } from './textContext';
+import { QRCodeErrorContext } from './QRCodeErrorContext';
 
 import { encodeQueryComponent, nullToError } from '@/utilities';
+import {
+  BUTTON_TEXT,
+  type ButtonText,
+  QRCode,
+  type QRCodeState,
+  URL_SPLITTER,
+} from '@/client/qr/QRCode';
 
-const INITIAL_TEXT = 'Copy to clipboard';
-const FAILED_TEXT = 'Failed to copy';
-const SUCCESS_TEXT = 'Copied to clipboard!';
-
-interface Size {
-  width: number;
-  height: number;
+export interface QRCodeFormState {
+  nextPushStateText?: string;
+  previousPushStateText?: string;
+  qrState: QRCodeState;
 }
 
-interface QRCodeState {
-  unitSize: Size;
-  pxSize: Size;
-  text: string;
-  initialText: string;
-  isQuine: boolean;
-  buttonText: string;
-  linkUrl: string;
+export interface QRCodeStateUpdate {
+  text?: string;
+  buttonText?: ButtonText;
+  shouldPushState?: boolean;
+  updateGeneration?: boolean;
+  resetNextPushStateText?: boolean;
+  shouldOptimiseUrl?: boolean;
 }
 
-export function QRCodeForm(): ReactElement {
-  const [_isPending, startTransition] = useTransition();
-  const ref = useRef<SVGSVGElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+export function QRCodeForm() {
   const resetRef = useRef<() => void>(undefined);
+  const ref = useRef<HTMLDivElement>(null);
 
   const searchParams = useSearchParams();
   const [state, updateState] = useReducer<
-    QRCodeState,
-    Pick<QRCodeState, 'initialText' | 'isQuine'>,
-    [Partial<QRCodeState>]
+    QRCodeFormState,
+    ReadonlyURLSearchParams,
+    [QRCodeStateUpdate]
   >(
-    produce((draft, newState) => {
-      Object.assign(draft, newState);
-      draft.linkUrl = draft.text
-        ? `?text=${encodeQueryComponent(draft.text)}`
-        : './qr';
-      draft.pxSize = {
-        width: draft.unitSize.width * 4,
-        height: draft.unitSize.height * 4,
-      };
+    produce((draft, instructions) => {
+      if (
+        instructions.shouldPushState &&
+        draft.previousPushStateText !== draft.qrState.text
+      ) {
+        draft.nextPushStateText = draft.qrState.text;
+      }
+      if (instructions.resetNextPushStateText) {
+        draft.previousPushStateText = draft.nextPushStateText;
+        draft.nextPushStateText = undefined;
+      }
+      if (instructions.text !== undefined) {
+        draft.qrState.text = instructions.text;
+      }
+      if (instructions.buttonText !== undefined) {
+        draft.qrState.buttonText = instructions.buttonText;
+      }
+      if (instructions.updateGeneration) {
+        draft.qrState.generation = draft.qrState.generation + 1;
+        if (instructions.text === undefined) {
+          draft.qrState.text = searchParams.get('text') ?? '';
+          draft.previousPushStateText = undefined;
+          draft.nextPushStateText = undefined;
+        }
+      }
+      if (instructions.shouldOptimiseUrl !== undefined) {
+        draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
+      }
     }),
-    {
-      initialText: decodeURIComponent(searchParams.get('text') ?? ''),
-      isQuine: searchParams.get('quine') === 'true',
-    },
-    (init) => {
-      const unitSize = {
-        width: 29,
-        height: 29,
-      };
-      const pxSize = {
-        width: unitSize.width * 4,
-        height: unitSize.height * 4,
-      };
+    searchParams,
+    (searchParams): QRCodeFormState => {
+      const isQuine = searchParams.get('quine') === 'true';
+      const paramText = searchParams.get('text') ?? '';
+      const text = isQuine
+        ? `https://www.aylett.co.uk/qr/?text=${paramText}`
+        : paramText;
       return {
-        unitSize,
-        pxSize,
-        text: init.initialText,
-        buttonText: INITIAL_TEXT,
-        linkUrl: init.initialText
-          ? '?text=' + encodeQueryComponent(init.initialText)
-          : './qr',
-        ...init,
+        qrState: {
+          text,
+          buttonText: BUTTON_TEXT.INITIAL_TEXT,
+          generation: 0,
+          shouldOptimiseUrl: true,
+        },
       };
     },
   );
 
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      function isQRCodeState(state: unknown): state is { qrText: string } {
-        return typeof state === 'object' && state !== null && 'qrText' in state;
+  const copyToClipboard = useCallback(() => {
+    startTransition(async () => {
+      if (!ref.current) {
+        throw new Error('QR Code SVG is not ready');
       }
-      if (!isQRCodeState(event.state)) {
-        return;
-      }
-      const qrText = event.state.qrText;
-      if (qrText) {
+
+      try {
+        const blob = nullToError(
+          toBlob(ref.current, {
+            pixelRatio: 1,
+            skipFonts: true,
+          }),
+          'Failed to render QR code image',
+        );
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob }),
+        ]);
         startTransition(() => {
-          updateState({ text: qrText });
-          if (inputRef.current) {
-            inputRef.current.value = qrText;
-          }
+          updateState({
+            buttonText: BUTTON_TEXT.SUCCESS_TEXT,
+            shouldPushState: true,
+          });
         });
+      } catch (error) {
+        startTransition(() => {
+          console.error(error);
+          updateState({ buttonText: BUTTON_TEXT.FAILED_TEXT });
+        });
+      }
+    });
+  }, [updateState]);
+
+  const alphanumericValue = useMemo(() => {
+    return state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
+  }, [state.qrState.text]);
+
+  const download = useCallback(() => {
+    startTransition(async () => {
+      if (!ref.current) {
+        throw new Error('QR Code SVG is not ready');
+      }
+
+      const dataUrl = await toPng(ref.current, {
+        pixelRatio: 1,
+        skipFonts: true,
+      });
+
+      const link = document.createElement('a');
+      link.download = `qr-${alphanumericValue}.png`;
+      link.href = dataUrl;
+      link.click();
+    });
+  }, [alphanumericValue]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      updateState({ updateGeneration: true });
+      if (resetRef.current) {
+        startTransition(resetRef.current);
       }
     };
 
@@ -117,25 +169,34 @@ export function QRCodeForm(): ReactElement {
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [updateState]);
 
   useEffect(() => {
-    if (state.isQuine) {
-      updateState({ isQuine: false, text: globalThis.location.href });
-      if (inputRef.current) {
-        inputRef.current.value = globalThis.location.href;
-      }
+    if (
+      state.nextPushStateText !== undefined &&
+      state.nextPushStateText !== state.qrState.text
+    ) {
+      const pushStateUrl = `?text=${encodeQueryComponent(state.nextPushStateText)}`;
+      globalThis.history.pushState({}, '', pushStateUrl);
+      updateState({ resetNextPushStateText: true });
     }
-    globalThis.history.replaceState(
-      { ...globalThis.history.state, qrText: state.text },
-      '',
-      state.linkUrl,
-    );
-  }, [state.linkUrl, state.text, state.isQuine]);
+  }, [state.nextPushStateText, state.qrState.text]);
+
+  useEffect(() => {
+    const linkUrl = state.qrState.text
+      ? `?text=${encodeQueryComponent(state.qrState.text)}`
+      : './qr';
+
+    globalThis.history.replaceState({}, '', linkUrl);
+  }, [state.qrState.text]);
 
   const setText = useCallback(
-    (newText: string) => {
-      updateState({ text: newText, buttonText: INITIAL_TEXT });
+    (newText: string, updateGeneration?: boolean) => {
+      updateState({
+        text: newText,
+        buttonText: BUTTON_TEXT.INITIAL_TEXT,
+        updateGeneration,
+      });
       if (resetRef.current) {
         resetRef.current();
       }
@@ -143,96 +204,82 @@ export function QRCodeForm(): ReactElement {
     [updateState],
   );
 
-  const resetText = useCallback(() => {
-    setText('');
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
-  }, [setText]);
-
-  const copyToClipboard = useCallback(() => {
-    startTransition(async () => {
-      if (!ref.current) {
-        return;
-      }
-
-      try {
-        const blob = nullToError(
-          toBlob(ref.current as unknown as HTMLElement, {
-            pixelRatio: 1,
-            skipFonts: true,
-            ...state.pxSize,
-          }),
-          'Failed to render QR code image',
-        );
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'image/png': blob }),
-        ]);
-        startTransition(() => {
-          updateState({ buttonText: SUCCESS_TEXT });
-
-          globalThis.history.pushState(
-            { ...globalThis.history.state, qrText: state.text },
-            '',
-            state.linkUrl,
-          );
-        });
-      } catch (error) {
-        startTransition(() => {
-          console.error(error);
-          updateState({ buttonText: FAILED_TEXT });
-        });
-      }
-    });
-  }, [state, updateState]);
+  const canOptimiseUrl = useMemo(() => {
+    return URL_SPLITTER.test(state.qrState.text);
+  }, [state.qrState.text]);
 
   return (
     <form className="flex items-center flex-col">
       <input
+        key={state.qrState.generation}
         type="text"
-        defaultValue={state.initialText}
+        defaultValue={state.qrState.text}
         onChange={(e) => {
           startTransition(() => {
             setText(e.target.value);
           });
         }}
+        onBlur={() => {
+          updateState({ shouldPushState: true });
+        }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
-        ref={inputRef}
         data-testid="qr-code-input"
+        data-generation={state.qrState.generation}
+        aria-label="Text to render as a QR code"
       />
-      <TextContext
+      <label
+        className={
+          'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+          (canOptimiseUrl ? ' h-lh' : ' h-[0]')
+        }
+      >
+        <input
+          type="checkbox"
+          disabled={!canOptimiseUrl}
+          className="m-1"
+          defaultChecked={state.qrState.shouldOptimiseUrl}
+          onChange={(event) => {
+            startTransition(() => {
+              updateState({ shouldOptimiseUrl: event.target.checked });
+            });
+          }}
+        />
+        Optimise URL
+      </label>
+      <QRCodeErrorContext
         value={{
-          resetText,
+          resetText: useCallback(() => {
+            setText('', true);
+          }, [setText]),
           updateResetRef: useCallback((newRef) => {
             resetRef.current = newRef;
           }, []),
         }}
       >
         <ErrorBoundary errorComponent={QRCodeError}>
-          <QRCodeSVGWrapper
-            value={state.text}
-            marginSize={4}
-            ref={ref}
-            size={512}
-            setDimensions={useCallback(
-              (unitSize: Size) => {
-                updateState({ unitSize });
-              },
-              [updateState],
-            )}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              startTransition(copyToClipboard);
-            }}
-            className="bg-blue-500 text-white rounded-md p-2 mt-4 w-full"
-          >
-            {state.buttonText}
-          </button>
+          <QRCode state={state.qrState} ref={ref} showDebug={true}>
+            <div className=" mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  startTransition(copyToClipboard);
+                }}
+              >
+                {state.qrState.buttonText}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  startTransition(download);
+                }}
+              >
+                Download
+              </button>
+            </div>
+          </QRCode>
         </ErrorBoundary>
-      </TextContext>
+      </QRCodeErrorContext>
     </form>
   );
 }

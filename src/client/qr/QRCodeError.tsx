@@ -2,12 +2,14 @@ import React, { useContext, useEffect } from 'react';
 
 import { type ErrorComponent } from 'next/dist/client/components/error-boundary';
 
-import { TextContext } from './textContext';
+import { QRCodeErrorContext } from './QRCodeErrorContext';
 
 export const QRCodeError = function QRCodeError({ error, reset }) {
-  const context = useContext(TextContext);
+  const context = useContext(QRCodeErrorContext);
   if (!context) {
-    throw new Error('QRCodeError must be used within a TextContext provider');
+    throw new Error(
+      'QRCodeError must be used within a QRCodeErrorContext provider',
+    );
   }
   const { resetText, updateResetRef } = context;
   useEffect(() => {
