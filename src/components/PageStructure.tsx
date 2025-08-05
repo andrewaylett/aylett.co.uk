@@ -56,7 +56,16 @@ export function PageStructure<
       >
         <Breadcrumbs breadcrumbs={breadcrumbs} />
         {header}
-        <Suspense fallback="Rendering...">
+        <Suspense
+          fallback={
+            <div>
+              Rendering...{' '}
+              <span className="appear-10s">
+                do you have Javascript enabled?
+              </span>
+            </div>
+          }
+        >
           <main className="hyphens-manual">{children}</main>
           <Footer author={author} keywords={keywords} copyright={copyright} />
         </Suspense>

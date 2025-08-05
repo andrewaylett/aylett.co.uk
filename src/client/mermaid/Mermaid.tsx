@@ -27,7 +27,14 @@ export default function Mermaid({
   const isDarkMode = useDarkMode();
   return (
     <ErrorBoundary errorComponent={ErrorComponent}>
-      <Suspense fallback={<>Loading...</>}>
+      <Suspense
+        fallback={
+          <div>
+            Loading...{' '}
+            <span className="appear-10s">do you have Javascript enabled?</span>
+          </div>
+        }
+      >
         <MermaidInner
           key={
             // Force re-render on dark mode change
