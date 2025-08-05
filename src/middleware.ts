@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|favicon.ico)[^A-Z]*[A-Z].*(?<!\\.(?:js|css)(?:\\.map)?)$)',
+    '/((?!api|_next/static|favicon.ico)[^A-Z]*[A-Z](?!.*\\.(?:js|css)(?:\\.map)?$).*)',
   ],
 };
 
