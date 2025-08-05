@@ -88,7 +88,18 @@ export default function MermaidInner({
 
   return (
     <>
-      <span>{isRendered ? '' : 'Rendering...'}</span>
+      <span>
+        {isRendered ? (
+          ''
+        ) : (
+          <div>
+            Rendering...{' '}
+            <span className="appear-10s">
+              it looks like something went wrong?
+            </span>
+          </div>
+        )}
+      </span>
       <div className={isRendered ? '' : 'hidden'} ref={mermaidDiv}>
         {children}
       </div>

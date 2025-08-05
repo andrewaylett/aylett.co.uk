@@ -54,6 +54,21 @@
     background-repeat: repeat;
 }
 
+@utility appear-10s {
+    animation: opacityOn 300ms normal forwards;
+    animation-delay: 10s;
+    opacity: 0;
+}
+
+@keyframes opacityOn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 @layer base {
     :root {
         /* With thanks to https://jameshfisher.com/2024/03/12/a-formula-for-responsive-font-size/ */
