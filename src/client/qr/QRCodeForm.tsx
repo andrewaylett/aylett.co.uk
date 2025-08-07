@@ -259,7 +259,7 @@ export function QRCodeForm() {
       >
         <ErrorBoundary errorComponent={QRCodeError}>
           <QRCode state={state.qrState} ref={ref} showDebug={true}>
-            <div className=" mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
+            <div className="mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
               <button
                 type="button"
                 onClick={() => {
