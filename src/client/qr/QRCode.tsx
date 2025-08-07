@@ -93,7 +93,7 @@ export function QRCode({
       {showDebug && (
         <details className="p-2 mt-4 w-full">
           <summary>Debug Information</summary>
-          <dl>
+          <dl className="columns-half-width">
             <dt>Module count</dt>
             <dd>{qrDebugDetails.moduleCount}</dd>
             <dt>QR Version</dt>

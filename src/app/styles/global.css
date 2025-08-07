@@ -8,7 +8,10 @@
     --font-sans: IBM Plex Sans, var(--font-plex-sans), Roboto, sans-serif;
     --font-mono: JetBrains Mono, ui-monospace, monospace;
 
-    --grid-template-columns-centre: 1fr min(65ch, 90%, 100% - 2rem) 1fr;
+    --text-block-width: 65ch;
+    --text-half-width: 30ch;
+
+    --grid-template-columns-centre: 1fr min(var(--text-block-width), 90%, 100% - 2rem) 1fr;
 
     --grid-column-2: 2;
 }
@@ -52,6 +55,11 @@
     /* fill=slate-700 */
     @apply dark:bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20width="60"%20height="50"%20viewBox="0%200%2050%2050"%20xmlns="http://www.w3.org/2000/svg"%3e%3ctext%20fill="oklch(0.372%200.044%20257.287)"%20x="0"%20y="50"%3eDRAFT%3c/text%3e%3c/svg%3e')];
     background-repeat: repeat;
+}
+
+@utility columns-half-width {
+    column-width: var(--text-half-width);
+    column-gap: calc(var(--spacing) * 4)
 }
 
 @utility appear-10s {
@@ -129,6 +137,18 @@
 
     li {
         @apply list-item list-outside;
+    }
+
+    dl {
+        margin-block: 1em;
+    }
+
+    dt {
+        font-weight: bolder;
+    }
+
+    dd {
+        margin-inline-start: 2ch;
     }
 
     nav {
