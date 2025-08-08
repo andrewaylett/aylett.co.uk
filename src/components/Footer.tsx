@@ -15,7 +15,7 @@ export function Footer({ author, copyright, keywords }: FooterProps) {
   const resolvedCopyright = copyright ? use(copyright) : getYear(Date.now());
 
   return (
-    <footer className="pt-[1em] text-smaller flex flex-row flex-wrap justify-between mt-[1ex] pb-1">
+    <footer className="sticky bottom-0 mt-4 pt-1 w-full *:text-smaller flex flex-row flex-wrap justify-between pb-1">
       {resolvedKeywords.length > 0 && (
         <div property="keywords">
           {resolvedKeywords

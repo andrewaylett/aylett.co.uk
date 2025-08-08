@@ -21,7 +21,7 @@ export interface PageStructureProps<
     ? S
     : never,
 > extends FooterProps {
-  breadcrumbs: Breadcrumbs;
+  breadcrumbs?: Breadcrumbs;
   header: ReactNode;
   lifecycle?: Promise<Schema['properties']['lifecycle']['enum'][number]>;
   schemaType: string;
@@ -49,13 +49,15 @@ export function PageStructure<
         ''
       )}
       <div
-        className="grid grid-cols-centre"
+        className="flex flex-col min-h-screen grid-cols-centre"
         vocab="https://schema.org/"
         resource={resource}
         typeof={schemaType}
       >
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-        {header}
+        {breadcrumbs === undefined ? null : (
+          <Breadcrumbs breadcrumbs={breadcrumbs} />
+        )}
+        <div className="">{header}</div>
         <Suspense
           fallback={
             <div>
@@ -67,7 +69,9 @@ export function PageStructure<
           }
         >
           <main className="hyphens-manual">{children}</main>
-          <Footer author={author} keywords={keywords} copyright={copyright} />
+          <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible">
+            <Footer author={author} keywords={keywords} copyright={copyright} />
+          </div>
         </Suspense>
       </div>
     </>

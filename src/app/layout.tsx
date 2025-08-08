@@ -6,6 +6,8 @@ import { type Metadata, type Viewport } from 'next';
 import localFont from 'next/font/local';
 import PlausibleProvider from 'next-plausible';
 
+import { BackgroundImage } from '@/components/BackgroundImage';
+
 import './styles/global.css';
 
 export const metadata: Metadata = {
@@ -124,7 +126,7 @@ function RootLayout({ children }: PropsWithChildren): ReactNode {
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200`}
+      className={`${plexSans.variable} bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 overflow-y-scroll`}
     >
       <body className="oldstyle-nums">
         <PlausibleProvider
@@ -132,6 +134,7 @@ function RootLayout({ children }: PropsWithChildren): ReactNode {
           scriptProps={{ src: '/js/script.js' }}
           enabled={nodeEnv === 'production'}
         >
+          <BackgroundImage />
           {children}
         </PlausibleProvider>
       </body>
