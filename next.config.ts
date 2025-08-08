@@ -19,18 +19,25 @@ const BASIC_HEADERS: Header['headers'] = [
     key: 'X-Content-Type-Options',
     value: 'nosniff',
   },
-  {
-    key: 'Cross-Origin-Embedder-Policy',
-    value: 'require-corp',
-  },
-  {
-    key: 'Cross-Origin-Opener-Policy',
-    value: 'same-origin',
-  },
-  {
-    key: 'Cross-Origin-Resource-Policy',
-    value: 'same-origin',
-  },
+];
+
+const CSP_RULES = [
+  "default-src 'self'",
+  "img-src 'self' data: blob:",
+  "script-src 'self' 'unsafe-inline'",
+  "script-src-elem 'self' 'unsafe-inline'",
+  "script-src-attr 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "object-src 'none'",
+  "child-src 'none'",
+  "worker-src 'self'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  'upgrade-insecure-requests',
+  'block-all-mixed-content',
+  'disown-opener',
+  "base-uri 'self'",
 ];
 
 const PRODUCTION_HEADERS: Header['headers'] = [
@@ -54,25 +61,22 @@ const PRODUCTION_HEADERS: Header['headers'] = [
   {
     key: 'Content-Security-Policy',
     value: [
-      "default-src 'self'",
-      "img-src 'self' data: blob:",
-      "script-src 'self' 'unsafe-inline'",
-      "script-src-elem 'self' 'unsafe-inline'",
-      "script-src-attr 'self'",
-      "style-src 'self' 'unsafe-inline'",
-      "font-src 'self'",
-      "object-src 'none'",
-      "child-src 'none'",
-      "worker-src 'self'",
-      "frame-ancestors 'none'",
-      "form-action 'self'",
-      'upgrade-insecure-requests',
-      'block-all-mixed-content',
-      'disown-opener',
-      "base-uri 'self'",
+      ...CSP_RULES,
       'report-to default',
       'report-uri https://aylett.report-uri.com/r/d/csp/enforce',
     ].join('; '),
+  },
+  {
+    key: 'Cross-Origin-Embedder-Policy',
+    value: 'require-corp',
+  },
+  {
+    key: 'Cross-Origin-Opener-Policy',
+    value: 'same-origin',
+  },
+  {
+    key: 'Cross-Origin-Resource-Policy',
+    value: 'same-origin',
   },
 ];
 
@@ -87,11 +91,16 @@ export default function nextConfig(
   phase: string,
   { defaultConfig }: { defaultConfig: NextConfig },
 ): NextConfig {
+  const vercelEnv = process.env.VERCEL_ENV;
+
+  const isProduction =
+    vercelEnv === undefined
+      ? [PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER].includes(phase)
+      : vercelEnv === 'production';
+
   const headers = [
     ...BASIC_HEADERS,
-    ...([PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER].includes(phase)
-      ? PRODUCTION_HEADERS
-      : []),
+    ...(isProduction ? PRODUCTION_HEADERS : []),
   ];
   const headerSets = Promise.resolve([
     {
