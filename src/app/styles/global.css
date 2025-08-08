@@ -8,10 +8,11 @@
     --font-sans: IBM Plex Sans, var(--font-plex-sans), Roboto, sans-serif;
     --font-mono: JetBrains Mono, ui-monospace, monospace;
 
-    --text-block-width: 65ch;
-    --text-half-width: 30ch;
+    --column-width-max: 65ch;
+    --column-half-width-max: 30ch;
 
-    --grid-template-columns-centre: 1fr min(var(--text-block-width), 90%, 100% - 2rem) 1fr;
+    --column-width: min(var(--column-width-max), 90%, 100% - 2rem);
+    --grid-template-columns-centre: 1fr var(--column-width) 1fr;
 
     --grid-column-2: 2;
 }
@@ -36,7 +37,11 @@
 
 @utility grid-cols-centre {
     & > * {
-        @apply col-2 px-0 mx-0;
+        width: var(--column-width);
+        align-self: center;
+    }
+    :is(& > :not(.bg-transparent)), :is(& > :is(.bg-transparent) > *) {
+        @apply bg-slate-50/90 dark:bg-slate-900/90 px-4;
     }
 }
 
@@ -58,7 +63,7 @@
 }
 
 @utility columns-half-width {
-    column-width: var(--text-half-width);
+    column-width: var(--column-half-width-max);
     column-gap: calc(var(--spacing) * 4)
 }
 
@@ -88,11 +93,11 @@
     }
 
     p, ol, ul, blockquote {
-        @apply my-[0.5lh]
+        @apply my-[0.5lh];
     }
 
     :is(div.flex, header) > :is(h1, h2, h3, h4, h5, h6, p, ol, ul, blockquote) {
-        @apply my-[0.25lh]
+        @apply my-[0.25lh];
     }
 
     h1 {
@@ -116,7 +121,10 @@
     }
 
     h6 {
-        @apply text-[120%] font-normal before:content-['▸&nbsp;'];
+        @apply text-[120%] font-normal;
+        ::before {
+            content: '▸ ';
+        }
     }
 
     a {
@@ -163,8 +171,17 @@
         @apply normal-nums tabular-nums font-mono;
     }
 
+    pre {
+        overflow-inline: scroll;
+    }
+
     button {
         @apply bg-blue-600 text-slate-200 hover:bg-blue-500 dark:bg-blue-300 dark:text-slate-800 dark:hover:bg-blue-400 rounded-md p-2;
+    }
+
+    main {
+        overflow-inline: clip;
+        display: block flow-root;
     }
 }
 
@@ -174,6 +191,6 @@
     }
 
     nav > *:not(:first-child)::before {
-        content: ' ▸ ';
+        content: ' ▸ ';
     }
 }

@@ -10,16 +10,18 @@ import { TitleHeader } from '@/components/TitleHeader';
 
 export const dynamic = 'error';
 
-export const metadata = {
-  title: 'QR Code Generator',
+const TITLE = 'QR Code Generator';
+
+export const metadata: Metadata = {
+  title: TITLE,
   description: 'Pure JS QR Code Generator',
-} satisfies Metadata;
+} as const;
 
 export default function QRPage() {
   return (
     <PageStructure
       breadcrumbs={[]}
-      header={<TitleHeader>{metadata.title}</TitleHeader>}
+      header={<TitleHeader>{TITLE}</TitleHeader>}
       schemaType="Item"
       resource="/qr"
     >

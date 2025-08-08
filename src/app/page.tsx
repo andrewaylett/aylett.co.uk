@@ -5,6 +5,8 @@ import React, { type ReactNode } from 'react';
 import { type Metadata } from 'next';
 import Link from 'next/link';
 
+import { PageStructure } from '@/components/PageStructure';
+
 export const metadata: Metadata = {
   verification: {
     me: 'https://social.aylett.co.uk/@andrew',
@@ -29,16 +31,24 @@ export const metadata: Metadata = {
 
 function Home(): ReactNode {
   return (
-    <div className="flex flex-col justify-center items-center px-2 min-h-screen">
+    <PageStructure
+      header={
+        <>
+          <h1 className="text-center">Welcome to aylett.co.uk</h1>
+          <p className="text-center">
+            Insert &apos;90s &ldquo;site under construction&rdquo; gif here.
+          </p>
+        </>
+      }
+      schemaType={''}
+      resource={''}
+    >
       <main
         vocab="https://schema.org/"
         typeof="ItemList"
         resource="/"
-        className="flex flex-col justify-center items-center text-center text-2xl py-16"
+        className="flex flex-col justify-center items-center text-center *:text-xl"
       >
-        <h1 className="text-center m-0 text-6xl">Welcome to aylett.co.uk</h1>
-
-        <p>Insert &apos;90s &ldquo;site under construction&rdquo; gif here.</p>
         <p>
           <Link property="item" typeof="WebPage" href="articles">
             <span property="name">Articles</span>
@@ -65,7 +75,7 @@ function Home(): ReactNode {
           </Link>
         </p>
       </main>
-    </div>
+    </PageStructure>
   );
 }
 

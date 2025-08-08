@@ -13,6 +13,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.mdx",
-    "../.next/types/**/*.ts"
+    "../.next/types/**/*.ts",
+    "../next-env.d.ts"
   ]
 }
