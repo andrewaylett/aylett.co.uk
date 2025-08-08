@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
-    "@eslint/js": "9.32.0",
+    "@eslint/js": "9.33.0",
     "@jest/globals": "30.0.5",
     "@next/eslint-plugin-next": "15.4.6",
     "@prettier/plugin-xml": "3.4.2",
@@ -68,7 +68,7 @@
     "@types/rss": "0.0.32",
     "babel-plugin-react-compiler": "19.1.0-rc.1",
     "encoding": "0.1.13",
-    "eslint": "9.32.0",
+    "eslint": "9.33.0",
     "eslint-config-andrewaylett": "6.1.0",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
