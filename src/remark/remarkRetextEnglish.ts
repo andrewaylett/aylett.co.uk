@@ -6,7 +6,6 @@ import {
 import {
   type Nodes,
   type Paragraph,
-  type Root,
   type Root as NlcstRoot,
   type Sentence,
 } from 'nlcst';
@@ -18,6 +17,7 @@ export type Options = Omit<ToMarkdownExtension, 'extensions'>;
 // See `parse-latin`.
 type Extension<Node extends Nodes> = (node: Node) => undefined;
 
+// Add custom data supported when `retext-english` is added.
 // See `retext-english` and `remark-stringify`.
 declare module 'unified' {
   // noinspection JSUnusedGlobalSymbols
@@ -29,7 +29,7 @@ declare module 'unified' {
     /**
      * List of extensions to transform root nodes.
      */
-    nlcstRootExtensions?: Extension<Root>[];
+    nlcstRootExtensions?: Extension<NlcstRoot>[];
     /**
      * List of extensions to transform sentence nodes.
      */
@@ -63,9 +63,15 @@ const remarkRetextEnglish: Plugin<
 ): (value: MdastRoot) => NlcstRoot {
   return (value: MdastRoot): NlcstRoot => {
     const parser = new ParseEnglish();
-    add(parser.tokenizeParagraphPlugins, this.data('nlcstParagraphExtensions'));
-    add(parser.tokenizeRootPlugins, this.data('nlcstRootExtensions'));
-    add(parser.tokenizeSentencePlugins, this.data('nlcstSentenceExtensions'));
+    parser.tokenizeParagraphPlugins.unshift(
+      ...(this.data('nlcstParagraphExtensions') ?? []),
+    );
+    parser.tokenizeRootPlugins.unshift(
+      ...(this.data('nlcstRootExtensions') ?? []),
+    );
+    parser.tokenizeSentencePlugins.unshift(
+      ...(this.data('nlcstSentenceExtensions') ?? []),
+    );
     return parser.parse(
       toMarkdown(value, {
         ...this.data('settings'),
@@ -78,9 +84,5 @@ const remarkRetextEnglish: Plugin<
     );
   };
 };
-
-function add<T>(list: T[], values: T[] | undefined) {
-  if (values) list.unshift(...values);
-}
 
 export default remarkRetextEnglish;
