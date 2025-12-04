@@ -50,7 +50,7 @@
     "yaml": "2.8.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.1",
+    "@eslint/eslintrc": "3.3.3",
     "@eslint/js": "9.33.0",
     "@jest/globals": "30.0.5",
     "@next/eslint-plugin-next": "15.5.6",
