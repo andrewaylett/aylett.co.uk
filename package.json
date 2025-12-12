@@ -22,7 +22,7 @@
     "mdast-util-from-markdown": "2.0.2",
     "mdast-util-to-markdown": "2.1.2",
     "mermaid": "11.12.2",
-    "next": "15.4.8",
+    "next": "15.4.9",
     "next-plausible": "3.12.5",
     "nlcst-to-string": "4.0.0",
     "openai": "5.13.1",
