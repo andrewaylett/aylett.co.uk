@@ -2,7 +2,6 @@ import andrewaylett from 'eslint-config-andrewaylett';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import next from '@next/eslint-plugin-next';
-const { flatConfig: nextPlugin } = next;
 
 export default tseslint.config(
     {
@@ -34,7 +33,7 @@ export default tseslint.config(
             },
         },
     },
-    nextPlugin.recommended,
+    next.configs.recommended,
     {
         files: ['**/*.ts', '**/*.mts', '**/*.tsx', '**/*.mtsx'],
         ...andrewaylett.configs.recommendedWithJestWithReactWithTypes,

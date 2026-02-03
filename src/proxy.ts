@@ -7,7 +7,7 @@ export const config = {
   ],
 };
 
-export default function middleware(req: NextRequest): NextResponse {
+export default function proxy(req: NextRequest): NextResponse {
   if (req.nextUrl.pathname === req.nextUrl.pathname.toLowerCase()) {
     return NextResponse.next();
   }

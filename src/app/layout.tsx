@@ -20,7 +20,6 @@ export const metadata: Metadata = {
     absolute: 'aylett.co.uk',
     template: '%s - aylett.co.uk',
   },
-  icons: '/favicon.ico',
   publisher: 'Andrew Aylett',
 };
 
