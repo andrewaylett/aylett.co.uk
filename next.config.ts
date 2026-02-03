@@ -123,10 +123,8 @@ export default function nextConfig(
   return withPlausibleProxy()({
     ...defaultConfig,
     ...({
-      experimental: {
-        typedRoutes: true,
-        reactCompiler: true,
-      },
+      typedRoutes: true,
+      reactCompiler: true,
       reactStrictMode: true,
       pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
       productionBrowserSourceMaps: true,
