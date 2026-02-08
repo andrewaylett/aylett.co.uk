@@ -24,6 +24,7 @@ import '@testing-library/jest-dom/jest-globals';
 
 jest.mock('html-to-image', () => ({
   toBlob: jest.fn<() => Promise<Blob>>().mockResolvedValue(new Blob()),
+  toPng: jest.fn<() => Promise<string>>().mockResolvedValue(''),
 }));
 
 const mockSearchParamsGet = jest.fn<(param: string) => string | null>(

@@ -15,9 +15,8 @@ import { type VFile } from 'vfile';
 import { parse } from 'yaml';
 import { type ZodType } from 'zod';
 
-import { intoReact } from './process_markdown';
-
 import { type Content } from '@/types';
+import { intoReact } from '@/remark/process_markdown';
 
 interface MDFile {
   path: string;
