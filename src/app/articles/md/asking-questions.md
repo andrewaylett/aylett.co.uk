@@ -1,21 +1,20 @@
 ---
 title: Asking Questions Internally
 author: Andrew Aylett
-revision: 1.0.0
+revision: 1.0.1
 revised: 2022/07/18
-expires: 2026/07/18
+expires: 2029/07/18
 abstract: Help your colleagues to help you
-description:
-    Discover the best practices for asking effective questions internally. Learn
-    how to get the people you work with to prioritize your request, and avoid
-    wasting time and resources.
+description: >
+    Practical advice for getting help from colleagues at work: read the docs
+    first, explain the business impact, start with your own team, avoid the XY
+    problem, and include enough context for others to actually help you.
 tags:
-    - Business & Collaboration
-    - Problem-Solving & Creativity
+    - Work
 lifecycle: live
 ---
 
-Most companies uses a lot of different technologies, and it's not reasonable to
+Most companies use a lot of different technologies, and it's not reasonable to
 expect everyone in the company to know everything about all of them. But when we
 have problems we need help with, there are a few useful steps we can take to
 make sure the people helping us can do so effectively. There are a few guides

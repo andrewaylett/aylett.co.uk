@@ -5,13 +5,12 @@ revision: '1.0'
 revised: 2013/01/19
 expires: 2033/01/19
 abstract: Useful if you need them
-description:
-    Andrew shares his experience using snow chains for the first time during a
-    snowstorm. Read on to learn about his tips and tricks, and what to keep in
-    mind when using snow chains.
+description: >
+    Lessons from a first-time snow chain user: practise in the driveway, don't
+    try to skip them on hills, untangle before fitting, wear waterproof
+    trousers, and removal is easier than you'd expect.
 tags:
-    - Education
-    - Parenting & Safety
+    - Safety
 ---
 
 It’s been snowing, and as we were planning to see friends who live in the

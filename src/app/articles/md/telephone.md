@@ -5,13 +5,12 @@ revision: '1.0'
 revised: 2012/07/18
 expires: 2032/07/18
 abstract: Who is this "security" for, anyway?
-description:
-    In this post, Andrew discusses why he is not a fan of answering security
-    questions when receiving incoming call from a company, and how security
-    should be designed to protect both parties.
+description: >
+    When a company phones you and asks security questions, the security protects
+    them, not you. You have no way to verify who called. The fix is to call
+    them back on their published number, but companies rarely make that easy.
 tags:
-    - Privacy & Security
-    - Business & Collaboration
+    - Security
 ---
 
 We don’t get many people phoning our land-line — just my mother-in-law,

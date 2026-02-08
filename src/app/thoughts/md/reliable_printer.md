@@ -2,9 +2,10 @@
 date: 2023/05/13
 author: Andrew Aylett
 title: Setting up and using the MFC-L3550CDW printer over a network
-description:
-    Learn how network printing is easier than ever, and how to set up and use
-    the MFC-L3550CDW printer over Ethernet.
+description: >
+    The Brother MFC-L3550CDW just works over Ethernet via IPP and mDNS -- no
+    driver installation needed. Network printing has quietly gone from dark
+    magic to plug-and-play, and works better on Linux than Mac or Windows.
 tags:
     - Technology
 ---

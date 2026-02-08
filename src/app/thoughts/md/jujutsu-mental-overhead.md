@@ -1,6 +1,9 @@
 ---
 title: Jujutsu makes things easier
-description: The easy things are easy, and the hard things are also easy.
+description: >
+    Jujutsu doesn't require more mental overhead than Git -- it requires less.
+    Parking work, switching context, and producing focused PRs all become
+    easier when the tooling handles the bookkeeping.
 tags:
     - Technology
 date: 2025/07/22

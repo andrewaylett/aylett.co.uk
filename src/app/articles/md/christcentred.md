@@ -5,15 +5,13 @@ revised: 2013/06/22
 abstract:
     The choice for a Christian parent is between full-time or part-time
     Christian Education.
-description:
-    Every Christian parent wants to provide their child with the best education
-    possible. But is it safe to put God in a box? Sending children to a
-    non-Christian school can expose them to worldview conflicts and undermine
-    the parents' God-given responsibility. Discover the importance of Christian
-    education and how it can help children fulfill their potential while
-    glorifying God and enjoying Him forever.
+description: >
+    An argument by James MacInnes that Christian parents face a choice between
+    full-time and part-time Christian education, and that non-Christian
+    schooling presents children with a worldview that conflicts with faith
+    at home.
 tags:
-    - Education
+    - Faith
 ---
 
 Every parent agrees that a good education is one of the most vital and

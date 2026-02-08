@@ -7,13 +7,12 @@ expires: 2026/10/20
 abstract:
     I want all my suppliers to tell me my scope three emissions are zero,
     please.
-description:
-    Learn about Scope Three emissions, their impact on the environment, and the
-    importance of suppliers taking responsibility. Explore the Scope Three Zero
-    Manifesto and Pledge for a more sustainable future.
+description: >
+    A manifesto arguing that suppliers should internalise their carbon costs so
+    that scope three emissions are zero for their customers, making sustainable
+    choices the default and removing the accounting burden from consumers.
 tags:
     - Sustainability
-    - Ethics & Society
 ---
 
 We face a challenge in assessing the ecological impact of the things we do: some
