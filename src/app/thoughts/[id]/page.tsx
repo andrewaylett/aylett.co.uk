@@ -14,7 +14,7 @@ import { PageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { Use } from '@/components/Use';
 import { type Markdown } from '@/remark/traverse';
-import { type ThoughtSchema, type TypeFrom } from '@/types';
+import { type Thought } from '@/types';
 import { gitHubUrl } from '@/utilities';
 
 export const dynamicParams = false;
@@ -84,12 +84,12 @@ function ThoughtPage({ params }: ThoughtProps) {
 
 export default ThoughtPage;
 
-function Thought({ page }: { page: Promise<Markdown<ThoughtSchema>> }) {
+function Thought({ page }: { page: Promise<Markdown<Thought>> }) {
   const { content, id, metadata } = useExploded(page);
   const { date, tags } = useExploded(metadata);
 
   return (
-    <PageStructure<typeof page>
+    <PageStructure
       schemaType="Article"
       resource={`/thoughts/${use(id)}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
@@ -111,7 +111,7 @@ function ThoughtHeader({
   metadata,
 }: {
   id: string;
-  metadata: Promise<TypeFrom<ThoughtSchema>>;
+  metadata: Promise<Thought>;
 }) {
   const data = use(metadata);
   return (

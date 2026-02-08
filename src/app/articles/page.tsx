@@ -10,7 +10,7 @@ import { ListingEntry } from '@/components/ListingEntry';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 import { type Markdown } from '@/remark/traverse';
-import { type ArticleSchema } from '@/types';
+import { type Article } from '@/types';
 import { asyncSortByKey } from '@/utilities';
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default function articles(): ReactNode {
   );
 }
 
-function Articles({ pages }: { pages: Promise<Markdown<ArticleSchema>[]> }) {
+function Articles({ pages }: { pages: Promise<Markdown<Article>[]> }) {
   const resolved = use(pages);
   const sorted = use(
     asyncSortByKey(resolved, async (page) => {

@@ -4,7 +4,7 @@ import { ListingEntry } from '@/components/ListingEntry';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 import { type Markdown } from '@/remark/traverse';
-import { type ArticleSchema, type ThoughtSchema } from '@/types';
+import { type Article, type Thought } from '@/types';
 
 export function TagPageContent({
   filteredArticles,
@@ -13,8 +13,8 @@ export function TagPageContent({
   unmangledTag,
 }: {
   tag: string;
-  filteredArticles: Markdown<ArticleSchema>[];
-  filteredThoughts: Markdown<ThoughtSchema>[];
+  filteredArticles: Markdown<Article>[];
+  filteredThoughts: Markdown<Thought>[];
   unmangledTag: string;
 }) {
   const articles =

@@ -5,20 +5,20 @@ import { ArticleHeader } from './ArticleHeader';
 import { useExploded } from '@/client/hooks/useExploded';
 import { PageStructure } from '@/components/PageStructure';
 import { type Markdown } from '@/remark/traverse';
-import { type ArticleSchema } from '@/types';
+import { type Article } from '@/types';
 
 export function ArticlePage({
   id,
   page,
 }: {
-  page: Promise<Markdown<ArticleSchema>>;
+  page: Promise<Markdown<Article>>;
   id: string;
 }): ReactElement {
   const { content, metadata } = useExploded(page);
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
 
   return (
-    <PageStructure<typeof page>
+    <PageStructure
       lifecycle={lifecycle}
       schemaType="Article"
       resource={`/articles/${id}`}
@@ -29,8 +29,8 @@ export function ArticlePage({
         </Suspense>
       }
       author={author}
-      copyright={copyright.then(
-        (c) => c || revised.then((r) => r.split('/')[0]),
+      copyright={copyright?.then(
+        (c) => c ?? revised.then((r) => r.split('/')[0]),
       )}
       keywords={tags}
     >

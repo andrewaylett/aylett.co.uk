@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from '@jest/globals';
 import { cleanup, render, screen, act } from '@testing-library/react';
 
 import { ListingEntry } from '@/components/ListingEntry';
-import { type ArticleSchema, type TypeFrom } from '@/types';
+import { type Article } from '@/types';
 
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/jest-globals';
@@ -25,8 +25,7 @@ describe('ArticleEntry', () => {
   afterEach(cleanup);
 
   it('renders article title and author when metadata is resolved', async () => {
-    const { resolve, promise: metadata } =
-      resolvablePromise<TypeFrom<ArticleSchema>>();
+    const { resolve, promise: metadata } = resolvablePromise<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="example-article" />),
@@ -45,7 +44,7 @@ describe('ArticleEntry', () => {
         description: '',
         tags: [''],
         tag: 'article',
-      } satisfies TypeFrom<ArticleSchema>);
+      } satisfies Article);
     });
 
     await expect(
@@ -55,8 +54,7 @@ describe('ArticleEntry', () => {
   });
 
   it('renders "Draft" label for draft articles', async () => {
-    const { resolve, promise: metadata } =
-      resolvablePromise<TypeFrom<ArticleSchema>>();
+    const { resolve, promise: metadata } = resolvablePromise<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="draft-article" />),
@@ -75,7 +73,7 @@ describe('ArticleEntry', () => {
         description: '',
         tags: [''],
         tag: 'article',
-      } satisfies TypeFrom<ArticleSchema>);
+      } satisfies Article);
     });
 
     await expect(screen.findByText('Draft:')).resolves.toBeInTheDocument();
@@ -85,8 +83,7 @@ describe('ArticleEntry', () => {
   });
 
   it('renders revision and revised date correctly', async () => {
-    const { resolve, promise: metadata } =
-      resolvablePromise<TypeFrom<ArticleSchema>>();
+    const { resolve, promise: metadata } = resolvablePromise<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="revised-article" />),
@@ -105,15 +102,14 @@ describe('ArticleEntry', () => {
         description: '',
         tags: [''],
         tag: 'article',
-      } satisfies TypeFrom<ArticleSchema>);
+      } satisfies Article);
     });
 
     await expect(screen.findByText('v3, 2023')).resolves.toBeInTheDocument();
   });
 
   it('renders abstract when provided', async () => {
-    const { resolve, promise: metadata } =
-      resolvablePromise<TypeFrom<ArticleSchema>>();
+    const { resolve, promise: metadata } = resolvablePromise<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="abstract-article" />),
@@ -132,7 +128,7 @@ describe('ArticleEntry', () => {
         description: '',
         tags: [''],
         tag: 'article',
-      } satisfies TypeFrom<ArticleSchema>);
+      } satisfies Article);
     });
 
     await expect(screen.findByText(':')).resolves.toBeInTheDocument();
@@ -142,8 +138,7 @@ describe('ArticleEntry', () => {
   });
 
   it('handles missing metadata gracefully', async () => {
-    const { resolve, promise: metadata } =
-      resolvablePromise<TypeFrom<ArticleSchema>>();
+    const { resolve, promise: metadata } = resolvablePromise<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="empty-article" />),
@@ -162,7 +157,7 @@ describe('ArticleEntry', () => {
         description: '',
         tags: [''],
         tag: 'article',
-      } satisfies TypeFrom<ArticleSchema>);
+      } satisfies Article);
     });
 
     await expect(screen.findByText('Dummy')).resolves.toBeInTheDocument();

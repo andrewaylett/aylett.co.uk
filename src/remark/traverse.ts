@@ -10,14 +10,14 @@ import * as path from 'node:path';
 
 import { type ReactElement } from 'react';
 
-import { type JSONSchema7 } from 'json-schema';
 import { read } from 'to-vfile';
 import { type VFile } from 'vfile';
 import { parse } from 'yaml';
-
-import { assertSchema, type TaggedSchema, type TypeFrom } from '../types';
+import { type ZodType } from 'zod';
 
 import { intoReact } from './process_markdown';
+
+import { type Content } from '@/types';
 
 interface MDFile {
   path: string;
@@ -66,19 +66,15 @@ export async function traverse(dir: string): Promise<MDFile[]> {
   return [...gen()];
 }
 
-async function extractMetadata<Schema extends JSONSchema7 & TaggedSchema>(
+async function extractMetadata<P extends Content>(
   vfile: Promise<VFile>,
-  schema: Schema,
-): Promise<TypeFrom<Schema>> {
+  schema: ZodType<P>,
+): Promise<P> {
   const node = (await vfile).data.frontMatter;
 
   if (node) {
-    const parsed: unknown = parse(node.value);
-    if (typeof parsed === 'object') {
-      (parsed as TaggedSchema).tag = schema.tag;
-    }
-    assertSchema(parsed, schema);
-    return parsed;
+    const raw: unknown = parse(node.value);
+    return schema.parse(raw);
   } else {
     throw new Error('No metadata found');
   }
@@ -89,8 +85,8 @@ async function extractResult(vfile: Promise<VFile>): Promise<ReactElement> {
 }
 
 /** Wraps a markdown file with lazy promises for its rendered React content and validated frontmatter metadata. */
-export class Markdown<Schema extends JSONSchema7 & TaggedSchema> {
-  constructor(mdFile: MDFile, schema: Schema) {
+export class Markdown<out P extends Content> {
+  constructor(mdFile: MDFile, schema: ZodType<P>) {
     this.id = mdFile.id;
     const vfile = mdFile.vfile.then((v) => intoReact.process(v));
     this.content = extractResult(vfile);
@@ -99,14 +95,14 @@ export class Markdown<Schema extends JSONSchema7 & TaggedSchema> {
 
   id: string;
   content: Promise<ReactElement>;
-  metadata: Promise<TypeFrom<Schema>>;
+  metadata: Promise<P>;
 }
 
 /** Discovers and wraps all markdown files in a directory, validating each against the given schema. */
-export async function findMarkdown<T extends JSONSchema7 & TaggedSchema>(
+export async function findMarkdown<P extends Content>(
   dir: string,
-  schema: T,
-): Promise<Markdown<T>[]> {
+  schema: ZodType<P>,
+): Promise<Markdown<P>[]> {
   const mdFiles = await traverse(dir);
 
   return mdFiles.map((f) => new Markdown(f, schema));

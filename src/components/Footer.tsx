@@ -4,15 +4,16 @@ import { getYear } from 'date-fns';
 import Link from 'next/link';
 
 export interface FooterProps {
-  author?: Promise<string>;
-  copyright?: Promise<string>;
+  author?: Promise<string | undefined>;
+  copyright?: Promise<string | undefined>;
   keywords?: Promise<string[]>;
 }
 
 export function Footer({ author, copyright, keywords }: FooterProps) {
   const resolvedKeywords = keywords ? use(keywords) : [];
-  const resolvedAuthor = author ? use(author) : 'Andrew Aylett';
-  const resolvedCopyright = copyright ? use(copyright) : getYear(Date.now());
+  const resolvedAuthor = (author && use(author)) ?? 'Andrew Aylett';
+  const resolvedCopyright =
+    (copyright && use(copyright)) ?? getYear(Date.now());
 
   return (
     <footer className="sticky bottom-0 mt-4 pt-1 w-full *:text-smaller flex flex-row flex-wrap justify-between pb-1">

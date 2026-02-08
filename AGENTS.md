@@ -52,7 +52,7 @@ src/
     remarkRetextEnglish.ts # remark → retext bridge
     retextRemark.ts       # retext → remark bridge
     components.tsx        # rehype-react component overrides (Mermaid)
-  types.ts                # Content schemas and TypeFrom utility type
+  types.ts                # Zod content schemas (Article, Thought, Content)
   utilities.ts            # Shared helpers
   proxy.ts                # Middleware: lowercase URL redirect
 test/                     # Jest test files (mirrors src/ structure)
@@ -88,7 +88,7 @@ This base processor is then extended:
 
 ### Content System
 
-Two content types, each with a JSON Schema constant in `src/types.ts`:
+Two content types, each with a Zod schema in `src/types.ts`:
 
 **Articles** (`ArticleSchema`):
 - Fields: title, revision, revised, author, expires, abstract, copyright,
@@ -106,10 +106,10 @@ request-level deduplication (see `articles.ts` and `thoughts.ts`).
 
 ### Type System
 
-`TypeFrom<Schema>` in `src/types.ts` recursively derives TypeScript types from
-JSON Schema constants at the type level. This means the schema constants serve
-as both runtime validators (via `assertSchema` + revalidator) and compile-time
-type sources — no separate interface definitions needed.
+`src/types.ts` defines Zod schemas (`ArticleSchema`, `ThoughtSchema`) that
+serve as both runtime validators and compile-time type sources via
+`z.infer<typeof Schema>`. The `tag` discriminator and `lifecycle` default are
+injected by Zod's `.default()` during parsing, not by mutation.
 
 ### Key Patterns
 

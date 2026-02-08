@@ -31,12 +31,12 @@ export async function generateMetadata({
 
   return {
     title: metadata.title,
-    authors: [{ name: metadata.author }],
+    authors: metadata.author ? [{ name: metadata.author }] : undefined,
     description: metadata.description,
     keywords: metadata.tags,
     openGraph: {
       type: 'article',
-      authors: [metadata.author],
+      authors: metadata.author ? [metadata.author] : undefined,
       description: metadata.description,
       expirationTime: metadata.expires,
       locale: 'en_GB',
