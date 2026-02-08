@@ -1,3 +1,10 @@
+/**
+ * Unified plugin that converts an nlcst (natural language) tree back to mdast (markdown).
+ *
+ * This is the inverse of `remarkRetextEnglish` — it re-parses the stringified
+ * nlcst back into markdown, preserving any micromark/mdast extensions registered
+ * on the processor.
+ */
 // noinspection JSUnusedGlobalSymbols
 
 import { type Root as MdastRoot } from 'mdast';

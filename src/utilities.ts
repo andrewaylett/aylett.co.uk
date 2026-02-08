@@ -1,3 +1,4 @@
+/** Awaits a nullable promise and throws if the result is null. */
 export async function nullToError<T>(
   value: Promise<T | null>,
   message?: string,
@@ -23,12 +24,14 @@ export function encodeQueryComponent(component: string): string {
   });
 }
 
+/** Returns a GitHub URL pointing to the commit history for a given page's markdown source. */
 export const gitHubUrl = (pageName: string): string =>
   `https://github.com/andrewaylett/aylett.co.uk/commits/main/src/pages${pageName.replace(
     /#.*/,
     '',
   )}.md`;
 
+/** Sorts an array by an async-derived key, resolving all keys in parallel before sorting. */
 export async function asyncSortByKey<T, K>(
   input: T[],
   keyExtractor: (v: T) => PromiseLike<K>,

@@ -1,3 +1,8 @@
+/**
+ * Next.js middleware that redirects URLs containing uppercase characters to their
+ * lowercase equivalent. The matcher regex excludes API routes, static files, and
+ * already-lowercase paths.
+ */
 /* eslint-disable unicorn/prefer-string-raw */
 import { type NextRequest, NextResponse } from 'next/server';
 
