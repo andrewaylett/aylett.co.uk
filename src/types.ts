@@ -1,3 +1,10 @@
+/**
+ * Content schema definitions and runtime validation.
+ *
+ * Each content type (article, thought) has a JSON Schema constant that doubles
+ * as a TypeScript type source via {@link TypeFrom}. The `tag` field
+ * discriminates content types at runtime.
+ */
 import { type JSONSchema7 } from 'json-schema';
 import { validate } from 'revalidator';
 
@@ -15,6 +22,7 @@ export interface LifecycleSchema {
   };
 }
 
+/** JSON Schema for article frontmatter. Includes lifecycle states for content maturity. */
 export const ArticleSchema = {
   type: 'object',
   properties: {
@@ -37,6 +45,7 @@ export const ArticleSchema = {
 } as const satisfies JSONSchema7 & LifecycleSchema & TaggedSchema;
 export type ArticleSchema = typeof ArticleSchema;
 
+/** JSON Schema for thought frontmatter. Simpler than articles — no lifecycle or revision tracking. */
 export const ThoughtSchema = {
   type: 'object',
   properties: {
@@ -49,6 +58,10 @@ export const ThoughtSchema = {
 } as const satisfies JSONSchema7 & TaggedSchema;
 export type ThoughtSchema = typeof ThoughtSchema;
 
+/**
+ * Recursively derives a TypeScript type from a JSON Schema constant.
+ * Handles objects, strings (with enum narrowing), arrays, numbers, and the custom `tag` discriminator.
+ */
 export type TypeFrom<Schema> = Schema extends { tag: infer T }
   ? TypeFrom<Omit<Schema, 'tag'>> & { tag: T }
   : Schema extends {
@@ -66,6 +79,7 @@ export type TypeFrom<Schema> = Schema extends { tag: infer T }
           ? number
           : never;
 
+/** Validates `parsed` against a JSON Schema and asserts its type, throwing on validation or tag mismatch. */
 export function assertSchema<T extends JSONSchema7 & TaggedSchema>(
   parsed: unknown,
   schema: T,

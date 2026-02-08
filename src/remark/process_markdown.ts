@@ -1,3 +1,12 @@
+/**
+ * Unified markdown processing pipeline.
+ *
+ * The pipeline has three stages:
+ * 1. Parse markdown and extract YAML frontmatter via `shiftIf`
+ * 2. Convert to natural language (retext) for smart-quote and dash processing,
+ *    then convert back to mdast
+ * 3. Convert to either React elements ({@link intoReact}) or plain text ({@link intoText})
+ */
 import { type Root, type Yaml } from 'mdast';
 import * as dev from 'react/jsx-dev-runtime';
 import * as prod from 'react/jsx-runtime';
@@ -37,6 +46,7 @@ function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
   }
 }
 
+/** Shared base processor: parses markdown, extracts frontmatter, applies smartypants and dash conversion. */
 export const baseProcessor: Processor = unified()
   .use([
     // First we split off the frontmatter
@@ -75,6 +85,7 @@ const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
 
 const devJsx = { jsxDEV: dev.jsxDEV };
 
+/** Extends base processor to produce React elements via rehype, with component overrides for Mermaid diagrams. */
 export const intoReact: Processor = baseProcessor()
   .use([
     remarkRehype,
@@ -128,6 +139,7 @@ export const intoReact: Processor = baseProcessor()
   ])
   .freeze();
 
+/** Extends base processor to serialize back to plain markdown text. */
 export const intoText: Processor = baseProcessor()
   .use([remarkStringify])
   .freeze();

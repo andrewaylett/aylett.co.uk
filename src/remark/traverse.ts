@@ -1,3 +1,10 @@
+/**
+ * Filesystem traversal for markdown content.
+ *
+ * Discovers `.md` files under `src/app/<dir>`, processes them through the
+ * unified pipeline, and exposes parsed metadata and rendered React content
+ * as lazy promises via the {@link Markdown} class.
+ */
 import { readdir, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 
@@ -32,6 +39,7 @@ async function findProjectDirectory(): Promise<string> {
   throw new Error(`Could not find project directory from ${process.cwd()}`);
 }
 
+/** Reads a directory under `src/app/` and returns all `.md` files with lazy-loaded vfile promises. */
 export async function traverse(dir: string): Promise<MDFile[]> {
   const app = path.resolve(await findProjectDirectory(), 'src/app');
   const target = path.join(app, dir);
@@ -80,6 +88,7 @@ async function extractResult(vfile: Promise<VFile>): Promise<ReactElement> {
   return (await vfile).result as ReactElement;
 }
 
+/** Wraps a markdown file with lazy promises for its rendered React content and validated frontmatter metadata. */
 export class Markdown<Schema extends JSONSchema7 & TaggedSchema> {
   constructor(mdFile: MDFile, schema: Schema) {
     this.id = mdFile.id;
@@ -93,6 +102,7 @@ export class Markdown<Schema extends JSONSchema7 & TaggedSchema> {
   metadata: Promise<TypeFrom<Schema>>;
 }
 
+/** Discovers and wraps all markdown files in a directory, validating each against the given schema. */
 export async function findMarkdown<T extends JSONSchema7 & TaggedSchema>(
   dir: string,
   schema: T,

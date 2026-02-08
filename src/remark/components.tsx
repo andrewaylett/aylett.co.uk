@@ -1,3 +1,9 @@
+/**
+ * Custom component overrides for rehype-react.
+ *
+ * Intercepts `<code>` elements with `language-mermaid` class and renders them
+ * via a dynamically imported Mermaid client component instead.
+ */
 import React from 'react';
 
 import { type Components } from 'rehype-react';
