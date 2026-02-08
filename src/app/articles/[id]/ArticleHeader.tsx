@@ -6,14 +6,14 @@ import { useExploded } from '@/client/hooks/useExploded';
 import { Description } from '@/components/Description';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { type Markdown } from '@/remark/traverse';
-import { type ArticleSchema } from '@/types';
+import { type Article } from '@/types';
 
 export function ArticleHeader({
   id,
   page,
 }: {
   id: string;
-  page: Promise<Markdown<ArticleSchema>>;
+  page: Promise<Markdown<Article>>;
 }) {
   const { metadata } = useExploded(page);
   const data = use(metadata);

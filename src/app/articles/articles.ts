@@ -5,11 +5,11 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import { findMarkdown, type Markdown } from '@/remark/traverse';
-import { ArticleSchema } from '@/types';
+import { type Article, ArticleSchema } from '@/types';
 
 async function articleForIdFn(params: {
   id: string;
-}): Promise<Markdown<ArticleSchema>> {
+}): Promise<Markdown<Article>> {
   const articles = await allArticles();
   return articles.find((article) => article.id === params.id) ?? notFound();
 }

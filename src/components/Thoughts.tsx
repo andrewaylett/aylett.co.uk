@@ -2,18 +2,18 @@ import React, { type ReactNode, Suspense, use } from 'react';
 
 import Link from 'next/link';
 
-import { type Markdown } from '../remark/traverse';
-import { type ThoughtSchema } from '../types';
-import { asyncSortByKey } from '../utilities';
-
 import { ListingEntry } from './ListingEntry';
 import { PageStructure } from './PageStructure';
 import { TitleHeader } from './TitleHeader';
 
+import { type Markdown } from '@/remark/traverse';
+import { type Thought } from '@/types';
+import { asyncSortByKey } from '@/utilities';
+
 export function Thoughts({
   pages,
 }: {
-  pages: Promise<Markdown<ThoughtSchema>[]>;
+  pages: Promise<Markdown<Thought>[]>;
 }): ReactNode {
   const resolved = use(pages);
   const sorted = use(

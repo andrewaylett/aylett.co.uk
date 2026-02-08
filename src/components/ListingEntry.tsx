@@ -3,13 +3,13 @@ import React, { use } from 'react';
 import Link from 'next/link';
 
 import { Description } from '@/components/Description';
-import { type ArticleSchema, type ThoughtSchema, type TypeFrom } from '@/types';
+import { type Content } from '@/types';
 
 export function ListingEntry({
   metadata,
   name,
 }: {
-  metadata: Promise<TypeFrom<ArticleSchema | ThoughtSchema>>;
+  metadata: Promise<Content>;
   name: string;
 }) {
   const data = use(metadata);

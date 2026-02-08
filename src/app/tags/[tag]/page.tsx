@@ -8,7 +8,7 @@ import { allArticles } from '@/app/articles/articles';
 import { TagPageContent } from '@/app/tags/[tag]/TagPageContent';
 import { allThoughts } from '@/app/thoughts/thoughts';
 import { type Markdown } from '@/remark/traverse';
-import { type ArticleSchema, type ThoughtSchema } from '@/types';
+import { type Article, type Thought } from '@/types';
 
 export async function generateStaticParams() {
   const tags = await allTags();
@@ -29,7 +29,7 @@ export default async function TagPage({
   let originalTag;
   let recalledTag;
 
-  const filteredArticles: Markdown<ArticleSchema>[] = [];
+  const filteredArticles: Markdown<Article>[] = [];
   for (const article of articles) {
     const metadata = await article.metadata;
     if ((recalledTag = metadata.tags.find((s) => s.toLowerCase() === tag))) {
@@ -38,7 +38,7 @@ export default async function TagPage({
     }
   }
 
-  const filteredThoughts: Markdown<ThoughtSchema>[] = [];
+  const filteredThoughts: Markdown<Thought>[] = [];
   for (const thought of thoughts) {
     const metadata = await thought.metadata;
     if ((recalledTag = metadata.tags.find((s) => s.toLowerCase() === tag))) {

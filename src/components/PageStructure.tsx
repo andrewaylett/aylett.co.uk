@@ -5,32 +5,19 @@ import React, {
   use,
 } from 'react';
 
-import { type JSONSchema7 } from 'json-schema';
-
 import { Footer, type FooterProps } from './Footer';
 
-import { type Markdown } from '@/remark/traverse';
-import { type LifecycleSchema, type TaggedSchema } from '@/types';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
-export interface PageStructureProps<
-  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>>,
-  Schema extends LifecycleSchema = T extends Promise<
-    Markdown<infer S extends LifecycleSchema & TaggedSchema>
-  >
-    ? S
-    : never,
-> extends FooterProps {
+export interface PageStructureProps extends FooterProps {
   breadcrumbs?: Breadcrumbs;
   header: ReactNode;
-  lifecycle?: Promise<Schema['properties']['lifecycle']['enum'][number]>;
+  lifecycle?: Promise<string>;
   schemaType: string;
   resource: string;
 }
 
-export function PageStructure<
-  T extends Promise<Markdown<JSONSchema7 & TaggedSchema>>,
->({
+export function PageStructure({
   author,
   breadcrumbs,
   children,
@@ -40,7 +27,7 @@ export function PageStructure<
   lifecycle,
   resource,
   schemaType,
-}: PropsWithChildren<PageStructureProps<T>>): ReactNode {
+}: PropsWithChildren<PageStructureProps>): ReactNode {
   return (
     <>
       {lifecycle && use(lifecycle) === 'draft' ? (
