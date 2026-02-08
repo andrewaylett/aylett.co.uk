@@ -6,13 +6,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev # --turbopack",
+    "dev": "next dev --turbopack",
     "build": "next build --experimental-app-only",
     "start": "next start",
     "format": "eslint --fix . && tsc -b .",
     "lint": "eslint && tsc -b .",
     "pretest": "npm run lint",
-    "test": "jest"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest"
   },
   "dependencies": {
     "client-only": "0.0.1",
@@ -86,7 +86,7 @@
     "prettier": "3.8.1",
     "react-dom": "19.2.4",
     "tailwindcss": "4.1.18",
-    "ts-node": "10.9.2",
+    "ts-jest": "^29.4.6",
     "typescript": "5.9.3",
     "typescript-eslint": "8.54.0"
   },
