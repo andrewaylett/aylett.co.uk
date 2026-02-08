@@ -2,12 +2,12 @@
 title: Generating metadata with GPT
 author: Andrew Aylett
 date: 2023/04/06
-description:
-    Andrew generates site metadata using GPT, including titles and descriptions.
+description: >
+    Site metadata like titles and descriptions are now generated with GPT. The
+    output is committed to the repository, not generated dynamically, and is
+    subject to review before publishing.
 tags:
-    - AI & NLP
-    - Problem-Solving & Creativity
-    - SEO
+    - AI
 ---
 
 I've decided to start generating site metadata using GPT. The specific endpoint

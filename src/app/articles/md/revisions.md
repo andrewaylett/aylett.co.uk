@@ -5,13 +5,12 @@ revision: '1.2'
 revised: 2020/09/13
 expires: 2025/09/13
 abstract: "Or: why this website isn't a blog"
-description:
-    Trying to avoid the pitfalls of traditional blogs, Andrew offers content
-    that can be refreshed and updated over time.
+description: >
+    Why this site is a collection of articles rather than a blog: articles can
+    be revised, versioned, and given lifecycle states, instead of being tied to
+    a posting date and left to go stale.
 tags:
     - Technology
-    - Problem-Solving & Creativity
-    - Business & Collaboration
 ---
 
 This website is a collection of articles, not a blog. Why? Well, I've always

@@ -2,14 +2,14 @@
 author: Andrew Aylett
 date: 2023/04/23
 title: TLS Termination Delegation in Browsers
-description:
-    A call for a mechanism for a browser to delegate TLS termination to a proxy,
-    without resorting to MITM, making it possible for the browser to properly
-    warn users when it’s active and support this feature in environments where
-    it’s useful.
+description: >
+    Wishing browsers could delegate TLS termination to a proxy the way servers
+    delegate to CDNs -- transparently, without MITM. Current alternatives like
+    Cloudflare's zero-trust require replacing the OS certificate store, which
+    is too close to black-hat interception.
 tags:
     - Technology
-    - Privacy & Security
+    - Security
 ---
 
 _Originally [posted](https://social.aylett.co.uk/notice/AUmwZvpCcKvQ2yrwPo) with

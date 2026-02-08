@@ -5,14 +5,12 @@ revision: '1.2'
 revised: 2021/08/09
 expires: 2025/08/09
 abstract: This is not a privacy policy
-description:
-    This website does not set any cookies or retain any logs, and aims to avoid
-    processing any personal data to comply with GDPR. Hosted by Vercel, personal
-    data is not collected for visitors to the site.
+description: >
+    This site sets no cookies and keeps no logs. The goal is to avoid processing
+    any personal data so no GDPR consent is needed. Hosted by Vercel with
+    Plausible analytics, neither of which collects personal data from visitors.
 tags:
-    - Ethics & Society
-    - Privacy & Security
-    - Technology
+    - Security
 ---
 
 Per the subhead, this is not (really) a privacy policy. This site doesn't have a

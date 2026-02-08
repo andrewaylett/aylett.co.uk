@@ -1,10 +1,11 @@
 ---
 title: Is an LLM inherently deterministic?
-description:
-    Exploring the determinism of large language models like GPT, and the
-    possibility of designing them to be deterministic.
+description: >
+    LLMs are deterministic in principle -- the model is immutable at inference
+    time. Non-reproducibility is a design choice, not an inherent property, and
+    a deterministic API would be technically possible even if expensive.
 tags:
-    - AI & NLP
+    - AI
     - Technology
 author: 'Andrew Aylett'
 date: '2023/04/05'

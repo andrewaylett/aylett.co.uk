@@ -2,9 +2,10 @@
 title: Always applying the Gradle Enterprise plugin
 author: Andrew Aylett
 date: 2023/10/29
-description:
-    Learn how to configure the Gradle Enterprise plugin in an init script to
-    avoid committing agreement to the terms of service into published projects.
+description: >
+    How to configure the Gradle Enterprise plugin in a user-scope init script,
+    so you get build scans for every project without committing the
+    terms-of-service agreement into published code.
 tags:
     - Technology
 ---

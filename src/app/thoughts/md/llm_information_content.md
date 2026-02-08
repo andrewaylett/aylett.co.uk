@@ -2,13 +2,14 @@
 title: 'Targeting LLM-Generated Text: An Analogy'
 author: Andrew Aylett
 date: 2023/06/05
-description:
-    In this response on Hacker News, Andrew draws on a driving analogy to
-    explain why it's easier to specifically target LLM-generated text, rather
-    than simply relying on anti-spam rules.
+description: >
+    A driving analogy for why LLM-generated text deserves specific rules: just
+    as we ban drink-driving rather than only 'dangerous driving', we can target
+    LLM spam directly because the output contains no more information than the
+    prompt.
 tags:
-    - AI & NLP
-    - Ethics & Society
+    - AI
+    - Society
 ---
 
 _In [response](https://news.ycombinator.com/context?id=36194777) to a question

@@ -5,12 +5,12 @@ revision: '1.0'
 revised: 2020/09/13
 expires: 2026/09/13
 abstract: The world changes; is this still relevant?
-description:
-    Learn why it's important to understand whether online content is current or
-    out-of-date, and how expiry dates can help with that.
+description: >
+    Why articles on this site carry expiry dates: the world changes around old
+    documents, and it helps to know whether what you're reading is still
+    considered current.
 tags:
     - Technology
-    - Business & Collaboration
 ---
 
 Articles on this website have an expiry date. It's something you'll see more

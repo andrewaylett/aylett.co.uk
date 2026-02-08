@@ -5,14 +5,13 @@ revision: '1.0'
 revised: 2020/09/05
 expires: 2025/09/05
 abstract: Some thoughts on the "Smart Kid Belt"
-description:
-    Smart Kid Belt is a type-approved automotive child restraint system with a
-    unique design that consists of a single strap to hold the shoulder belt
-    down, but it does not fully comply with UN Regulation No. 44 requirements,
-    according to some experts' opinions. Andrew wouldn't recommend using it.
+description: >
+    Research notes on the Smart Kid Belt, a controversial child restraint that
+    is just a strap holding the seatbelt down. Despite Polish type approval,
+    multiple countries have called for its withdrawal as it falls outside UN
+    Regulation No. 44.
 tags:
-    - Parenting & Safety
-    - Ethics & Society
+    - Safety
 ---
 
 -   https://smartkidbelt.com/en/

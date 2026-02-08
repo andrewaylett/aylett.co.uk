@@ -5,11 +5,11 @@ revision: '0.1'
 revised: 2024/04/20
 expires: 2024/04/20
 abstract: Attributes across two axes
-description:
-    Learn what Andrew thinks about Nerds, Geeks, and Hipsters.
-    Once he's finished the article, that is.
+description: >
+    A draft exploring how nerds, geeks, and hipsters differ along two axes:
+    desire to share and desire to talk about their interests.
 tags:
-    - Ethics & Society
+    - Society
 lifecycle: draft
 ---
 

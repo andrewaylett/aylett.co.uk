@@ -1,8 +1,11 @@
 ---
 title: Avoid Post-Meeting Meetings
-description: Stop having coffee machine meetings when you have virtual meetings.
+description: >
+    The real progress used to happen at the coffee machine after presentations.
+    In a remote world, make the presentation a pre-read document so the actual
+    discussion happens in the actual meeting.
 tags:
-    - Business & Collaboration
+    - Work
 date: 2023/04/10
 ---
 

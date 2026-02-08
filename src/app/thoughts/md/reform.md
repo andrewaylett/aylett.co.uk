@@ -2,9 +2,12 @@
 title: Reform, and a trap of politics
 author: Andrew Aylett
 date: 2025/05/03
-description: A brief discussion of why it's hard to counter support for Reform.
+description: >
+    The problem with Reform isn't their stated goals but their proposed means:
+    unethical, unlikely to work, and used to justify the means themselves.
+    Untested parties can promise utopia at no cost.
 tags:
-- Ethics & Society
+    - Society
 ---
 In the context of [Reform's election success](https://www.theguardian.com/politics/2025/may/02/reform-uk-nigel-farage-english-local-elections), I commented on a private Slack:
 

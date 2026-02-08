@@ -5,12 +5,12 @@ revision: '1.2'
 revised: 2023/04/06
 expires: 2024/04/05
 abstract: Worth whatever you paid for them.
-description:
-    In this article, Andrew introduces his new brief thoughts section and
-    techniques for classification and metadata addition.
+description: >
+    Introducing a new section for shorter, less formal writing that doesn't
+    warrant a full article. Metadata and tags may be LLM-assisted, but the
+    content remains Andrew's responsibility.
 tags:
-    - AI & NLP
-    - Problem-Solving & Creativity
+    - AI
 ---
 
 In a similar vein to [Simon Wilison's TIL](https://til.simonwillison.net/), I've
