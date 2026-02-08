@@ -13,7 +13,7 @@ Personal website for Andrew Aylett, hosted at https://www.aylett.co.uk/.
 - **Linting:** ESLint 9 (flat config) + TypeScript type-checking
 - **Hosting:** Vercel (auto-deploy from main)
 - **Analytics:** Plausible (self-proxied)
-- **Node:** ^22
+- **Node:** ^24
 
 ## Directory Structure
 
@@ -126,11 +126,11 @@ injected by Zod's `.default()` during parsing, not by mutation.
 ## Commands
 
 ```sh
-npm run dev      # Start local dev server (next dev)
-npm run build    # Production build (next build --experimental-app-only)
-npm test         # Runs lint, then Jest
-npm run lint     # ESLint + TypeScript type-check (eslint && tsc -b .)
-npm run format   # Auto-fix: eslint --fix . && tsc -b .
+pnpm run dev      # Start local dev server (next dev)
+pnpm run build    # Production build (next build --experimental-app-only)
+pnpm test         # Runs lint, then Jest
+pnpm run lint     # ESLint + TypeScript type-check (eslint && tsc -b .)
+pnpm run format   # Auto-fix: eslint --fix . && tsc -b .
 ```
 
 ## Testing
@@ -143,7 +143,7 @@ npm run format   # Auto-fix: eslint --fix . && tsc -b .
   - `test/components/ListingEntry.test.tsx` — listing entry component tests
 - Libraries: `@testing-library/react`, `@testing-library/jest-dom`,
   `@testing-library/user-event`
-- `npm test` runs `npm run lint` as a pretest step
+- `pnpm test` runs `pnpm run lint` as a pretest step
 
 ## Non-obvious Details
 

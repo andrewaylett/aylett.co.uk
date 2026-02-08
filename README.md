@@ -17,9 +17,9 @@ Both are written in Markdown with YAML frontmatter.
 ## Development
 
 ```sh
-npm run dev      # Start local dev server
-npm run build    # Production build
-npm test         # Lint + type-check + Jest tests
-npm run lint     # ESLint + TypeScript only
-npm run format   # Auto-fix lint issues
+pnpm run dev      # Start local dev server
+pnpm run build    # Production build
+pnpm test         # Lint + type-check + Jest tests
+pnpm run lint     # ESLint + TypeScript only
+pnpm run format   # Auto-fix lint issues
 ```
