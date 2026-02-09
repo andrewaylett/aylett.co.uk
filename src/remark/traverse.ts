@@ -75,7 +75,7 @@ async function extractMetadata<P extends Content>(
     const raw: unknown = parse(node.value);
     return schema.parse(raw);
   } else {
-    throw new Error('No metadata found');
+    throw new Error(`No metadata found in ${(await vfile).path}`);
   }
 }
 
