@@ -72,8 +72,9 @@ The most complex custom code. Defined in `src/remark/process_markdown.ts`:
 
 1. **Parse:** `remark-parse` turns markdown into an mdast tree
 2. **Frontmatter extraction:** `remark-frontmatter` identifies YAML blocks,
-   then a custom `shiftIf` helper removes the first YAML node from the tree
-   and stores it on `vfile.data.frontMatter`
+   then a custom plugin finds and splices the YAML node from the tree,
+   storing it on `vfile.data.frontMatter`. A warning is emitted if the
+   YAML node is not the first child (unexpected position).
 3. **Text processing:** The mdast tree is bridged to nlcst via
    `remarkRetextEnglish`, processed with `retext-smartypants` (smart quotes),
    then bridged back to mdast via `retextRemark`
@@ -153,10 +154,11 @@ pnpm run format   # Auto-fix: eslint --fix . && tsc -b .
 - **Mermaid dynamic import:** Mermaid is loaded client-side only via
   `next/dynamic`. The `intoReact` pipeline also strips the `<pre>` wrapper
   around mermaid code blocks so rehype-react can substitute the component.
-- **`shiftIf` frontmatter extraction:** Rather than using a standard frontmatter
-  plugin's built-in extraction, a custom `shiftIf` helper peels the first YAML
-  node from the tree. This allows the frontmatter to travel through the rest of
-  the pipeline on `vfile.data.frontMatter`.
+- **Frontmatter extraction:** Rather than using a standard frontmatter
+  plugin's built-in extraction, a custom plugin finds and splices the YAML
+  node from the tree. This allows the frontmatter to travel through the rest
+  of the pipeline on `vfile.data.frontMatter`. A vfile warning is emitted if
+  the YAML node is not the first child.
 - **`pageExtensions`:** Set to `['js', 'jsx', 'ts', 'tsx']` in
   `next.config.ts` — `.md` files are **not** page sources; they are read from
   the filesystem by `traverse.ts`.

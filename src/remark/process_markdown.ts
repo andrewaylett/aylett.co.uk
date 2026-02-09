@@ -38,14 +38,6 @@ declare module 'vfile' {
   }
 }
 
-/// If the consumer returns `true`, the value is removed from the array.
-function shiftIf<T>(array: T[], consumer: (val: T) => boolean): void {
-  const first = array.shift();
-  if (first !== undefined && !consumer(first)) {
-    array.unshift(first);
-  }
-}
-
 /** Shared base processor: parses markdown, extracts frontmatter, applies smartypants and dash conversion. */
 export const baseProcessor: Processor = unified()
   .use([
@@ -54,13 +46,19 @@ export const baseProcessor: Processor = unified()
     remarkFrontmatter,
     () =>
       (tree: Root, file: VFile): Root => {
-        shiftIf(tree.children, (yamlnode) => {
-          if (is<'yaml'>(yamlnode, 'yaml')) {
-            file.data.frontMatter = yamlnode;
-            return true;
-          }
-          return false;
-        });
+        const index = tree.children.findIndex((node) =>
+          is<'yaml'>(node, 'yaml'),
+        );
+        if (index === -1) {
+          return tree;
+        }
+        if (index !== 0) {
+          file.message(
+            `YAML frontmatter found at position ${index}, expected position 0`,
+          );
+        }
+        const [yamlNode] = tree.children.splice(index, 1);
+        file.data.frontMatter = yamlNode as Yaml;
         return tree;
       },
     // Then we convert the markdown back to text, to process the text
