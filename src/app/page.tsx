@@ -70,8 +70,8 @@ function Home(): ReactNode {
           </Link>
         </p>
         <p>
-          <Link property="item" typeof="WebPage" href="qr">
-            <span property="name">QR Code Generator</span>
+          <Link property="item" typeof="WebPage" href="tools">
+            <span property="name">Tools</span>
           </Link>
         </p>
       </main>

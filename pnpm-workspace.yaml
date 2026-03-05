@@ -1,2 +1,5 @@
 trustPolicyExclude:
 - semver@6.3.1
+- react-redux@9.2.0
+- reselect@5.1.1
+- langium@3.3.1
