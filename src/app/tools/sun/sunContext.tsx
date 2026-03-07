@@ -2,6 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
+import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
 import { type DayTimes } from '@/app/tools/sun/buildYearData';
 import { type Loc } from '@/app/tools/sun/locations';
 
@@ -26,11 +27,11 @@ interface SunState {
   b: LocState;
   date: string;
   year: number;
-  metric: 'sunrise' | 'sunset';
+  metric: SunriseOrSunset;
   diff: number | null;
   setDate: (date: string) => void;
   setYear: (year: number) => void;
-  setMetric: (metric: 'sunrise' | 'sunset') => void;
+  setMetric: (metric: SunriseOrSunset) => void;
 }
 
 export const SunContext = createContext<SunState | undefined>(undefined);

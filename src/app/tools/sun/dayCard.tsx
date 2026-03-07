@@ -21,10 +21,12 @@ export function DayCard({
         <p className="text-slate-400 dark:text-slate-500 text-xs">{name}</p>
       </div>
     );
-  const { sunrise, sunset, dayLength, polar } = data;
+  const { sunrise, sunset, dawn, dusk, dayLength, polar } = data;
   const labels: [string, string][] = [
+    ['Dawn', minsToTime(dawn)],
     ['Sunrise', minsToTime(sunrise)],
     ['Sunset', minsToTime(sunset)],
+    ['Dusk', minsToTime(dusk)],
     ['Day length', minsToHuman(dayLength)],
   ];
   return (
@@ -44,7 +46,12 @@ export function DayCard({
               <p
                 className="font-mono text-lg"
                 style={{
-                  color: label === 'Day length' ? undefined : color,
+                  color:
+                    label === 'Day length'
+                      ? undefined
+                      : label === 'Dawn' || label === 'Dusk'
+                        ? `color-mix(in srgb, ${color} 60%, transparent)`
+                        : color,
                 }}
               >
                 {val}
