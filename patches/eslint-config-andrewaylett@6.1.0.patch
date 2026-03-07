@@ -1,0 +1,13 @@
+diff --git a/dist/facets/react.js b/dist/facets/react.js
+index 38f700163e7f306ab0b855a1859420c224c849ef..e8ed4baf7455cd7a0327ce2d1c432013dd260d3c 100644
+--- a/dist/facets/react.js
++++ b/dist/facets/react.js
+@@ -6,7 +6,7 @@ export default merge('react', [
+         ...react.configs.flat.recommended,
+         settings: { react: { version: 'detect' } },
+     },
+-    reactHooks.configs['recommended-latest'],
++    reactHooks.configs.flat?.['recommended-latest'] ?? reactHooks.configs['recommended-latest'],
+     {
+         rules: {
+             'react/no-unescaped-entities': [

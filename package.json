@@ -110,7 +110,10 @@
       "@swc/core",
       "sharp",
       "unrs-resolver"
-    ]
+    ],
+    "patchedDependencies": {
+      "eslint-config-andrewaylett@6.1.0": "patches/eslint-config-andrewaylett@6.1.0.patch"
+    }
   },
   "browserslist": {
     "production": [
