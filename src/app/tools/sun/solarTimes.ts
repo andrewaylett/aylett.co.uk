@@ -3,6 +3,8 @@ import { ukOffsetMinutes } from '@/app/tools/sun/ukOffsetMinutes';
 export interface SolarTimes {
   sunrise?: number; // minutes from midnight UK local time (GMT/BST)
   sunset?: number; // minutes from midnight UK local time (GMT/BST)
+  dawn?: number; // civil dawn (sun 6° below horizon), minutes from midnight
+  dusk?: number; // civil dusk (sun 6° below horizon), minutes from midnight
   dayLength?: number; // in minutes
   polar?: 'midnight sun' | 'polar night';
 }
@@ -69,5 +71,18 @@ export function solarTimes(
   const sunset = Math.round(solarNoon + ha * 4 + offset);
   const dayLength = sunset - sunrise;
 
-  return { sunrise, sunset, dayLength };
+  // Civil twilight: sun 6° below horizon (96° zenith angle)
+  const cosHACivil =
+    (Math.cos((96 * Math.PI) / 180) - Math.sin(latR) * sinDec) /
+    (Math.cos(latR) * Math.cos(dec));
+
+  let dawn: number | undefined;
+  let dusk: number | undefined;
+  if (cosHACivil >= -1 && cosHACivil <= 1) {
+    const haCivil = (Math.acos(cosHACivil) * 180) / Math.PI;
+    dawn = Math.round(solarNoon - haCivil * 4 + offset);
+    dusk = Math.round(solarNoon + haCivil * 4 + offset);
+  }
+
+  return { sunrise, sunset, dawn, dusk, dayLength };
 }

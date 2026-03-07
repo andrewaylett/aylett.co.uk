@@ -14,7 +14,7 @@ export function SunDifference(): React.JSX.Element {
   return (
     <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6">
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-        {metric === 'sunrise' ? 'Sunrise' : 'Sunset'} difference on{' '}
+        {metric.charAt(0).toUpperCase() + metric.slice(1)} difference on{' '}
         {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
           day: 'numeric',
           month: 'long',

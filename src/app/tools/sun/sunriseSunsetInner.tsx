@@ -4,8 +4,13 @@ import React from 'react';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 
-export type SunriseOrSunset = 'sunrise' | 'sunset';
-const sunriseAndSunset: SunriseOrSunset[] = ['sunrise', 'sunset'];
+export type SunriseOrSunset = 'sunrise' | 'sunset' | 'dawn' | 'dusk';
+const sunriseAndSunset: SunriseOrSunset[] = [
+  'dawn',
+  'sunrise',
+  'sunset',
+  'dusk',
+];
 
 export function SunriseSunsetInner(): React.JSX.Element {
   const { year, metric, setYear, setMetric } = useSun();

@@ -77,8 +77,8 @@ export function Charts(): React.JSX.Element | null {
       .flatMap((a): Point[] => {
         const b = mapB[a.date];
         if (!b) return [];
-        const valA = metric === 'sunrise' ? a.sunrise : a.sunset;
-        const valB = metric === 'sunrise' ? b.sunrise : b.sunset;
+        const valA = a[metric];
+        const valB = b[metric];
         const diff = valA != null && valB != null ? valA - valB : undefined;
         // Longitude component: purely east-west offset, 4 min/degree, constant through the year.
         // Further east → earlier solar noon → earlier sunrise & sunset (in the same timezone).
