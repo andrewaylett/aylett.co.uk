@@ -24,7 +24,7 @@
     "mdast-util-to-markdown": "2.1.2",
     "mermaid": "11.12.2",
     "micromark-util-types": "2.0.2",
-    "next": "16.1.6",
+    "next": "16.1.7",
     "next-plausible": "3.12.5",
     "nlcst-to-string": "4.0.0",
     "parse-english": "7.0.0",
