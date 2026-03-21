@@ -38,8 +38,6 @@ function acos(n: number) {
   return Math.acos(n) as Radians;
 }
 
-const round = Math.round;
-
 /** Atmospheric refraction correction for sunrise/sunset (degrees) */
 const REFRACTION = 0.833;
 /** Zenith angle for sunrise/sunset: 90° + atmospheric refraction */
@@ -61,8 +59,7 @@ export function solarTimes(
   // Equation of time (minutes) — how far solar time deviates from clock time
   const y2 = tan((obliq / 2) as Radians) ** 2;
   const eot =
-    MIN_PER_DEG_LNG *
-    (180 / PI) *
+    (MIN_PER_DEG_LNG / RAD) *
     (y2 * sin((2 * L0) as Radians) -
       2 * ecc * sin(M) +
       4 * ecc * y2 * sin(M) * cos((2 * L0) as Radians) -
@@ -80,8 +77,8 @@ export function solarTimes(
   const solarNoon = SOLAR_NOON_BASE - MIN_PER_DEG_LNG * lng - eot; // UTC minutes from midnight
   const offset = ukOffsetMinutes(date);
 
-  const sunrise = round(solarNoon - ha * MIN_PER_DEG_LNG + offset);
-  const sunset = round(solarNoon + ha * MIN_PER_DEG_LNG + offset);
+  const sunrise = solarNoon - ha * MIN_PER_DEG_LNG + offset;
+  const sunset = solarNoon + ha * MIN_PER_DEG_LNG + offset;
   const dayLength = sunset - sunrise;
 
   // Civil twilight: sun 6° below horizon
@@ -92,8 +89,8 @@ export function solarTimes(
   let dusk: number | undefined;
   if (cosHACivil >= -1 && cosHACivil <= 1) {
     const haCivil = acos(cosHACivil) / RAD;
-    dawn = round(solarNoon - haCivil * MIN_PER_DEG_LNG + offset);
-    dusk = round(solarNoon + haCivil * MIN_PER_DEG_LNG + offset);
+    dawn = solarNoon - haCivil * MIN_PER_DEG_LNG + offset;
+    dusk = solarNoon + haCivil * MIN_PER_DEG_LNG + offset;
   }
 
   return { sunrise, sunset, dawn, dusk, dayLength };

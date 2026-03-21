@@ -12,7 +12,6 @@ import { Description } from '@/components/Description';
 import { Optional } from '@/components/Optional';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
-import { Use } from '@/components/Use';
 import { type Markdown } from '@/remark/traverse';
 import { type Thought } from '@/types';
 import { gitHubUrl } from '@/utilities';
@@ -98,9 +97,7 @@ function Thought({ page }: { page: Promise<Markdown<Thought>> }) {
       keywords={tags}
     >
       <Suspense>
-        <div property="articleBody">
-          <Use el={content} />
-        </div>
+        <div property="articleBody">{use(content)}</div>
       </Suspense>
     </PageStructure>
   );

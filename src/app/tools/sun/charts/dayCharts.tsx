@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useDeferredValue, useMemo } from 'react';
+import React, { useDeferredValue } from 'react';
 
 import {
   CartesianGrid,
@@ -41,65 +41,57 @@ const MONTHS = [
 
 /** Charts for time-of-day metrics: diff, absolute times, and day length. */
 export function DayCharts(): React.JSX.Element {
-  const { a, b, year, metric } = useSun();
-  const { loc: locA } = a;
-  const { loc: locB } = b;
+  const sun = useSun();
 
-  const deferredLocA = useDeferredValue(locA);
-  const deferredLocB = useDeferredValue(locB);
-  const deferredYear = useDeferredValue(year);
-  const deferredMetric = useDeferredValue(metric);
+  const locA = useDeferredValue(sun.a.loc);
+  const locB = useDeferredValue(sun.b.loc);
+  const year = useDeferredValue(sun.year);
+  const metric = useDeferredValue(sun.metric);
 
   const isPending =
-    deferredLocA !== locA ||
-    deferredLocB !== locB ||
-    deferredYear !== year ||
-    deferredMetric !== metric;
+    locA !== sun.a.loc ||
+    locB !== sun.b.loc ||
+    year !== sun.year ||
+    metric !== sun.metric;
 
-  const data = useMemo<Point[]>(() => {
-    const rA = buildYearData(deferredLocA.lat, deferredLocA.lng, deferredYear);
-    const rB = buildYearData(deferredLocB.lat, deferredLocB.lng, deferredYear);
-    const mapB: Partial<Record<string, DayTimes>> = Object.fromEntries(
-      rB.map((r) => [r.date, r]),
-    );
-    return rA
-      .flatMap((a, i): Point[] => {
-        const b = mapB[a.date];
-        if (!b) return [];
-        const valA = a[deferredMetric];
-        const valB = b[deferredMetric];
-        const diff = valA != null && valB != null ? valA - valB : undefined;
-        // Longitude component: purely east-west offset, 4 min/degree, constant through the year.
-        // Further east → earlier solar noon → earlier sunrise & sunset (in the same timezone).
-        // lngDiff > 0 means A is further west, so A's times are later.
-        const lngDiff = Math.round((deferredLocA.lng - deferredLocB.lng) * -4);
-        const latDiff = diff == null ? undefined : diff - lngDiff;
-        const [, mo, d] = a.date.split('-').map(Number);
-        return [
-          {
-            date: a.date,
-            label: `${d} ${MONTHS[mo - 1]}`,
-            diff,
-            valA,
-            valB,
-            lngDiff,
-            latDiff,
-            dayLengthA: rA[i].dayLength,
-            dayLengthB: b.dayLength,
-          },
-        ];
-      })
-      .filter(Boolean);
-  }, [deferredLocA, deferredLocB, deferredYear, deferredMetric]);
-
-  const tickDates = useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, i) => {
-        const month = String(i + 1).padStart(2, '0');
-        return `${deferredYear}-${month}-01`;
-      }),
-    [deferredYear],
+  const rA = buildYearData(locA.lat, locA.lng, year);
+  const rB = buildYearData(locB.lat, locB.lng, year);
+  const mapB: Partial<Record<string, DayTimes>> = Object.fromEntries(
+    rB.map((r) => [r.date, r]),
   );
+  const data = rA
+    .flatMap((a, i): Point[] => {
+      const b = mapB[a.date];
+      if (!b) return [];
+      const valA = a[metric];
+      const valB = b[metric];
+      const diff = valA != null && valB != null ? valA - valB : undefined;
+      // Longitude component: purely east-west offset, 4 min/degree, constant through the year.
+      // Further east → earlier solar noon → earlier sunrise & sunset (in the same timezone).
+      // lngDiff > 0 means A is further west, so A's times are later.
+      const lngDiff = Math.round((locA.lng - locB.lng) * -4);
+      const latDiff = diff == null ? undefined : diff - lngDiff;
+      const [, mo, d] = a.date.split('-').map(Number);
+      return [
+        {
+          date: a.date,
+          label: `${d} ${MONTHS[mo - 1]}`,
+          diff,
+          valA,
+          valB,
+          lngDiff,
+          latDiff,
+          dayLengthA: rA[i].dayLength,
+          dayLengthB: b.dayLength,
+        },
+      ];
+    })
+    .filter(Boolean);
+
+  const tickDates = Array.from({ length: 12 }, (_, i) => {
+    const month = String(i + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+  });
 
   return (
     <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
@@ -268,7 +260,8 @@ export function DayCharts(): React.JSX.Element {
               name={locA.name}
               dot={false}
               stroke={COL_A}
-              strokeWidth={2}
+              strokeWidth={1}
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -276,7 +269,8 @@ export function DayCharts(): React.JSX.Element {
               name={locB.name}
               dot={false}
               stroke={COL_B}
-              strokeWidth={2}
+              strokeWidth={1}
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>

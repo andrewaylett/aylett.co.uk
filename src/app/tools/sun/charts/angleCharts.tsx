@@ -94,7 +94,8 @@ export function AngleCharts(): React.JSX.Element {
             name={locA.name}
             dot={false}
             stroke={COL_A}
-            strokeWidth={2}
+            strokeWidth={1}
+            isAnimationActive={false}
           />
           <Line
             type="monotone"
@@ -102,7 +103,8 @@ export function AngleCharts(): React.JSX.Element {
             name={locB.name}
             dot={false}
             stroke={COL_B}
-            strokeWidth={2}
+            strokeWidth={1}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

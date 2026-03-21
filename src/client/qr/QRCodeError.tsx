@@ -4,7 +4,13 @@ import { type ErrorComponent } from 'next/dist/client/components/error-boundary'
 
 import { QRCodeErrorContext } from './QRCodeErrorContext';
 
-export const QRCodeError = function QRCodeError({ error, reset }) {
+export const QRCodeError: ErrorComponent = ({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset?: () => void;
+}) => {
   const context = useContext(QRCodeErrorContext);
   if (!context) {
     throw new Error(
@@ -29,4 +35,4 @@ export const QRCodeError = function QRCodeError({ error, reset }) {
       </button>
     </div>
   );
-} satisfies ErrorComponent;
+};

@@ -6,14 +6,13 @@ import { Temporal } from 'temporal-polyfill';
 
 import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
 import { type Loc, PRESET_LOCATIONS } from '@/app/tools/sun/locations';
-import { solarTimes } from '@/app/tools/sun/solarTimes';
 import {
   type CustomLoc,
   type LocState,
   SunContext,
 } from '@/app/tools/sun/sunContext';
 
-function useLoc(initial: Loc, date: string): LocState {
+function useLoc(initial: Loc): LocState {
   const [loc, setLoc] = useState<Loc>(initial);
   const [mode, setMode] = useState<'preset' | 'custom'>('preset');
   const [custom, setCustom] = useState<CustomLoc>({
@@ -22,16 +21,8 @@ function useLoc(initial: Loc, date: string): LocState {
     lng: '',
   });
 
-  const day = date
-    ? {
-        date,
-        ...solarTimes(Temporal.PlainDate.from(date), loc.lat, loc.lng),
-      }
-    : undefined;
-
   return {
     loc,
-    day,
     setLoc,
     mode,
     setMode,
@@ -47,22 +38,15 @@ export function SunProvider({
 }: {
   children: ReactNode;
 }): React.JSX.Element {
-  const today = new Date().toLocaleDateString('en-CA');
-  const thisYear = new Date().getFullYear();
+  const today = Temporal.Now.plainDateISO();
+  const thisYear = today.year;
 
-  const [date, setDate] = useState(today);
-  const [year, setYear] = useState(thisYear);
+  const [date, setDate] = useState<Temporal.PlainDate>(today);
+  const [year, setYear] = useState<number>(thisYear);
   const [metric, setMetric] = useState<SunriseOrSunset>('sunset');
 
-  const a = useLoc(PRESET_LOCATIONS[0], date);
-  const b = useLoc(PRESET_LOCATIONS[1], date);
-
-  const diff = (() => {
-    if (!a.day || !b.day) return null;
-    const kA = a.day[metric];
-    const kB = b.day[metric];
-    return kA != null && kB != null ? kA - kB : null;
-  })();
+  const a = useLoc(PRESET_LOCATIONS[0]);
+  const b = useLoc(PRESET_LOCATIONS[1]);
 
   return (
     <SunContext.Provider
@@ -72,7 +56,6 @@ export function SunProvider({
         date,
         year,
         metric,
-        diff,
         setDate,
         setYear,
         setMetric,
