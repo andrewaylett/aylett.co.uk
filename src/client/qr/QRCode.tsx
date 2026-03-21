@@ -24,23 +24,10 @@ export const URL_SPLITTER =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
 const QR_ALPHANUMERIC_CHARACTERS = /^[A-Z0-9 $%*+./:-]*$/;
 
-export function QRCode({
-  state,
-  ref,
-  showDebug = false,
-  children,
-}: PropsWithChildren<{
-  state: QRCodeState;
-  showDebug?: boolean;
-  ref: RefObject<HTMLDivElement | null>;
-}>) {
-  const canOptimiseUrl = useMemo(() => {
-    return URL_SPLITTER.test(state.text);
-  }, [state.text]);
-
-  const qrValueArray: string[] = useMemo(() => {
-    const match = URL_SPLITTER.exec(state.text);
-    if (state.shouldOptimiseUrl && match?.groups?.start) {
+function useQrValue(text: string, shouldOptimiseUrl: boolean): string[] {
+  return useMemo(() => {
+    const match = URL_SPLITTER.exec(text);
+    if (shouldOptimiseUrl && match?.groups?.start) {
       const start = match.groups.start.toUpperCase();
       const rest = match.groups.rest;
       if (QR_ALPHANUMERIC_CHARACTERS.test(rest)) {
@@ -48,20 +35,25 @@ export function QRCode({
       }
       return [start, rest];
     }
-    return [state.text];
-  }, [state.shouldOptimiseUrl, state.text]);
+    return [text];
+  }, [shouldOptimiseUrl, text]);
+}
+
+function useOptimisedQr(state: QRCodeState) {
+  const qrValueArray: string[] = useQrValue(
+    state.text,
+    state.shouldOptimiseUrl,
+  );
 
   const nonOptimisedQr = useQRCode({
-    value: [state.text],
+    values: [state.text],
     level: 'L',
     minVersion: 1,
   });
-  const willAttemptOptimisation = state.shouldOptimiseUrl && canOptimiseUrl;
   const optimisedQr = useQRCode({
-    value: qrValueArray,
+    values: qrValueArray,
     level: 'L',
     minVersion: 1,
-    justError: !willAttemptOptimisation,
   });
 
   if (nonOptimisedQr instanceof Error) {
@@ -76,6 +68,46 @@ export function QRCode({
         nonOptimisedQr.qrcode.errorCorrectionLevel.ordinal);
 
   const qrDetails = willUseOptimisedQr ? optimisedQr : nonOptimisedQr;
+  const optimisedQrErrorMessage =
+    optimisedQr instanceof Error && optimisedQr.message;
+
+  const canOptimiseUrl = URL_SPLITTER.test(state.text);
+  const willAttemptOptimisation = state.shouldOptimiseUrl && canOptimiseUrl;
+  const debugMessage = () =>
+    `${
+      canOptimiseUrl
+        ? state.shouldOptimiseUrl
+          ? willUseOptimisedQr
+            ? 'Optimised'
+            : "Optimisation doesn't help"
+          : 'Optimisation manually disabled'
+        : 'Not able to optimise this input'
+    }${
+      willAttemptOptimisation && optimisedQrErrorMessage
+        ? ` and rendering the optimised form gave an error: ${optimisedQrErrorMessage}`
+        : ''
+    }`;
+
+  return {
+    qrValueArray,
+    willUseOptimisedQr,
+    qrDetails,
+    debugMessage,
+  };
+}
+
+export function QRCode({
+  state,
+  ref,
+  showDebug = false,
+  children,
+}: PropsWithChildren<{
+  state: QRCodeState;
+  showDebug?: boolean;
+  ref: RefObject<HTMLDivElement | null>;
+}>) {
+  const { qrValueArray, willUseOptimisedQr, qrDetails, debugMessage } =
+    useOptimisedQr(state);
   const qrDebugDetails = useDebugDetails(qrDetails);
 
   return (
@@ -111,18 +143,7 @@ export function QRCode({
             <dt>Render Generation</dt>
             <dd>{state.generation}</dd>
             <dt>Optimisation</dt>
-            <dd>
-              {canOptimiseUrl
-                ? state.shouldOptimiseUrl
-                  ? willUseOptimisedQr
-                    ? 'Optimised'
-                    : "Optimisation doesn't help"
-                  : 'Optimisation manually disabled'
-                : 'Not able to optimise this input'}{' '}
-              {willAttemptOptimisation &&
-                optimisedQr instanceof Error &&
-                ` and rendering the optimised form gave an error: ${optimisedQr.message}`}
-            </dd>
+            <dd>{debugMessage()}</dd>
           </dl>
         </details>
       )}

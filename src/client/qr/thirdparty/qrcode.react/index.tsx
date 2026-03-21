@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: ISC
  */
 
-import React from 'react';
+import React, { useDebugValue, useMemo } from 'react';
 
 import * as qrcodegen from '../qrcodegen';
 import { type QrCode } from '../qrcodegen';
@@ -51,7 +51,7 @@ interface QRProps {
    * The value to encode into the QR Code. An array of strings can be passed in
    * to represent multiple segments to further optimize the QR Code.
    */
-  value: string | string[];
+  values: string[];
   /**
    * The Error Correction Level to use.
    * @see https://www.qrcode.com/en/about/error_correction.html
@@ -159,49 +159,27 @@ interface QrCodeDetails {
 }
 
 export function useQRCode({
-  value,
+  values,
   level,
   minVersion,
-  justError = false,
 }: {
-  value: string | string[];
+  values: string[];
   level: ErrorCorrectionLevel;
   minVersion: number;
-  justError?: boolean;
 }): QrCodeDetails | Error {
-  const qrcode = React.useMemo(() => {
-    if (justError) {
-      return new Error('Deliberately erroring instead of rendering QR Code');
-    }
-    const values = Array.isArray(value) ? value : [value];
-    // eslint-disable-next-line unicorn/no-array-reduce
-    const segments = values.reduce<qrcodegen.QrSegment[]>((accum, v) => {
-      accum.push(...qrcodegen.QrSegment.makeSegments(v));
-      return accum;
-    }, []);
-    try {
-      return qrcodegen.QrCode.encodeSegments(
-        segments,
-        ERROR_LEVEL_MAP[level],
-        minVersion,
-        undefined,
-        undefined,
-        true,
-      );
-    } catch (error) {
-      if (error instanceof Error) {
-        return error;
-      }
-      return new Error(
-        `Unknown error when encoding QR Code: ${JSON.stringify(error)}`,
-      );
-    }
-  }, [value, level, minVersion, justError]);
+  useDebugValue(values, (v) => `QR: [${v.join(', ')}]`);
 
-  return React.useMemo((): QrCodeDetails | Error => {
-    if (qrcode instanceof Error) {
-      return qrcode;
-    }
+  const segments = values.flatMap((v) => qrcodegen.QrSegment.makeSegments(v));
+
+  try {
+    const qrcode = qrcodegen.QrCode.encodeSegments(
+      segments,
+      ERROR_LEVEL_MAP[level],
+      minVersion,
+      undefined,
+      undefined,
+      true,
+    );
 
     const cells = qrcode.getModules();
 
@@ -213,19 +191,26 @@ export function useQRCode({
       margin,
       numCells,
     };
-  }, [qrcode]);
+  } catch (error) {
+    if (error instanceof Error) {
+      return error;
+    }
+    return new Error(
+      `Unknown error when encoding QR Code: ${JSON.stringify(error)}`,
+    );
+  }
 }
 
 export const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
   function QRCodeSVG(props, forwardedRef) {
     const {
-      value,
+      values,
       level = DEFAULT_LEVEL,
       minVersion = DEFAULT_MINVERSION,
     } = props;
 
     const details = useQRCode({
-      value,
+      values,
       level,
       minVersion,
     });
@@ -236,21 +221,23 @@ export const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
   },
 );
 
-export function useDebugDetails(details: QrCodeDetails) {
-  const moduleCount = details.numCells - details.margin * 2;
-  const qrVersion = (moduleCount - 17) / 4;
-  const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
-  return {
-    ...details,
-    moduleCount,
-    qrVersion,
-    level,
-  };
+export function useDebugDetails(details: QrCodeDetails): DebugDetails {
+  return useMemo(() => {
+    const moduleCount = details.numCells - details.margin * 2;
+    const qrVersion = (moduleCount - 17) / 4;
+    const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
+    return {
+      ...details,
+      moduleCount,
+      qrVersion,
+      level,
+    };
+  }, [details]);
 }
 
 export const QRCodeSVGDetails = React.forwardRef<
   SVGSVGElement,
-  Omit<QRPropsSVG, 'value'> & { details: QrCodeDetails }
+  Omit<QRPropsSVG, 'values'> & { details: QrCodeDetails }
 >(function QRCodeSVGDetails(props, forwardedRef) {
   const {
     details,

@@ -121,8 +121,8 @@ export function QRCodeForm() {
           });
         });
       } catch (error) {
+        console.error(error);
         startTransition(() => {
-          console.error(error);
           updateState({ buttonText: BUTTON_TEXT.FAILED_TEXT });
         });
       }
@@ -223,7 +223,7 @@ export function QRCodeForm() {
       <label
         className={
           'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-          (canOptimiseUrl ? ' h-lh' : ' h-[0]')
+          (canOptimiseUrl ? ' h-lh' : ' h-0')
         }
       >
         <input

@@ -2,8 +2,9 @@
 
 import { createContext, useContext } from 'react';
 
+import { type Temporal } from 'temporal-polyfill';
+
 import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
-import { type DayTimes } from '@/app/tools/sun/buildYearData';
 import { type Loc } from '@/app/tools/sun/locations';
 
 export interface CustomLoc {
@@ -14,7 +15,6 @@ export interface CustomLoc {
 
 export interface LocState {
   loc: Loc;
-  day: DayTimes | undefined;
   setLoc: (loc: Loc) => void;
   mode: 'preset' | 'custom';
   setMode: (mode: 'preset' | 'custom') => void;
@@ -25,11 +25,10 @@ export interface LocState {
 interface SunState {
   a: LocState;
   b: LocState;
-  date: string;
+  date: Temporal.PlainDate;
   year: number;
   metric: SunriseOrSunset;
-  diff: number | null;
-  setDate: (date: string) => void;
+  setDate: (date: Temporal.PlainDate) => void;
   setYear: (year: number) => void;
   setMetric: (metric: SunriseOrSunset) => void;
 }

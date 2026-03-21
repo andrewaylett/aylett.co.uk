@@ -5,9 +5,15 @@ import React from 'react';
 import { useSun } from '@/app/tools/sun/sunContext';
 import { COL_NEG, COL_POS } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
+import { solarTimes } from '@/app/tools/sun/solarTimes';
 
 export function SunDifference(): React.JSX.Element {
-  const { a, b, date, metric, diff } = useSun();
+  const { a, b, date, metric } = useSun();
+
+  const kA = solarTimes(date, a.loc.lat, a.loc.lng)[metric];
+  const kB = solarTimes(date, b.loc.lat, b.loc.lng)[metric];
+  const diff = kA != null && kB != null ? kA - kB : null;
+
   if (diff === null) {
     return <></>;
   }
@@ -15,7 +21,7 @@ export function SunDifference(): React.JSX.Element {
     <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6">
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
         {metric.charAt(0).toUpperCase() + metric.slice(1)} difference on{' '}
-        {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
+        {date.toLocaleString('en-GB', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',

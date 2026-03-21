@@ -12,9 +12,10 @@
     "start": "next start",
     "format": "eslint --fix . && tsc -b .",
     "prelint": "next typegen",
-    "lint": "eslint && tsc -b .",
+    "lint": "eslint && tsc -b . && pnpm run react-compiler",
     "pretest": "pnpm run lint",
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
+    "react-compiler": "react-compiler-marker ."
   },
   "dependencies": {
     "client-only": "0.0.1",
@@ -31,6 +32,7 @@
     "parse-english": "7.0.0",
     "qrcode.react": "4.2.0",
     "react": "19.2.4",
+    "react-compiler-marker": "^0.1.0",
     "react-dom": "19.2.4",
     "react-is": "^19.2.4",
     "recharts": "^3.7.0",
