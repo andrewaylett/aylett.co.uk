@@ -1,26 +1,18 @@
 import React from 'react';
 
-import { type Temporal } from 'temporal-polyfill';
-
 import { type Loc } from '@/app/tools/sun/locations';
-import { solarTimes } from '@/app/tools/sun/solarTimes';
+import { useSolarTimes } from '@/app/tools/sun/solarTimes';
 import { minsToTime } from '@/app/tools/sun/minsToTime';
 import { minsToHuman } from '@/app/tools/sun/minsToHuman';
 
 export function DayCard({
   loc,
-  date,
   color,
 }: {
   loc: Loc;
-  date: Temporal.PlainDate;
   color: string;
 }): React.JSX.Element {
-  const { sunrise, sunset, dawn, dusk, dayLength, polar } = solarTimes(
-    date,
-    loc.lat,
-    loc.lng,
-  );
+  const { sunrise, sunset, dawn, dusk, dayLength, polar } = useSolarTimes(loc);
   const labels: [string, string][] = [
     ['Dawn', minsToTime(dawn)],
     ['Sunrise', minsToTime(sunrise)],

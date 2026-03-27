@@ -5,13 +5,13 @@ import React from 'react';
 import { useSun } from '@/app/tools/sun/sunContext';
 import { COL_NEG, COL_POS } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
-import { solarTimes } from '@/app/tools/sun/solarTimes';
+import { useSolarTimes } from '@/app/tools/sun/solarTimes';
 
 export function SunDifference(): React.JSX.Element {
   const { a, b, date, metric } = useSun();
 
-  const kA = solarTimes(date, a.loc.lat, a.loc.lng)[metric];
-  const kB = solarTimes(date, b.loc.lat, b.loc.lng)[metric];
+  const kA = useSolarTimes(a.loc)[metric];
+  const kB = useSolarTimes(b.loc)[metric];
   const diff = kA != null && kB != null ? kA - kB : null;
 
   if (diff === null) {

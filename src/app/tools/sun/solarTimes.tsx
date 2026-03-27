@@ -1,10 +1,9 @@
-import { type Temporal } from 'temporal-polyfill';
-
+import { type Loc } from '@/app/tools/sun/locations';
 import { ukOffsetMinutes } from '@/app/tools/sun/ukOffsetMinutes';
 import {
-  toJulianDay,
-  solarParams,
   type Radians,
+  type SolarParams,
+  useSolarParams,
 } from '@/app/tools/sun/solarParams';
 
 export interface SolarTimes {
@@ -49,22 +48,29 @@ const SOLAR_NOON_BASE = 720;
 /** Minutes per degree of longitude (360° / 24 h = 4 min/°) */
 const MIN_PER_DEG_LNG = 4;
 
-export function solarTimes(
-  date: Temporal.PlainDate,
-  lat: number,
-  lng: number,
-): SolarTimes {
-  const { sinDec, dec, L0, M, obliq, ecc } = solarParams(toJulianDay(date));
+function equationOfTime(solarParams: SolarParams): number {
+  const { L0, M, obliq, ecc } = solarParams;
 
   // Equation of time (minutes) — how far solar time deviates from clock time
   const y2 = tan((obliq / 2) as Radians) ** 2;
-  const eot =
+
+  return (
     (MIN_PER_DEG_LNG / RAD) *
     (y2 * sin((2 * L0) as Radians) -
       2 * ecc * sin(M) +
       4 * ecc * y2 * sin(M) * cos((2 * L0) as Radians) -
       0.5 * y2 * y2 * sin((4 * L0) as Radians) -
-      1.25 * ecc * ecc * sin((2 * M) as Radians));
+      1.25 * ecc * ecc * sin((2 * M) as Radians))
+  );
+}
+
+export function solarTimes(
+  solarParams: SolarParams,
+  lat: number,
+  lng: number,
+): SolarTimes {
+  const { sinDec, dec } = solarParams;
+  const eot = equationOfTime(solarParams);
 
   const latR = rad(lat);
   const cosHA =
@@ -75,7 +81,7 @@ export function solarTimes(
 
   const ha = acos(cosHA) / RAD;
   const solarNoon = SOLAR_NOON_BASE - MIN_PER_DEG_LNG * lng - eot; // UTC minutes from midnight
-  const offset = ukOffsetMinutes(date);
+  const offset = ukOffsetMinutes(solarParams.date);
 
   const sunrise = solarNoon - ha * MIN_PER_DEG_LNG + offset;
   const sunset = solarNoon + ha * MIN_PER_DEG_LNG + offset;
@@ -94,4 +100,8 @@ export function solarTimes(
   }
 
   return { sunrise, sunset, dawn, dusk, dayLength };
+}
+
+export function useSolarTimes(loc: Loc): SolarTimes {
+  return solarTimes(useSolarParams(), loc.lat, loc.lng);
 }

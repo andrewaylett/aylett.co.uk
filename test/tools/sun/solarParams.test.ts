@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { Temporal } from 'temporal-polyfill';
 
-import { toJulianDay, solarParams } from '@/app/tools/sun/solarParams';
+import { toJulianDay, computeSolarParams } from '@/app/tools/sun/solarParams';
 
 const toDeg = (rad: number) => (rad * 180) / Math.PI;
 
@@ -22,36 +22,28 @@ describe('toJulianDay', () => {
 
 describe('solarParams', () => {
   it('gives declination ≈ +23.4° near summer solstice (2024-06-21)', () => {
-    const { dec } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-06-21')),
-    );
+    const { dec } = computeSolarParams(Temporal.PlainDate.from('2024-06-21'));
     expect(toDeg(dec)).toBeCloseTo(23.4, 0);
   });
 
   it('gives declination ≈ −23.4° near winter solstice (2024-12-21)', () => {
-    const { dec } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-12-21')),
-    );
+    const { dec } = computeSolarParams(Temporal.PlainDate.from('2024-12-21'));
     expect(toDeg(dec)).toBeCloseTo(-23.4, 0);
   });
 
   it('gives declination ≈ 0° near spring equinox (2024-03-20)', () => {
-    const { dec } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-03-20')),
-    );
+    const { dec } = computeSolarParams(Temporal.PlainDate.from('2024-03-20'));
     expect(Math.abs(toDeg(dec))).toBeLessThan(1);
   });
 
   it('gives obliquity ≈ 23.44° for a contemporary date', () => {
-    const { obliq } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-01-01')),
-    );
+    const { obliq } = computeSolarParams(Temporal.PlainDate.from('2024-01-01'));
     expect(toDeg(obliq)).toBeCloseTo(23.44, 1);
   });
 
   it('sinDec equals sin(dec)', () => {
-    const { sinDec, dec } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-06-21')),
+    const { sinDec, dec } = computeSolarParams(
+      Temporal.PlainDate.from('2024-06-21'),
     );
     expect(sinDec).toBeCloseTo(Math.sin(dec), 10);
   });
@@ -60,9 +52,7 @@ describe('solarParams', () => {
     // M is an accumulated angle (not reduced), so its absolute value grows over
     // time. To verify that it's in radians (not degrees), reduce it to [0, 2π),
     // convert to degrees, and check the resulting angle is plausible for 2024-06-21.
-    const { M } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-06-21')),
-    );
+    const { M } = computeSolarParams(Temporal.PlainDate.from('2024-06-21'));
     const Mmod = ((M % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     const Mdeg = toDeg(Mmod);
     expect(Mdeg).toBeGreaterThan(150);
@@ -70,9 +60,7 @@ describe('solarParams', () => {
   });
 
   it('L0 is in radians, reduced to [0, 2π)', () => {
-    const { L0 } = solarParams(
-      toJulianDay(Temporal.PlainDate.from('2024-06-21')),
-    );
+    const { L0 } = computeSolarParams(Temporal.PlainDate.from('2024-06-21'));
     expect(L0).toBeGreaterThanOrEqual(0);
     expect(L0).toBeLessThan(2 * Math.PI);
   });

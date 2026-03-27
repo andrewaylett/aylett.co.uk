@@ -38,11 +38,12 @@ export function SunProvider({
 }: {
   children: ReactNode;
 }): React.JSX.Element {
-  const today = Temporal.Now.plainDateISO();
-  const thisYear = today.year;
-
-  const [date, setDate] = useState<Temporal.PlainDate>(today);
-  const [year, setYear] = useState<number>(thisYear);
+  const [date, setDate] = useState<Temporal.PlainDate>(() =>
+    Temporal.Now.plainDateISO(),
+  );
+  const [year, setYear] = useState<number>(
+    () => Temporal.Now.plainDateISO().year,
+  );
   const [metric, setMetric] = useState<SunriseOrSunset>('sunset');
 
   const a = useLoc(PRESET_LOCATIONS[0]);

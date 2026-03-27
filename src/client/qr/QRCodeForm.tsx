@@ -2,13 +2,14 @@
 
 import React, {
   type ChangeEvent,
-  startTransition,
   useEffect,
+  useEffectEvent,
   useReducer,
   useRef,
+  useTransition,
 } from 'react';
 
-import { type ReadonlyURLSearchParams, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { toBlob, toPng } from 'html-to-image';
@@ -31,13 +32,104 @@ export interface QRCodeFormState {
   qrState: QRCodeState;
 }
 
-export interface QRCodeStateUpdate {
-  text?: string;
-  buttonText?: ButtonText;
-  shouldPushState?: boolean;
-  updateGeneration?: boolean;
-  resetNextPushStateText?: boolean;
-  shouldOptimiseUrl?: boolean;
+interface QRCodeStateSetShouldOptimiseUrl {
+  type: 'setShouldOptimiseUrl';
+  shouldOptimiseUrl: boolean;
+}
+
+interface QRCodeStateSetText {
+  type: 'setText';
+  text: string;
+}
+
+interface QRCodeStatePushState {
+  type: 'pushState';
+}
+
+interface QRCodeResetNextPushStateText {
+  type: 'resetNextPushStateText';
+}
+
+interface QRCodeStateSetButtonText {
+  type: 'setButtonText';
+  buttonText: ButtonText;
+}
+
+interface QRCodeStateUpdateGeneration {
+  type: 'updateGeneration';
+}
+
+interface QRCodeStatePopState {
+  type: 'popState';
+  text: string;
+}
+
+type QRCodeStateUpdate =
+  | QRCodeStateSetShouldOptimiseUrl
+  | QRCodeStateSetText
+  | QRCodeStatePushState
+  | QRCodeResetNextPushStateText
+  | QRCodeStateSetButtonText
+  | QRCodeStateUpdateGeneration
+  | QRCodeStatePopState;
+
+function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
+  switch (instructions.type) {
+    case 'setText': {
+      draft.qrState.text = instructions.text;
+      break;
+    }
+    case 'pushState': {
+      if (draft.previousPushStateText !== draft.qrState.text) {
+        draft.nextPushStateText = draft.qrState.text;
+      }
+      break;
+    }
+    case 'popState': {
+      recipe(draft, { type: 'setText', text: instructions.text });
+      draft.previousPushStateText = undefined;
+      draft.nextPushStateText = undefined;
+      recipe(draft, { type: 'updateGeneration' });
+      break;
+    }
+    case 'resetNextPushStateText': {
+      draft.previousPushStateText = draft.nextPushStateText;
+      draft.nextPushStateText = undefined;
+      break;
+    }
+    case 'setShouldOptimiseUrl': {
+      draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
+      break;
+    }
+    case 'setButtonText': {
+      draft.qrState.buttonText = instructions.buttonText;
+      break;
+    }
+    case 'updateGeneration': {
+      draft.qrState.generation = draft.qrState.generation + 1;
+      break;
+    }
+    default: {
+      throw new Error('Unknown state update');
+    }
+  }
+}
+const producer = produce<QRCodeFormState, [QRCodeStateUpdate]>(recipe);
+
+function initState(searchParams: URLSearchParams): QRCodeFormState {
+  const isQuine = searchParams.get('quine') === 'true';
+  const paramText = searchParams.get('text') ?? '';
+  const text = isQuine
+    ? `https://www.aylett.co.uk/qr/?text=${paramText}`
+    : paramText;
+  return {
+    qrState: {
+      text,
+      buttonText: BUTTON_TEXT.INITIAL_TEXT,
+      generation: 0,
+      shouldOptimiseUrl: true,
+    },
+  };
 }
 
 export function QRCodeForm() {
@@ -45,59 +137,10 @@ export function QRCodeForm() {
   const ref = useRef<HTMLDivElement>(null);
 
   const searchParams = useSearchParams();
-  const [state, updateState] = useReducer<
-    QRCodeFormState,
-    ReadonlyURLSearchParams,
-    [QRCodeStateUpdate]
-  >(
-    produce((draft, instructions) => {
-      if (
-        instructions.shouldPushState &&
-        draft.previousPushStateText !== draft.qrState.text
-      ) {
-        draft.nextPushStateText = draft.qrState.text;
-      }
-      if (instructions.resetNextPushStateText) {
-        draft.previousPushStateText = draft.nextPushStateText;
-        draft.nextPushStateText = undefined;
-      }
-      if (instructions.text !== undefined) {
-        draft.qrState.text = instructions.text;
-      }
-      if (instructions.buttonText !== undefined) {
-        draft.qrState.buttonText = instructions.buttonText;
-      }
-      if (instructions.updateGeneration) {
-        draft.qrState.generation = draft.qrState.generation + 1;
-        if (instructions.text === undefined) {
-          draft.qrState.text = searchParams.get('text') ?? '';
-          draft.previousPushStateText = undefined;
-          draft.nextPushStateText = undefined;
-        }
-      }
-      if (instructions.shouldOptimiseUrl !== undefined) {
-        draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
-      }
-    }),
-    searchParams,
-    (searchParams): QRCodeFormState => {
-      const isQuine = searchParams.get('quine') === 'true';
-      const paramText = searchParams.get('text') ?? '';
-      const text = isQuine
-        ? `https://www.aylett.co.uk/qr/?text=${paramText}`
-        : paramText;
-      return {
-        qrState: {
-          text,
-          buttonText: BUTTON_TEXT.INITIAL_TEXT,
-          generation: 0,
-          shouldOptimiseUrl: true,
-        },
-      };
-    },
-  );
+  const [state, dispatch] = useReducer(producer, searchParams, initState);
+  const [_inTransition, startTransition] = useTransition();
 
-  const copyToClipboard = () => {
+  function copyToClipboard() {
     startTransition(async () => {
       if (!ref.current) {
         throw new Error('QR Code SVG is not ready');
@@ -115,23 +158,29 @@ export function QRCodeForm() {
           new ClipboardItem({ 'image/png': blob }),
         ]);
         startTransition(() => {
-          updateState({
+          dispatch({
+            type: 'pushState',
+          });
+          dispatch({
+            type: 'setButtonText',
             buttonText: BUTTON_TEXT.SUCCESS_TEXT,
-            shouldPushState: true,
           });
         });
       } catch (error) {
         console.error(error);
         startTransition(() => {
-          updateState({ buttonText: BUTTON_TEXT.FAILED_TEXT });
+          dispatch({
+            type: 'setButtonText',
+            buttonText: BUTTON_TEXT.FAILED_TEXT,
+          });
         });
       }
     });
-  };
+  }
 
   const alphanumericValue = state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
 
-  const download = () => {
+  function download() {
     startTransition(async () => {
       if (!ref.current) {
         throw new Error('QR Code SVG is not ready');
@@ -147,18 +196,17 @@ export function QRCodeForm() {
       link.href = dataUrl;
       link.click();
     });
-  };
+  }
 
+  const onPopState = useEffectEvent(() => {
+    dispatch({ type: 'popState', text: searchParams.get('text') ?? '' });
+    if (resetRef.current) {
+      startTransition(resetRef.current);
+    }
+  });
   useEffect(() => {
-    const handlePopState = () => {
-      updateState({ updateGeneration: true });
-      if (resetRef.current) {
-        startTransition(resetRef.current);
-      }
-    };
-
     const abortController = new AbortController();
-    globalThis.addEventListener('popstate', handlePopState, {
+    globalThis.addEventListener('popstate', onPopState, {
       passive: true,
       signal: abortController.signal,
     });
@@ -166,7 +214,7 @@ export function QRCodeForm() {
     return () => {
       abortController.abort();
     };
-  }, [updateState]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -175,7 +223,9 @@ export function QRCodeForm() {
     ) {
       const pushStateUrl = `?text=${encodeQueryComponent(state.nextPushStateText)}`;
       globalThis.history.pushState({}, '', pushStateUrl);
-      updateState({ resetNextPushStateText: true });
+      dispatch({
+        type: 'resetNextPushStateText',
+      });
     }
   }, [state.nextPushStateText, state.qrState.text]);
 
@@ -187,16 +237,22 @@ export function QRCodeForm() {
     globalThis.history.replaceState({}, '', linkUrl);
   }, [state.qrState.text]);
 
-  const setText = (newText: string, updateGeneration?: boolean) => {
-    updateState({
+  function setText(newText: string, updateGeneration?: boolean) {
+    dispatch({
+      type: 'setText',
       text: newText,
+    });
+    if (updateGeneration) {
+      dispatch({ type: 'updateGeneration' });
+    }
+    dispatch({
+      type: 'setButtonText',
       buttonText: BUTTON_TEXT.INITIAL_TEXT,
-      updateGeneration,
     });
     if (resetRef.current) {
       resetRef.current();
     }
-  };
+  }
 
   const canOptimiseUrl = URL_SPLITTER.test(state.qrState.text);
 
@@ -212,7 +268,9 @@ export function QRCodeForm() {
           });
         }}
         onBlur={() => {
-          updateState({ shouldPushState: true });
+          dispatch({
+            type: 'pushState',
+          });
         }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
@@ -233,7 +291,10 @@ export function QRCodeForm() {
           defaultChecked={state.qrState.shouldOptimiseUrl}
           onChange={(event) => {
             startTransition(() => {
-              updateState({ shouldOptimiseUrl: event.target.checked });
+              dispatch({
+                type: 'setShouldOptimiseUrl',
+                shouldOptimiseUrl: event.target.checked,
+              });
             });
           }}
         />
