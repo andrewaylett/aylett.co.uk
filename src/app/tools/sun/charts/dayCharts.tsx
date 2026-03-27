@@ -14,6 +14,7 @@ import {
   YAxis,
 } from 'recharts';
 
+import { type Loc } from '@/app/tools/sun/locations';
 import { type Point } from '@/app/tools/sun/charts/point';
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildYearData, type DayTimes } from '@/app/tools/sun/buildYearData';
@@ -39,6 +40,10 @@ const MONTHS = [
   'Dec',
 ];
 
+function useYearData(loc: Loc): DayTimes[] {
+  return buildYearData(loc.lat, loc.lng, useSun().year);
+}
+
 /** Charts for time-of-day metrics: diff, absolute times, and day length. */
 export function DayCharts(): React.JSX.Element {
   const sun = useSun();
@@ -54,8 +59,8 @@ export function DayCharts(): React.JSX.Element {
     year !== sun.year ||
     metric !== sun.metric;
 
-  const rA = buildYearData(locA.lat, locA.lng, year);
-  const rB = buildYearData(locB.lat, locB.lng, year);
+  const rA = useYearData(locA);
+  const rB = useYearData(locB);
   const mapB: Partial<Record<string, DayTimes>> = Object.fromEntries(
     rB.map((r) => [r.date, r]),
   );

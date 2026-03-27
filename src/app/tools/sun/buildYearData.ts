@@ -1,6 +1,7 @@
 import { Temporal } from 'temporal-polyfill';
 
 import { type SolarTimes, solarTimes } from '@/app/tools/sun/solarTimes';
+import { computeSolarParams } from '@/app/tools/sun/solarParams';
 
 export interface DayTimes extends SolarTimes {
   date: string; // YYYY-MM-DD
@@ -15,7 +16,10 @@ export function buildYearData(
   const results: DayTimes[] = [];
   let d = new Temporal.PlainDate(year, 1, 1);
   while (d.year === year) {
-    results.push({ date: d.toString(), ...solarTimes(d, lat, lng) });
+    results.push({
+      date: d.toString(),
+      ...solarTimes(computeSolarParams(d), lat, lng),
+    });
     d = d.add({ days: 1 });
   }
   return results;

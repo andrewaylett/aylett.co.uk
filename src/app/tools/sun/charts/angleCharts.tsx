@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useDeferredValue } from 'react';
 
 import {
   CartesianGrid,
@@ -13,7 +13,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import { useSun } from '@/app/tools/sun/sunContext';
+import { useDeclinations, useSun } from '@/app/tools/sun/sunContext';
 import {
   buildAngleData,
   solarElevationRange,
@@ -23,14 +23,17 @@ import { ChartCard } from '@/app/tools/sun/charts/chartCard';
 
 /** Chart for hours above a given solar elevation angle across the year. */
 export function AngleCharts(): React.JSX.Element {
-  const { a, b, year } = useSun();
-  const { loc: locA } = a;
-  const { loc: locB } = b;
+  const sun = useSun();
+
+  const locA = useDeferredValue(sun.a.loc);
+  const locB = useDeferredValue(sun.b.loc);
+  const year = useDeferredValue(sun.year);
+  const declinations = useDeferredValue(useDeclinations());
 
   // Compute the union of both locations' annual elevation ranges so both
   // lines share the same x-axis.
-  const rangeA = solarElevationRange(locA.lat, year);
-  const rangeB = solarElevationRange(locB.lat, year);
+  const rangeA = solarElevationRange(locA.lat, declinations);
+  const rangeB = solarElevationRange(locB.lat, declinations);
   const minAngle = Math.min(rangeA.minAngle, rangeB.minAngle);
   const maxAngle = Math.max(rangeA.maxAngle, rangeB.maxAngle);
   const adA = buildAngleData(locA.lat, year, minAngle, maxAngle);

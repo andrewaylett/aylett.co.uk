@@ -1,6 +1,8 @@
 import { describe, expect, it } from '@jest/globals';
 import { Temporal } from 'temporal-polyfill';
 
+import { computeSolarParams } from '../../../src/app/tools/sun/solarParams';
+
 import { solarTimes } from '@/app/tools/sun/solarTimes';
 
 const d = (s: string) => Temporal.PlainDate.from(s);
@@ -11,19 +13,23 @@ const LONDON = { lat: 51.5, lng: -0.1 };
 describe('solarTimes', () => {
   it('returns polar night for Tromsø in December', () => {
     // 69.6°N — well above Arctic Circle; sun does not rise in mid-December
-    const result = solarTimes(d('2024-12-21'), 69.6, 18.95);
+    const result = solarTimes(computeSolarParams(d('2024-12-21')), 69.6, 18.95);
     expect(result.polar).toBe('polar night');
   });
 
   it('returns midnight sun for Tromsø in June', () => {
     // Sun does not set in mid-June at 69.6°N
-    const result = solarTimes(d('2024-06-21'), 69.6, 18.95);
+    const result = solarTimes(computeSolarParams(d('2024-06-21')), 69.6, 18.95);
     expect(result.polar).toBe('midnight sun');
   });
 
   describe('London, spring equinox 2024-03-20', () => {
     // Algorithm gives: sunrise 363 (06:03 GMT), sunset 1093 (18:13 GMT)
-    const result = solarTimes(d('2024-03-20'), LONDON.lat, LONDON.lng);
+    const result = solarTimes(
+      computeSolarParams(d('2024-03-20')),
+      LONDON.lat,
+      LONDON.lng,
+    );
 
     it('returns sunrise and sunset, not a polar result', () => {
       expect(result.polar).toBeUndefined();
@@ -49,7 +55,11 @@ describe('solarTimes', () => {
 
   describe('London, summer solstice 2024-06-21', () => {
     // Algorithm gives: sunrise 283 (04:43 BST), sunset 1281 (21:21 BST)
-    const result = solarTimes(d('2024-06-21'), LONDON.lat, LONDON.lng);
+    const result = solarTimes(
+      computeSolarParams(d('2024-06-21')),
+      LONDON.lat,
+      LONDON.lng,
+    );
 
     it('sunrise is within 2 minutes of 283 min (04:43 BST)', () => {
       expect(result.sunrise).toBeGreaterThanOrEqual(281);
@@ -64,7 +74,11 @@ describe('solarTimes', () => {
 
   describe('London, winter solstice 2024-12-21', () => {
     // Algorithm gives: sunrise 484 (08:04 GMT), sunset 953 (15:53 GMT)
-    const result = solarTimes(d('2024-12-21'), LONDON.lat, LONDON.lng);
+    const result = solarTimes(
+      computeSolarParams(d('2024-12-21')),
+      LONDON.lat,
+      LONDON.lng,
+    );
 
     it('sunrise is within 2 minutes of 484 min (08:04 GMT)', () => {
       expect(result.sunrise).toBeGreaterThanOrEqual(482);
@@ -78,7 +92,11 @@ describe('solarTimes', () => {
   });
 
   it('civil dawn is before sunrise and civil dusk is after sunset', () => {
-    const result = solarTimes(d('2024-06-21'), LONDON.lat, LONDON.lng);
+    const result = solarTimes(
+      computeSolarParams(d('2024-06-21')),
+      LONDON.lat,
+      LONDON.lng,
+    );
     const { dawn, dusk, sunrise, sunset } = result;
     expect(dawn).toBeDefined();
     expect(dusk).toBeDefined();

@@ -1,5 +1,7 @@
 import { type Temporal } from 'temporal-polyfill';
 
+import { useSun } from '@/app/tools/sun/sunContext';
+
 /**
  * Compute solar orbital parameters for a given Julian Day Number.
  *
@@ -82,6 +84,8 @@ const ECC_RATE_2 = 0.000_000_126_7;
 // ---------------------------------------------------------------------------
 
 export interface SolarParams {
+  date: Temporal.PlainDate;
+  jd: JulianDay;
   sinDec: number;
   dec: Radians;
   /** Mean longitude (radians) */
@@ -110,7 +114,12 @@ export function toJulianDay(date: Temporal.PlainDate): JulianDay {
     JD_OFFSET) as JulianDay;
 }
 
-export function solarParams(jd: JulianDay): SolarParams {
+export function useSolarParams(): SolarParams {
+  return computeSolarParams(useSun().date);
+}
+
+export function computeSolarParams(date: Temporal.PlainDate): SolarParams {
+  const jd = toJulianDay(date);
   const T = (jd - J2000) / JULIAN_CENTURY_DAYS;
 
   const L0 = ((((L0_EPOCH + T * (L0_RATE_1 + T * L0_RATE_2)) % TWO_PI) +
@@ -131,5 +140,5 @@ export function solarParams(jd: JulianDay): SolarParams {
   const dec = Math.asin(sinDec) as Radians;
   const ecc = ECC_EPOCH - T * (ECC_RATE_1 + ECC_RATE_2 * T);
 
-  return { sinDec, dec, L0, M, obliq, ecc };
+  return { date, jd, sinDec, dec, L0, M, obliq, ecc };
 }

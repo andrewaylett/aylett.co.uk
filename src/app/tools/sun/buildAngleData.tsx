@@ -1,18 +1,23 @@
 import { Temporal } from 'temporal-polyfill';
 
-import { solarParams, toJulianDay } from '@/app/tools/sun/solarParams';
+import { computeSolarParams } from '@/app/tools/sun/solarParams';
 
 export interface AnglePoint {
   angle: number;
   hours: number;
 }
 
-function computeDeclinations(year: number): { sinDec: number; dec: number }[] {
+export interface Declination {
+  sinDec: number;
+  dec: number;
+}
+
+export function computeDeclinations(year: number): Declination[] {
   if (!Number.isFinite(year)) return [];
   const days: { sinDec: number; dec: number }[] = [];
   let d = new Temporal.PlainDate(year, 1, 1);
   while (d.year === year) {
-    const { sinDec, dec } = solarParams(toJulianDay(d));
+    const { sinDec, dec } = computeSolarParams(d);
     days.push({ sinDec, dec });
     d = d.add({ days: 1 });
   }
@@ -30,16 +35,15 @@ function computeDeclinations(year: number): { sinDec: number; dec: number }[] {
  */
 export function solarElevationRange(
   lat: number,
-  year: number,
+  declinations: Declination[],
 ): { minAngle: number; maxAngle: number } {
-  const days = computeDeclinations(year);
   const latR = (lat * Math.PI) / 180;
   const cosLat = Math.cos(latR);
   const sinLat = Math.sin(latR);
   const toDeg = (r: number) => (r * 180) / Math.PI;
   let minEl = 90;
   let maxEl = -90;
-  for (const { sinDec, dec } of days) {
+  for (const { sinDec, dec } of declinations) {
     const cosDec = Math.cos(dec);
     const elNoon = toDeg(Math.asin(sinLat * sinDec + cosLat * cosDec));
     const elMidnight = toDeg(Math.asin(sinLat * sinDec - cosLat * cosDec));
