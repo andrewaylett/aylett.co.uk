@@ -1,11 +1,6 @@
 'use client';
 
-import React, {
-  type PropsWithChildren,
-  type ReactElement,
-  useDeferredValue,
-  useMemo,
-} from 'react';
+import React, { useDeferredValue, useMemo } from 'react';
 
 import {
   CartesianGrid,
@@ -19,15 +14,15 @@ import {
   YAxis,
 } from 'recharts';
 
-import { buildAngleData, solarElevationRange } from './buildAngleData';
-import { buildYearData, type DayTimes } from './buildYearData';
-import { DiffTooltip } from './diffTooltip';
-
+import { type Point } from '@/app/tools/sun/charts/point';
+import { useSun } from '@/app/tools/sun/sunContext';
+import { buildYearData, type DayTimes } from '@/app/tools/sun/buildYearData';
+import { ChartCard } from '@/app/tools/sun/charts/chartCard';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
+import { DiffTooltip } from '@/app/tools/sun/charts/diffTooltip';
 import { minsToTime } from '@/app/tools/sun/minsToTime';
 import { minsToHuman } from '@/app/tools/sun/minsToHuman';
-import { useSun } from '@/app/tools/sun/sunContext';
 
 const MONTHS = [
   'Jan',
@@ -44,27 +39,8 @@ const MONTHS = [
   'Dec',
 ];
 
-export interface Point {
-  date: string;
-  label: string;
-  valB?: number;
-  diff?: number;
-  valA?: number;
-  lngDiff: number;
-  latDiff?: number;
-  dayLengthA?: number;
-  dayLengthB?: number;
-}
-
-function Card({ children }: PropsWithChildren): ReactElement {
-  return (
-    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-4">
-      {children}
-    </div>
-  );
-}
-
-export function Charts(): React.JSX.Element {
+/** Charts for time-of-day metrics: diff, absolute times, and day length. */
+export function DayCharts(): React.JSX.Element {
   const { a, b, year, metric } = useSun();
   const { loc: locA } = a;
   const { loc: locB } = b;
@@ -116,22 +92,6 @@ export function Charts(): React.JSX.Element {
       .filter(Boolean);
   }, [deferredLocA, deferredLocB, deferredYear, deferredMetric]);
 
-  const angleData = useMemo(() => {
-    // Compute the union of both locations' annual elevation ranges so both
-    // lines share the same x-axis.
-    const rangeA = solarElevationRange(locA.lat, year);
-    const rangeB = solarElevationRange(locB.lat, year);
-    const minAngle = Math.min(rangeA.minAngle, rangeB.minAngle);
-    const maxAngle = Math.max(rangeA.maxAngle, rangeB.maxAngle);
-    const adA = buildAngleData(locA.lat, locA.lng, year, minAngle, maxAngle);
-    const adB = buildAngleData(locB.lat, locB.lng, year, minAngle, maxAngle);
-    return adA.map((p, i) => ({
-      angle: p.angle,
-      hoursA: p.hours,
-      hoursB: adB[i].hours,
-    }));
-  }, [locA, locB, year]);
-
   const tickDates = useMemo(
     () =>
       Array.from({ length: 12 }, (_, i) => {
@@ -141,19 +101,9 @@ export function Charts(): React.JSX.Element {
     [deferredYear],
   );
 
-  const angleTicks: number[] = [];
-  if (angleData.length > 0) {
-    const minAngle = angleData[0].angle;
-    const last = angleData.at(-1);
-    const maxAngle = last ? last.angle : minAngle;
-    for (let t = Math.ceil(minAngle / 10) * 10; t <= maxAngle; t += 10) {
-      angleTicks.push(t);
-    }
-  }
-
   return (
     <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
-      <Card>
+      <ChartCard>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
           <span style={{ color: COL_A }}>{locA.name}</span> {metric} minus{' '}
           <span style={{ color: COL_B }}>{locB.name}</span> {metric} · {year}
@@ -216,8 +166,8 @@ export function Charts(): React.JSX.Element {
             />
           </LineChart>
         </ResponsiveContainer>
-      </Card>
-      <Card>
+      </ChartCard>
+      <ChartCard>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
           Absolute {metric} times · {year}
         </p>
@@ -274,8 +224,8 @@ export function Charts(): React.JSX.Element {
             />
           </LineChart>
         </ResponsiveContainer>
-      </Card>
-      <Card>
+      </ChartCard>
+      <ChartCard>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
           Day length · {year}
         </p>
@@ -330,62 +280,7 @@ export function Charts(): React.JSX.Element {
             />
           </LineChart>
         </ResponsiveContainer>
-      </Card>
-      <Card>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-          Hours above elevation · {year}
-        </p>
-        <ResponsiveContainer width="100%" height={220}>
-          <LineChart
-            data={angleData}
-            margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="angle"
-              ticks={angleTicks}
-              tickFormatter={(v: number) => `${v}°`}
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-            />
-            <YAxis
-              tickFormatter={(v: number) => `${v}h`}
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-              width={48}
-            />
-            <Tooltip
-              formatter={(v: number | undefined, n: string | undefined) => [
-                v == null ? '—' : `${v}h`,
-                n,
-              ]}
-              labelFormatter={(v: unknown) => `${String(v)}° elevation`}
-              contentStyle={{
-                background: '#111827',
-                border: '1px solid #374151',
-                fontSize: 12,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-            <Line
-              type="monotone"
-              dataKey="hoursA"
-              name={locA.name}
-              dot={false}
-              stroke={COL_A}
-              strokeWidth={2}
-            />
-            <Line
-              type="monotone"
-              dataKey="hoursB"
-              name={locB.name}
-              dot={false}
-              stroke={COL_B}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </Card>
+      </ChartCard>
     </div>
   );
 }
