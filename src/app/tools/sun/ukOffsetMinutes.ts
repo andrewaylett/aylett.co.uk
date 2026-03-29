@@ -1,6 +1,8 @@
-export function ukOffsetMinutes(dateStr: string) {
+import { type Temporal } from 'temporal-polyfill';
+
+export function ukOffsetMinutes(date: Temporal.PlainDate): number {
   // BST (UTC+1): last Sunday of March → last Sunday of October
-  const [y, m, d] = dateStr.split('-').map(Number);
+  const { year: y, month: m, day: d } = date;
   function lastSunday(yr: number, mo: number) {
     const last = new Date(yr, mo, 0);
     return last.getDate() - last.getDay();

@@ -2,6 +2,8 @@
 
 import React, { type ReactNode, useState } from 'react';
 
+import { Temporal } from 'temporal-polyfill';
+
 import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
 import { type Loc, PRESET_LOCATIONS } from '@/app/tools/sun/locations';
 import { solarTimes } from '@/app/tools/sun/solarTimes';
@@ -20,7 +22,12 @@ function useLoc(initial: Loc, date: string): LocState {
     lng: '',
   });
 
-  const day = { date, ...solarTimes(date, loc.lat, loc.lng) };
+  const day = date
+    ? {
+        date,
+        ...solarTimes(Temporal.PlainDate.from(date), loc.lat, loc.lng),
+      }
+    : undefined;
 
   return {
     loc,

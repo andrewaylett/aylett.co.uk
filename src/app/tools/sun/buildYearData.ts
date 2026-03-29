@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import { type SolarTimes, solarTimes } from '@/app/tools/sun/solarTimes';
 
 export interface DayTimes extends SolarTimes {
@@ -9,15 +11,12 @@ export function buildYearData(
   lng: number,
   year: number,
 ): DayTimes[] {
+  if (!Number.isFinite(year)) return [];
   const results: DayTimes[] = [];
-  const d = new Date(year, 0, 1);
-  while (d.getFullYear() === year) {
-    const y = d.getFullYear();
-    const mo = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const dateStr = `${y}-${mo}-${day}`;
-    results.push({ date: dateStr, ...solarTimes(dateStr, lat, lng) });
-    d.setDate(d.getDate() + 1);
+  let d = new Temporal.PlainDate(year, 1, 1);
+  while (d.year === year) {
+    results.push({ date: d.toString(), ...solarTimes(d, lat, lng) });
+    d = d.add({ days: 1 });
   }
   return results;
 }

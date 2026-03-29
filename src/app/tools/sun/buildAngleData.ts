@@ -1,43 +1,20 @@
+import { Temporal } from 'temporal-polyfill';
+
+import { solarParams, toJulianDay } from '@/app/tools/sun/solarParams';
+
 export interface AnglePoint {
   angle: number;
   hours: number;
 }
 
 function computeDeclinations(year: number): { sinDec: number; dec: number }[] {
+  if (!Number.isFinite(year)) return [];
   const days: { sinDec: number; dec: number }[] = [];
-  const d = new Date(year, 0, 1);
-  while (d.getFullYear() === year) {
-    const y = d.getFullYear();
-    const m = d.getMonth() + 1;
-    const day = d.getDate();
-
-    const jd =
-      367 * y -
-      Math.floor((7 * (y + Math.floor((m + 9) / 12))) / 4) +
-      Math.floor((275 * m) / 9) +
-      day +
-      1_721_013.5;
-
-    const T = (jd - 2_451_545) / 36_525;
-    const L0 = (280.466_46 + T * (36_000.769_83 + T * 0.000_303_2)) % 360;
-    const Mrad =
-      ((357.529_11 + T * (35_999.050_29 - T * 0.000_153_7)) * Math.PI) / 180;
-    const C =
-      (1.914_602 - T * (0.004_817 + 0.000_014 * T)) * Math.sin(Mrad) +
-      (0.019_993 - 0.000_101 * T) * Math.sin(2 * Mrad) +
-      0.000_289 * Math.sin(3 * Mrad);
-    const sunLon = ((L0 + C) * Math.PI) / 180;
-    const obliq =
-      ((23.439_291_111 -
-        T * (0.013_004_167 + T * (0.000_000_163_9 - T * 0.000_000_503_6))) *
-        Math.PI) /
-      180;
-
-    const sinDec = Math.sin(obliq) * Math.sin(sunLon);
-    const dec = Math.asin(sinDec);
-
+  let d = new Temporal.PlainDate(year, 1, 1);
+  while (d.year === year) {
+    const { sinDec, dec } = solarParams(toJulianDay(d));
     days.push({ sinDec, dec });
-    d.setDate(d.getDate() + 1);
+    d = d.add({ days: 1 });
   }
   return days;
 }
