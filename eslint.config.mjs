@@ -89,4 +89,10 @@ export default tseslint.config(
       '@typescript-eslint/require-await': ['off'],
     },
   },
+  {
+    files: ['next-env.d.ts'],
+    rules: {
+      'prettier/prettier': ['off'],
+    },
+  },
 );

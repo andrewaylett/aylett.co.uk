@@ -19,7 +19,9 @@ export function BackgroundImage() {
           src={night}
           placeholder="blur"
           alt=""
-          objectFit="cover"
+          style={{
+            objectFit: 'cover',
+          }}
           fill={true}
           sizes="calc(max(100vw, 133vh))"
         />
@@ -29,7 +31,9 @@ export function BackgroundImage() {
           src={field}
           placeholder="blur"
           alt=""
-          objectFit="cover"
+          style={{
+            objectFit: 'cover',
+          }}
           fill={true}
           sizes="calc(max(100vw, 133vh))"
         />

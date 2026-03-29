@@ -1,6 +1,5 @@
 import React, { use } from 'react';
 
-import { getYear } from 'date-fns';
 import Link from 'next/link';
 
 export interface FooterProps {
@@ -12,8 +11,7 @@ export interface FooterProps {
 export function Footer({ author, copyright, keywords }: FooterProps) {
   const resolvedKeywords = keywords ? use(keywords) : [];
   const resolvedAuthor = (author && use(author)) ?? 'Andrew Aylett';
-  const resolvedCopyright =
-    (copyright && use(copyright)) ?? getYear(Date.now());
+  const resolvedCopyright = copyright && use(copyright);
 
   return (
     <footer className="sticky bottom-0 mt-4 pt-1 w-full *:text-smaller flex flex-row flex-wrap justify-between pb-1">
@@ -34,8 +32,12 @@ export function Footer({ author, copyright, keywords }: FooterProps) {
         </div>
       )}
       <div property="copyrightNotice" className="text-right">
-        Copyright © <span property="copyrightHolder">{resolvedAuthor}</span>,{' '}
-        <span property="copyrightYear">{resolvedCopyright}</span>
+        Copyright © <span property="copyrightHolder">{resolvedAuthor}</span>
+        {resolvedCopyright && (
+          <>
+            , <span property="copyrightYear">{resolvedCopyright}</span>
+          </>
+        )}
       </div>
     </footer>
   );

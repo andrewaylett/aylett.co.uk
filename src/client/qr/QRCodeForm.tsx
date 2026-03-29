@@ -1,10 +1,9 @@
 'use client';
 
 import React, {
+  type ChangeEvent,
   startTransition,
-  useCallback,
   useEffect,
-  useMemo,
   useReducer,
   useRef,
 } from 'react';
@@ -98,7 +97,7 @@ export function QRCodeForm() {
     },
   );
 
-  const copyToClipboard = useCallback(() => {
+  const copyToClipboard = () => {
     startTransition(async () => {
       if (!ref.current) {
         throw new Error('QR Code SVG is not ready');
@@ -128,13 +127,11 @@ export function QRCodeForm() {
         });
       }
     });
-  }, [updateState]);
+  };
 
-  const alphanumericValue = useMemo(() => {
-    return state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
-  }, [state.qrState.text]);
+  const alphanumericValue = state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
 
-  const download = useCallback(() => {
+  const download = () => {
     startTransition(async () => {
       if (!ref.current) {
         throw new Error('QR Code SVG is not ready');
@@ -150,7 +147,7 @@ export function QRCodeForm() {
       link.href = dataUrl;
       link.click();
     });
-  }, [alphanumericValue]);
+  };
 
   useEffect(() => {
     const handlePopState = () => {
@@ -190,23 +187,18 @@ export function QRCodeForm() {
     globalThis.history.replaceState({}, '', linkUrl);
   }, [state.qrState.text]);
 
-  const setText = useCallback(
-    (newText: string, updateGeneration?: boolean) => {
-      updateState({
-        text: newText,
-        buttonText: BUTTON_TEXT.INITIAL_TEXT,
-        updateGeneration,
-      });
-      if (resetRef.current) {
-        resetRef.current();
-      }
-    },
-    [updateState],
-  );
+  const setText = (newText: string, updateGeneration?: boolean) => {
+    updateState({
+      text: newText,
+      buttonText: BUTTON_TEXT.INITIAL_TEXT,
+      updateGeneration,
+    });
+    if (resetRef.current) {
+      resetRef.current();
+    }
+  };
 
-  const canOptimiseUrl = useMemo(() => {
-    return URL_SPLITTER.test(state.qrState.text);
-  }, [state.qrState.text]);
+  const canOptimiseUrl = URL_SPLITTER.test(state.qrState.text);
 
   return (
     <form className="flex items-center flex-col">
@@ -214,7 +206,7 @@ export function QRCodeForm() {
         key={state.qrState.generation}
         type="text"
         defaultValue={state.qrState.text}
-        onChange={(e) => {
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
           startTransition(() => {
             setText(e.target.value);
           });
@@ -249,12 +241,12 @@ export function QRCodeForm() {
       </label>
       <QRCodeErrorContext
         value={{
-          resetText: useCallback(() => {
+          resetText: () => {
             setText('', true);
-          }, [setText]),
-          updateResetRef: useCallback((newRef) => {
+          },
+          updateResetRef: (newRef) => {
             resetRef.current = newRef;
-          }, []),
+          },
         }}
       >
         <ErrorBoundary errorComponent={QRCodeError}>

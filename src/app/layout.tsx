@@ -1,6 +1,6 @@
 import 'server-only';
 
-import React, { type PropsWithChildren, type ReactNode, useMemo } from 'react';
+import React, { type PropsWithChildren, type ReactNode } from 'react';
 
 import { type Metadata, type Viewport } from 'next';
 import localFont from 'next/font/local';
@@ -119,8 +119,8 @@ const PLEX_SANS = localFont({
 });
 
 function RootLayout({ children }: PropsWithChildren): ReactNode {
-  const plexSans = useMemo(() => PLEX_SANS, []);
-  const nodeEnv = useMemo(() => process.env.NODE_ENV, []);
+  const plexSans = PLEX_SANS;
+  const nodeEnv = process.env.NODE_ENV;
 
   return (
     <html
