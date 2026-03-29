@@ -3,8 +3,8 @@
 import React, {
   type PropsWithChildren,
   type ReactElement,
-  useEffect,
-  useState,
+  useDeferredValue,
+  useMemo,
 } from 'react';
 
 import {
@@ -50,6 +50,8 @@ export interface Point {
   valA?: number;
   lngDiff: number;
   latDiff?: number;
+  dayLengthA?: number;
+  dayLengthB?: number;
 }
 
 function Card({ children }: PropsWithChildren): ReactElement {
@@ -60,30 +62,39 @@ function Card({ children }: PropsWithChildren): ReactElement {
   );
 }
 
-export function Charts(): React.JSX.Element | null {
+export function Charts(): React.JSX.Element {
   const { a, b, year, metric } = useSun();
   const { loc: locA } = a;
   const { loc: locB } = b;
 
-  const [data, setData] = useState<Point[] | null>(null);
+  const deferredLocA = useDeferredValue(locA);
+  const deferredLocB = useDeferredValue(locB);
+  const deferredYear = useDeferredValue(year);
+  const deferredMetric = useDeferredValue(metric);
 
-  useEffect(() => {
-    const rA = buildYearData(locA.lat, locA.lng, year);
-    const rB = buildYearData(locB.lat, locB.lng, year);
+  const isPending =
+    deferredLocA !== locA ||
+    deferredLocB !== locB ||
+    deferredYear !== year ||
+    deferredMetric !== metric;
+
+  const data = useMemo<Point[]>(() => {
+    const rA = buildYearData(deferredLocA.lat, deferredLocA.lng, deferredYear);
+    const rB = buildYearData(deferredLocB.lat, deferredLocB.lng, deferredYear);
     const mapB: Partial<Record<string, DayTimes>> = Object.fromEntries(
       rB.map((r) => [r.date, r]),
     );
-    const points: Point[] = rA
+    return rA
       .flatMap((a): Point[] => {
         const b = mapB[a.date];
         if (!b) return [];
-        const valA = a[metric];
-        const valB = b[metric];
+        const valA = a[deferredMetric];
+        const valB = b[deferredMetric];
         const diff = valA != null && valB != null ? valA - valB : undefined;
         // Longitude component: purely east-west offset, 4 min/degree, constant through the year.
         // Further east → earlier solar noon → earlier sunrise & sunset (in the same timezone).
         // lngDiff > 0 means A is further west, so A's times are later.
-        const lngDiff = Math.round((locA.lng - locB.lng) * -4);
+        const lngDiff = Math.round((deferredLocA.lng - deferredLocB.lng) * -4);
         const latDiff = diff == null ? undefined : diff - lngDiff;
         const [, mo, d] = a.date.split('-').map(Number);
         return [
@@ -99,17 +110,19 @@ export function Charts(): React.JSX.Element | null {
         ];
       })
       .filter(Boolean);
-    setData(points);
-  }, [locA, locB, year, metric]);
+  }, [deferredLocA, deferredLocB, deferredYear, deferredMetric]);
 
-  if (!data) {
-    return null;
-  }
-
-  const tickDates = data.filter((_, i) => i % 30 === 0).map((d) => d.date);
+  const tickDates = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => {
+        const month = String(i + 1).padStart(2, '0');
+        return `${deferredYear}-${month}-01`;
+      }),
+    [deferredYear],
+  );
 
   return (
-    <>
+    <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
       <Card>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
           <span style={{ color: COL_A }}>{locA.name}</span> {metric} minus{' '}
@@ -149,6 +162,7 @@ export function Charts(): React.JSX.Element | null {
               stroke={COL_A}
               strokeWidth={2}
               name="Total"
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -158,6 +172,7 @@ export function Charts(): React.JSX.Element | null {
               strokeWidth={1}
               strokeDasharray="4 2"
               name="Longitude"
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -167,6 +182,7 @@ export function Charts(): React.JSX.Element | null {
               strokeWidth={1}
               strokeDasharray="2 3"
               name="Latitude"
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -215,6 +231,7 @@ export function Charts(): React.JSX.Element | null {
               dot={false}
               stroke={COL_A}
               strokeWidth={2}
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -223,10 +240,11 @@ export function Charts(): React.JSX.Element | null {
               dot={false}
               stroke={COL_B}
               strokeWidth={2}
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>
       </Card>
-    </>
+    </div>
   );
 }
