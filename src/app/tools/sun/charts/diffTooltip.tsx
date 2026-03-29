@@ -6,7 +6,7 @@ import {
   type ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
 
-import { type Point } from '@/app/tools/sun/charts';
+import { type Point } from '@/app/tools/sun/charts/point';
 import { COL_NEG, COL_POS } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
 import { minsToTime } from '@/app/tools/sun/minsToTime';

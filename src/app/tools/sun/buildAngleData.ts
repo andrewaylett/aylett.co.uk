@@ -84,7 +84,6 @@ export function solarElevationRange(
  */
 export function buildAngleData(
   lat: number,
-  lng: number,
   year: number,
   minAngle: number,
   maxAngle: number,

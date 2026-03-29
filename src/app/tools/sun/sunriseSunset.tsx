@@ -2,11 +2,12 @@ import React from 'react';
 
 import { SunProvider } from '@/app/tools/sun/sunProvider';
 import { SunriseSunsetInner } from '@/app/tools/sun/sunriseSunsetInner';
-import { Charts } from '@/app/tools/sun/charts';
 import { LocationPickers } from '@/app/tools/sun/locationPickers';
 import { DatePicker } from '@/app/tools/sun/datePicker';
 import { DayCards } from '@/app/tools/sun/dayCards';
 import { SunDifference } from '@/app/tools/sun/sunDifference';
+import { AngleCharts } from '@/app/tools/sun/charts/angleCharts';
+import { DayCharts } from '@/app/tools/sun/charts/dayCharts';
 
 export function SunriseSunset(): React.JSX.Element {
   return (
@@ -19,7 +20,8 @@ export function SunriseSunset(): React.JSX.Element {
       <DayCards />
       <SunDifference />
       <SunriseSunsetInner />
-      <Charts />
+      <DayCharts />
+      <AngleCharts />
       <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-2">
         Solar position via Meeus / NOAA algorithm · accuracy ±1–2 min
       </p>
