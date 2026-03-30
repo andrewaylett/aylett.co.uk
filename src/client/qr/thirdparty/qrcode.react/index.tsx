@@ -7,7 +7,7 @@
 import React, { useDebugValue, useMemo } from 'react';
 
 import * as qrcodegen from '../qrcodegen';
-import { type QrCode } from '../qrcodegen';
+import { type QrCode, type QrSegment } from '../qrcodegen';
 
 type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
 type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
@@ -48,10 +48,9 @@ function errorLevelToString(
 
 interface QRProps {
   /**
-   * The value to encode into the QR Code. An array of strings can be passed in
-   * to represent multiple segments to further optimize the QR Code.
+   * The value to encode into the QR Code.  Will be optimised into segments as necessary.
    */
-  values: string[];
+  value: string;
   /**
    * The Error Correction Level to use.
    * @see https://www.qrcode.com/en/about/error_correction.html
@@ -149,6 +148,7 @@ export interface DebugDetails {
   moduleCount: number;
   qrVersion: number;
   level: ErrorCorrectionLevel;
+  segments: readonly QrSegment[];
 }
 
 interface QrCodeDetails {
@@ -156,23 +156,34 @@ interface QrCodeDetails {
   margin: number;
   numCells: number;
   qrcode: QrCode;
+  segments: readonly QrSegment[];
+}
+
+// Returns which character-count-bits group the version belongs to (0, 1, or 2).
+// Segments should be re-optimised whenever the actual version lands in a different
+// group from the one used to compute them.
+function versionGroup(version: number): number {
+  return Math.floor((version + 7) / 17);
 }
 
 export function useQRCode({
-  values,
+  value,
   level,
   minVersion,
 }: {
-  values: string[];
+  value: string;
   level: ErrorCorrectionLevel;
   minVersion: number;
 }): QrCodeDetails | Error {
-  useDebugValue(values, (v) => `QR: [${v.join(', ')}]`);
-
-  const segments = values.flatMap((v) => qrcodegen.QrSegment.makeSegments(v));
+  useDebugValue(value, (v) => `QR: "${v}"`);
 
   try {
-    const qrcode = qrcodegen.QrCode.encodeSegments(
+    // Optimise segments for the minimum version, then encode to find the actual version.
+    // If the actual version lands in a different ccbits group (1–9, 10–26, 27–40),
+    // re-optimise for that version and re-encode — a single retry is sufficient since
+    // re-optimised segments can only use fewer bits, never more.
+    let segments = qrcodegen.QrSegment.makeSegments(value, minVersion);
+    let qrcode = qrcodegen.QrCode.encodeSegments(
       segments,
       ERROR_LEVEL_MAP[level],
       minVersion,
@@ -181,8 +192,23 @@ export function useQRCode({
       true,
     );
 
-    const cells = qrcode.getModules();
+    if (versionGroup(qrcode.version) !== versionGroup(minVersion)) {
+      const reoptimised = qrcodegen.QrSegment.makeSegments(
+        value,
+        qrcode.version,
+      );
+      qrcode = qrcodegen.QrCode.encodeSegments(
+        reoptimised,
+        ERROR_LEVEL_MAP[level],
+        minVersion,
+        undefined,
+        undefined,
+        true,
+      );
+      segments = reoptimised;
+    }
 
+    const cells = qrcode.getModules();
     const margin = SPEC_MARGIN_SIZE;
     const numCells = cells.length + margin * 2;
     return {
@@ -190,6 +216,7 @@ export function useQRCode({
       cells,
       margin,
       numCells,
+      segments,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -204,13 +231,13 @@ export function useQRCode({
 export const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
   function QRCodeSVG(props, forwardedRef) {
     const {
-      values,
+      value,
       level = DEFAULT_LEVEL,
       minVersion = DEFAULT_MINVERSION,
     } = props;
 
     const details = useQRCode({
-      values,
+      value,
       level,
       minVersion,
     });
@@ -231,13 +258,14 @@ export function useDebugDetails(details: QrCodeDetails): DebugDetails {
       moduleCount,
       qrVersion,
       level,
+      segments: details.segments,
     };
   }, [details]);
 }
 
 export const QRCodeSVGDetails = React.forwardRef<
   SVGSVGElement,
-  Omit<QRPropsSVG, 'values'> & { details: QrCodeDetails }
+  Omit<QRPropsSVG, 'value'> & { details: QrCodeDetails }
 >(function QRCodeSVGDetails(props, forwardedRef) {
   const {
     details,

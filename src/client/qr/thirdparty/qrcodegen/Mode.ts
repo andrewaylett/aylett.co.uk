@@ -21,11 +21,34 @@ export class Mode {
     private readonly numBitsCharCount: [int, int, int],
   ) {}
 
-  /*-- Method --*/
+  /*-- Methods --*/
 
   // (Package-private) Returns the bit width of the character count field for a segment in
   // this mode in a QR Code at the given version number. The result is in the range [0, 16].
   public numCharCountBits(ver: int): int {
     return this.numBitsCharCount[Math.floor((ver + 7) / 17)];
+  }
+
+  public toString(): string {
+    switch (this.modeBits) {
+      case 0x1: {
+        return 'NUMERIC';
+      }
+      case 0x2: {
+        return 'ALPHANUMERIC';
+      }
+      case 0x4: {
+        return 'BYTE';
+      }
+      case 0x7: {
+        return 'ECI';
+      }
+      case 0x8: {
+        return 'KANJI';
+      }
+      default: {
+        return `UNKNOWN(0x${this.modeBits.toString(16)})`;
+      }
+    }
   }
 }
