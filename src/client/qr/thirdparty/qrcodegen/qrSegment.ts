@@ -73,14 +73,127 @@ export class QrSegment {
   }
 
   // Returns a new mutable list of zero or more segments to represent the given Unicode text string.
-  // The result may use various segment modes and switch modes to optimize the length of the bit stream.
-  public static makeSegments(text: string): QrSegment[] {
-    // Select the most efficient segment encoding automatically
+  // Uses a bottom-up DP over character-type run boundaries to find the minimum-bit segmentation
+  // at the given QR version (default 1). Only positions where the character type changes need
+  // to be considered as segment boundaries — extending a byte segment through the middle of a
+  // run is never better than starting it at the run boundary.
+  public static makeSegments(text: string, version: int = 1): QrSegment[] {
     if (text == '') return [];
-    else if (QrSegment.isNumeric(text)) return [QrSegment.makeNumeric(text)];
-    else if (QrSegment.isAlphanumeric(text))
+    // Fast paths for homogeneous strings
+    if (QrSegment.isNumeric(text)) return [QrSegment.makeNumeric(text)];
+    if (QrSegment.isAlphanumeric(text))
       return [QrSegment.makeAlphanumeric(text)];
-    else return [QrSegment.makeBytes(QrSegment.toUtf8ByteArray(text))];
+
+    const n: int = text.length;
+
+    // Precompute run extents (right-to-left, O(n)):
+    // numericEnd[i]  = smallest j >= i where text[j] is not a digit (or n)
+    // alphaEnd[i]    = smallest j >= i where text[j] is not alphanumeric (or n)
+    const numericEnd: int[] = Array.from<int>({ length: n + 1 });
+    const alphaEnd: int[] = Array.from<int>({ length: n + 1 });
+    numericEnd[n] = n;
+    alphaEnd[n] = n;
+    for (let i = n - 1; i >= 0; i--) {
+      numericEnd[i] = /[0-9]/.test(text[i]) ? numericEnd[i + 1] : i;
+      alphaEnd[i] = QrSegment.ALPHANUMERIC_CHARSET.includes(text[i])
+        ? alphaEnd[i + 1]
+        : i;
+    }
+
+    // Collect boundary positions: positions where character type changes, plus 0 and n.
+    // charType: 0 = numeric, 1 = alphanumeric (non-numeric), 2 = byte-only.
+    function charType(i: int): int {
+      if (numericEnd[i] > i) return 0;
+      if (alphaEnd[i] > i) return 1;
+      return 2;
+    }
+    const bounds: int[] = [0];
+    for (let i = 1; i < n; i++) {
+      if (charType(i) !== charType(i - 1)) bounds.push(i);
+    }
+    bounds.push(n);
+    const m: int = bounds.length; // m - 1 runs
+
+    // Bit cost of encoding `len` characters in each mode.
+    function numericDataBits(len: int): int {
+      return (
+        Math.floor(len / 3) * 10 + (len % 3 === 2 ? 7 : len % 3 === 1 ? 4 : 0)
+      );
+    }
+    function alphaDataBits(len: int): int {
+      return Math.floor(len / 2) * 11 + (len % 2 === 1 ? 6 : 0);
+    }
+    function segCost(mode: Mode, len: int): int {
+      const data =
+        mode === Mode.NUMERIC
+          ? numericDataBits(len)
+          : mode === Mode.ALPHANUMERIC
+            ? alphaDataBits(len)
+            : len * 8;
+      return 4 + mode.numCharCountBits(version) + data;
+    }
+
+    // DP over bound indices (O(k^2) where k = number of runs).
+    const dp: number[] = Array.from<number>({ length: m }).fill(
+      Number.POSITIVE_INFINITY,
+    );
+    const fromIdx: int[] = Array.from<int>({ length: m }).fill(-1);
+    const fromMode: Mode[] = Array.from<Mode>({ length: m }).fill(Mode.BYTE);
+    dp[0] = 0;
+
+    for (let i = 1; i < m; i++) {
+      for (let j = 0; j < i; j++) {
+        if (dp[j] === Number.POSITIVE_INFINITY) continue;
+        const s: int = bounds[j];
+        const e: int = bounds[i];
+        const len: int = e - s;
+
+        // Always try BYTE
+        const byteCost: number = dp[j] + segCost(Mode.BYTE, len);
+        if (byteCost < dp[i]) {
+          dp[i] = byteCost;
+          fromIdx[i] = j;
+          fromMode[i] = Mode.BYTE;
+        }
+
+        // Try NUMERIC if the entire span is digits
+        if (numericEnd[s] >= e) {
+          const nc: number = dp[j] + segCost(Mode.NUMERIC, len);
+          if (nc < dp[i]) {
+            dp[i] = nc;
+            fromIdx[i] = j;
+            fromMode[i] = Mode.NUMERIC;
+          }
+        }
+
+        // Try ALPHANUMERIC if the entire span is alphanumeric
+        if (alphaEnd[s] >= e) {
+          const ac: number = dp[j] + segCost(Mode.ALPHANUMERIC, len);
+          if (ac < dp[i]) {
+            dp[i] = ac;
+            fromIdx[i] = j;
+            fromMode[i] = Mode.ALPHANUMERIC;
+          }
+        }
+      }
+    }
+
+    // Backtrack and build segments.
+    const result: QrSegment[] = [];
+    for (let i = m - 1; i > 0; ) {
+      const j: int = fromIdx[i];
+      const mode: Mode = fromMode[i];
+      const substr: string = text.slice(bounds[j], bounds[i]);
+      if (mode === Mode.NUMERIC) {
+        result.unshift(QrSegment.makeNumeric(substr));
+      } else if (mode === Mode.ALPHANUMERIC) {
+        result.unshift(QrSegment.makeAlphanumeric(substr));
+      } else {
+        result.unshift(QrSegment.makeBytes(QrSegment.toUtf8ByteArray(substr)));
+      }
+      i = j;
+    }
+    return result;
   }
 
   // Returns a segment representing an Extended Channel Interpretation

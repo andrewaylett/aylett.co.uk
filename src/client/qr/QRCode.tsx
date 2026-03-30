@@ -22,36 +22,29 @@ export type ButtonText = (typeof BUTTON_TEXT)[keyof typeof BUTTON_TEXT];
 
 export const URL_SPLITTER =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
-const QR_ALPHANUMERIC_CHARACTERS = /^[A-Z0-9 $%*+./:-]*$/;
 
-function useQrValue(text: string, shouldOptimiseUrl: boolean): string[] {
+function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
   return useMemo(() => {
     const match = URL_SPLITTER.exec(text);
     if (shouldOptimiseUrl && match?.groups?.start) {
       const start = match.groups.start.toUpperCase();
       const rest = match.groups.rest;
-      if (QR_ALPHANUMERIC_CHARACTERS.test(rest)) {
-        return [start + rest];
-      }
-      return [start, rest];
+      return start + rest;
     }
-    return [text];
+    return text;
   }, [shouldOptimiseUrl, text]);
 }
 
 function useOptimisedQr(state: QRCodeState) {
-  const qrValueArray: string[] = useQrValue(
-    state.text,
-    state.shouldOptimiseUrl,
-  );
+  const qrValue: string = useQrValue(state.text, state.shouldOptimiseUrl);
 
   const nonOptimisedQr = useQRCode({
-    values: [state.text],
+    value: state.text,
     level: 'L',
     minVersion: 1,
   });
   const optimisedQr = useQRCode({
-    values: qrValueArray,
+    value: qrValue,
     level: 'L',
     minVersion: 1,
   });
@@ -89,7 +82,7 @@ function useOptimisedQr(state: QRCodeState) {
     }`;
 
   return {
-    qrValueArray,
+    qrValue,
     willUseOptimisedQr,
     qrDetails,
     debugMessage,
@@ -106,8 +99,7 @@ export function QRCode({
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }>) {
-  const { qrValueArray, willUseOptimisedQr, qrDetails, debugMessage } =
-    useOptimisedQr(state);
+  const { qrValue, qrDetails, debugMessage } = useOptimisedQr(state);
   const qrDebugDetails = useDebugDetails(qrDetails);
 
   return (
@@ -133,17 +125,17 @@ export function QRCode({
             <dt>Error Correction Level</dt>
             <dd>{qrDebugDetails.level}</dd>
             <dt>Rendered value</dt>
-            <dd>
-              {'[' +
-                (willUseOptimisedQr
-                  ? qrValueArray.map((v) => '"' + v + '"').join(', ')
-                  : '"' + state.text + '"') +
-                ']'}
-            </dd>
+            <dd>{'"' + qrValue + '"'}</dd>
             <dt>Render Generation</dt>
             <dd>{state.generation}</dd>
             <dt>Optimisation</dt>
             <dd>{debugMessage()}</dd>
+            <dt>Segments</dt>
+            <dd>
+              {qrDebugDetails.segments
+                .map((s) => `${s.mode.toString()}(${s.numChars})`)
+                .join(', ')}
+            </dd>
           </dl>
         </details>
       )}
