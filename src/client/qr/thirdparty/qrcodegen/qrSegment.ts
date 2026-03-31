@@ -185,11 +185,15 @@ export class QrSegment {
       const mode: Mode = fromMode[i];
       const substr: string = text.slice(bounds[j], bounds[i]);
       if (mode === Mode.NUMERIC) {
-        result.unshift(QrSegment.makeNumeric(substr));
+        result.unshift(QrSegment.makeNumeric(substr).withText(substr));
       } else if (mode === Mode.ALPHANUMERIC) {
-        result.unshift(QrSegment.makeAlphanumeric(substr));
+        result.unshift(QrSegment.makeAlphanumeric(substr).withText(substr));
       } else {
-        result.unshift(QrSegment.makeBytes(QrSegment.toUtf8ByteArray(substr)));
+        result.unshift(
+          QrSegment.makeBytes(QrSegment.toUtf8ByteArray(substr)).withText(
+            substr,
+          ),
+        );
       }
       i = j;
     }
@@ -240,9 +244,16 @@ export class QrSegment {
     public readonly numChars: int,
     // The data bits of this segment. Accessed through getData().
     private readonly bitData: bit[],
+    // The original source text for this segment, if known.
+    public readonly text?: string,
   ) {
     if (numChars < 0) throw new RangeError('Invalid argument');
     this.bitData = [...bitData]; // Make defensive copy
+  }
+
+  // Returns a copy of this segment with the given source text attached.
+  public withText(text: string): QrSegment {
+    return new QrSegment(this.mode, this.numChars, this.getData(), text);
   }
 
   /*-- Methods --*/
