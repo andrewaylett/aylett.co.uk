@@ -79,10 +79,10 @@ export class QrSegment {
   // run is never better than starting it at the run boundary.
   public static makeSegments(text: string, version: int = 1): QrSegment[] {
     if (text == '') return [];
-    // Fast paths for homogeneous strings
+    // Fast path for all-numeric strings: numeric mode is always optimal here.
+    // (No fast path for all-alphanumeric: a long numeric suffix is better in
+    // numeric mode, so we let the DP decide.)
     if (QrSegment.isNumeric(text)) return [QrSegment.makeNumeric(text)];
-    if (QrSegment.isAlphanumeric(text))
-      return [QrSegment.makeAlphanumeric(text)];
 
     const n: int = text.length;
 
