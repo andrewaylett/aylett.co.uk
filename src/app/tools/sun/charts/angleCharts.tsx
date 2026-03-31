@@ -7,7 +7,6 @@ import {
   Legend,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -59,58 +58,62 @@ export function AngleCharts(): React.JSX.Element {
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
         Hours above elevation · {year}
       </p>
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart
-          data={angleData}
-          margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-          <XAxis
-            dataKey="angle"
-            ticks={angleTicks}
-            tickFormatter={(v: number) => `${v}°`}
-            stroke="#6b7280"
-            tick={{ fill: '#9ca3af', fontSize: 11 }}
-          />
-          <YAxis
-            tickFormatter={(v: number) => `${v}h`}
-            stroke="#6b7280"
-            tick={{ fill: '#9ca3af', fontSize: 11 }}
-            width={48}
-          />
-          <Tooltip
-            formatter={(v: number | undefined, n: string | undefined) => [
-              v == null ? '—' : `${v}h`,
-              n,
-            ]}
-            labelFormatter={(v: unknown) => `${String(v)}° elevation`}
-            contentStyle={{
-              background: '#111827',
-              border: '1px solid #374151',
-              fontSize: 12,
-            }}
-          />
-          <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-          <Line
-            type="monotone"
-            dataKey="hoursA"
-            name={locA.name}
-            dot={false}
-            stroke={COL_A}
-            strokeWidth={1}
-            isAnimationActive={false}
-          />
-          <Line
-            type="monotone"
-            dataKey="hoursB"
-            name={locB.name}
-            dot={false}
-            stroke={COL_B}
-            strokeWidth={1}
-            isAnimationActive={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <LineChart
+        data={angleData}
+        margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+        responsive
+        style={{
+          width: '100%',
+          maxHeight: '80vh',
+          aspectRatio: 1.618,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <XAxis
+          dataKey="angle"
+          ticks={angleTicks}
+          tickFormatter={(v: number) => `${v}°`}
+          stroke="#6b7280"
+          tick={{ fill: '#9ca3af', fontSize: 11 }}
+        />
+        <YAxis
+          tickFormatter={(v: number) => `${v}h`}
+          stroke="#6b7280"
+          tick={{ fill: '#9ca3af', fontSize: 11 }}
+          width={48}
+        />
+        <Tooltip
+          formatter={(v: number | undefined, n: string | undefined) => [
+            v == null ? '—' : `${v}h`,
+            n,
+          ]}
+          labelFormatter={(v: unknown) => `${String(v)}° elevation`}
+          contentStyle={{
+            background: '#111827',
+            border: '1px solid #374151',
+            fontSize: 12,
+          }}
+        />
+        <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
+        <Line
+          type="monotone"
+          dataKey="hoursA"
+          name={locA.name}
+          dot={false}
+          stroke={COL_A}
+          strokeWidth={1}
+          isAnimationActive={false}
+        />
+        <Line
+          type="monotone"
+          dataKey="hoursB"
+          name={locB.name}
+          dot={false}
+          stroke={COL_B}
+          strokeWidth={1}
+          isAnimationActive={false}
+        />
+      </LineChart>
     </ChartCard>
   );
 }
