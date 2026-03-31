@@ -12,3 +12,7 @@ export const PRESET_LOCATIONS: Loc[] = [
   { name: 'Aberdeen', lat: 57.1497, lng: -2.0943 },
   { name: 'Penzance, Cornwall', lat: 50.1186, lng: -5.537 },
 ];
+
+export const LOC_A = 'A' as const;
+export const LOC_B = 'B' as const;
+export type LocationRef = typeof LOC_A | typeof LOC_B;

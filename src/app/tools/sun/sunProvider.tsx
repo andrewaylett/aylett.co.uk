@@ -5,33 +5,12 @@ import React, { type ReactNode, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
-import { type Loc, PRESET_LOCATIONS } from '@/app/tools/sun/locations';
 import {
-  type CustomLoc,
-  type LocState,
-  SunContext,
-} from '@/app/tools/sun/sunContext';
-
-function useLoc(initial: Loc): LocState {
-  const [loc, setLoc] = useState<Loc>(initial);
-  const [mode, setMode] = useState<'preset' | 'custom'>('preset');
-  const [custom, setCustom] = useState<CustomLoc>({
-    name: '',
-    lat: '',
-    lng: '',
-  });
-
-  return {
-    loc,
-    setLoc,
-    mode,
-    setMode,
-    custom,
-    setCustomField: (key, value) => {
-      setCustom((prev) => ({ ...prev, [key]: value }));
-    },
-  };
-}
+  type Loc,
+  type LocationRef,
+  PRESET_LOCATIONS,
+} from '@/app/tools/sun/locations';
+import { SunContext } from '@/app/tools/sun/sunContext';
 
 export function SunProvider({
   children,
@@ -46,8 +25,24 @@ export function SunProvider({
   );
   const [metric, setMetric] = useState<SunriseOrSunset>('sunset');
 
-  const a = useLoc(PRESET_LOCATIONS[0]);
-  const b = useLoc(PRESET_LOCATIONS[1]);
+  const [a, setA] = useState(PRESET_LOCATIONS[0]);
+  const [b, setB] = useState(PRESET_LOCATIONS[1]);
+
+  function setLoc(locRef: LocationRef, loc: Loc | ((loc: Loc) => Loc)) {
+    switch (locRef) {
+      case 'A': {
+        setA(loc);
+        break;
+      }
+      case 'B': {
+        setB(loc);
+        break;
+      }
+      default: {
+        throw new Error('Invalid location reference');
+      }
+    }
+  }
 
   return (
     <SunContext.Provider
@@ -60,6 +55,7 @@ export function SunProvider({
         setDate,
         setYear,
         setMetric,
+        setLoc,
       }}
     >
       {children}

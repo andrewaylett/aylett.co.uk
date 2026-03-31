@@ -1,17 +1,14 @@
-'use client';
-
 import React from 'react';
 
-import { useSun } from '@/app/tools/sun/sunContext';
 import { LocationPicker } from '@/app/tools/sun/locationPicker';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
+import { LOC_A, LOC_B } from '@/app/tools/sun/locations';
 
 export function LocationPickers() {
-  const { a, b } = useSun();
   return (
     <div className="flex flex-wrap gap-4 mb-4">
-      <LocationPicker label="Location A" locState={a} color={COL_A} />
-      <LocationPicker label="Location B" locState={b} color={COL_B} />
+      <LocationPicker label="Location A" locRef={LOC_A} color={COL_A} />
+      <LocationPicker label="Location B" locRef={LOC_B} color={COL_B} />
     </div>
   );
 }
