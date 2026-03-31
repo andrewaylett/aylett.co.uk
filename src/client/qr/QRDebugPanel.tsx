@@ -40,7 +40,11 @@ export function QRDebugPanel({
           <dt>Segments</dt>
           <dd>
             {qrDebugDetails.segments
-              .map((s) => `${s.mode.toString()}(${s.numChars})`)
+              .map((s) =>
+                s.text === undefined
+                  ? `${s.mode.toString()}(${s.numChars})`
+                  : `${s.mode.toString()}(${JSON.stringify(s.text)})`,
+              )
               .join(', ')}
           </dd>
         </dl>

@@ -37,7 +37,10 @@ function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
 }
 
 function useOptimisedQr(state: QRCodeState) {
-  const qrValue: string = useQrValue(state.text, state.shouldOptimiseUrl);
+  const optimisedValue: string = useQrValue(
+    state.text,
+    state.shouldOptimiseUrl,
+  );
 
   const nonOptimisedQr = useQRCode({
     value: state.text,
@@ -45,7 +48,7 @@ function useOptimisedQr(state: QRCodeState) {
     minVersion: 1,
   });
   const optimisedQr = useQRCode({
-    value: qrValue,
+    value: optimisedValue,
     level: 'L',
     minVersion: 1,
   });
@@ -66,24 +69,27 @@ function useOptimisedQr(state: QRCodeState) {
     optimisedQr instanceof Error && optimisedQr.message;
 
   const canOptimiseUrl = URL_SPLITTER.test(state.text);
-  const willAttemptOptimisation = state.shouldOptimiseUrl && canOptimiseUrl;
-  const debugMessage = () =>
-    `${
-      canOptimiseUrl
-        ? state.shouldOptimiseUrl
-          ? willUseOptimisedQr
-            ? 'Optimised'
-            : "Optimisation doesn't help"
-          : 'Optimisation manually disabled'
-        : 'Not able to optimise this input'
-    }${
-      willAttemptOptimisation && optimisedQrErrorMessage
-        ? ` and rendering the optimised form gave an error: ${optimisedQrErrorMessage}`
-        : ''
-    }`;
+  const debugMessage = () => {
+    const urlPart = canOptimiseUrl
+      ? state.shouldOptimiseUrl
+        ? willUseOptimisedQr
+          ? 'URL uppercased'
+          : `URL uppercasing unhelpful${optimisedQrErrorMessage ? ` (error: ${optimisedQrErrorMessage})` : ''}`
+        : 'URL uppercasing disabled'
+      : null;
+
+    const segModes = qrDetails.segments.map((s) => s.mode.toString());
+    const hasNonByte = segModes.some((m) => m !== 'BYTE');
+    const segPart = hasNonByte
+      ? `segmented (${[...new Set(segModes)].join('+')})`
+      : null;
+
+    const parts = [urlPart, segPart].filter(Boolean);
+    return parts.length > 0 ? parts.join(', ') : 'None';
+  };
 
   return {
-    qrValue,
+    actualValue: willUseOptimisedQr ? optimisedValue : state.text,
     willUseOptimisedQr,
     qrDetails,
     debugMessage,
@@ -100,7 +106,7 @@ export function QRCode({
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }>) {
-  const { qrValue, qrDetails, debugMessage } = useOptimisedQr(state);
+  const { actualValue, qrDetails, debugMessage } = useOptimisedQr(state);
   const qrDebugDetails = useDebugDetails(qrDetails);
 
   return (
@@ -118,7 +124,7 @@ export function QRCode({
       {showDebug && (
         <QRDebugPanel
           qrDebugDetails={qrDebugDetails}
-          qrValue={qrValue}
+          qrValue={actualValue}
           state={state}
           debugMessage={debugMessage}
         />
