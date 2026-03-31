@@ -5,32 +5,24 @@ import { createContext, useContext } from 'react';
 import { type Temporal } from 'temporal-polyfill';
 
 import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
-import { type Loc } from '@/app/tools/sun/locations';
-
-export interface CustomLoc {
-  name: string;
-  lat: string;
-  lng: string;
-}
-
-export interface LocState {
-  loc: Loc;
-  setLoc: (loc: Loc) => void;
-  mode: 'preset' | 'custom';
-  setMode: (mode: 'preset' | 'custom') => void;
-  custom: CustomLoc;
-  setCustomField: (key: keyof CustomLoc, value: string) => void;
-}
+import { type Loc, type LocationRef } from '@/app/tools/sun/locations';
 
 interface SunState {
-  a: LocState;
-  b: LocState;
+  a: Loc;
+  b: Loc;
   date: Temporal.PlainDate;
   year: number;
   metric: SunriseOrSunset;
   setDate: (date: Temporal.PlainDate) => void;
   setYear: (year: number) => void;
   setMetric: (metric: SunriseOrSunset) => void;
+
+  setLoc(
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    this: void,
+    locRef: LocationRef,
+    loc: Loc | ((loc: Loc) => Loc),
+  ): void;
 }
 
 export const SunContext = createContext<SunState | undefined>(undefined);
@@ -39,4 +31,31 @@ export function useSun(): SunState {
   const ctx = useContext(SunContext);
   if (!ctx) throw new Error('useSun must be used within SunProvider');
   return ctx;
+}
+
+export function useLoc(
+  locRef: LocationRef,
+): [Loc, (loc: Loc | ((loc: Loc) => Loc)) => void] {
+  const { a, b, setLoc } = useSun();
+  switch (locRef) {
+    case 'A': {
+      return [
+        a,
+        (loc) => {
+          setLoc('A', loc);
+        },
+      ];
+    }
+    case 'B': {
+      return [
+        b,
+        (loc) => {
+          setLoc('B', loc);
+        },
+      ];
+    }
+    default: {
+      throw new Error('Invalid location reference');
+    }
+  }
 }

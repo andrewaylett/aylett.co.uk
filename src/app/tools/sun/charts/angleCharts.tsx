@@ -21,8 +21,8 @@ import { ChartCard } from '@/app/tools/sun/charts/chartCard';
 export function AngleCharts(): React.JSX.Element {
   const sun = useSun();
 
-  const locA = useDeferredValue(sun.a.loc);
-  const locB = useDeferredValue(sun.b.loc);
+  const locA = useDeferredValue(sun.a);
+  const locB = useDeferredValue(sun.b);
   const year = useDeferredValue(sun.year);
 
   // Both datasets cover -90°..90°; merge by index, dropping points where the

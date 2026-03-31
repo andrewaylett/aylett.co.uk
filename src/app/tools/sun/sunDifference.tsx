@@ -10,8 +10,8 @@ import { useSolarTimes } from '@/app/tools/sun/solarTimes';
 export function SunDifference(): React.JSX.Element {
   const { a, b, date, metric } = useSun();
 
-  const kA = useSolarTimes(a.loc)[metric];
-  const kB = useSolarTimes(b.loc)[metric];
+  const kA = useSolarTimes(a)[metric];
+  const kB = useSolarTimes(b)[metric];
   const diff = kA != null && kB != null ? kA - kB : null;
 
   if (diff === null) {
@@ -34,7 +34,7 @@ export function SunDifference(): React.JSX.Element {
         {minutesToHHMM(diff)}
       </p>
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-        {diff >= 0 ? a.loc.name : b.loc.name} has the later {metric}.
+        {diff >= 0 ? a.name : b.name} has the later {metric}.
       </p>
     </div>
   );

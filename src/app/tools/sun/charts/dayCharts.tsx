@@ -47,14 +47,14 @@ function useYearData(loc: Loc): DayTimes[] {
 export function DayCharts(): React.JSX.Element {
   const sun = useSun();
 
-  const locA = useDeferredValue(sun.a.loc);
-  const locB = useDeferredValue(sun.b.loc);
+  const locA = useDeferredValue(sun.a);
+  const locB = useDeferredValue(sun.b);
   const year = useDeferredValue(sun.year);
   const metric = useDeferredValue(sun.metric);
 
   const isPending =
-    locA !== sun.a.loc ||
-    locB !== sun.b.loc ||
+    locA !== sun.a ||
+    locB !== sun.b ||
     year !== sun.year ||
     metric !== sun.metric;
 
