@@ -8,7 +8,6 @@ import {
   Line,
   LineChart,
   ReferenceLine,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -108,177 +107,189 @@ export function DayCharts(): React.JSX.Element {
         <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
           Positive = A later · Negative = B later
         </p>
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart
-            data={data}
-            margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="date"
-              ticks={tickDates}
-              tickFormatter={(d: string) =>
-                MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-              }
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-            />
-            <YAxis
-              tickFormatter={minutesToHHMM}
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-              width={72}
-            />
-            <Tooltip content={DiffTooltip} />
-            <Legend wrapperStyle={{ fontSize: 11, color: '#9ca3af' }} />
-            <ReferenceLine y={0} stroke="#4b5563" strokeDasharray="4 2" />
-            <Line
-              type="monotone"
-              dataKey="diff"
-              dot={false}
-              stroke={COL_A}
-              strokeWidth={2}
-              name="Total"
-              isAnimationActive={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="lngDiff"
-              dot={false}
-              stroke="#6b7280"
-              strokeWidth={1}
-              strokeDasharray="4 2"
-              name="Longitude"
-              isAnimationActive={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="latDiff"
-              dot={false}
-              stroke="#a78bfa"
-              strokeWidth={1}
-              strokeDasharray="2 3"
-              name="Latitude"
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <LineChart
+          data={data}
+          margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+          responsive
+          style={{
+            width: '100%',
+            maxHeight: '80vh',
+            aspectRatio: 1.618,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis
+            dataKey="date"
+            ticks={tickDates}
+            tickFormatter={(d: string) =>
+              MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
+            }
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+          />
+          <YAxis
+            tickFormatter={minutesToHHMM}
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+            width={72}
+          />
+          <Tooltip content={DiffTooltip} />
+          <Legend wrapperStyle={{ fontSize: 11, color: '#9ca3af' }} />
+          <ReferenceLine y={0} stroke="#4b5563" strokeDasharray="4 2" />
+          <Line
+            type="monotone"
+            dataKey="diff"
+            dot={false}
+            stroke={COL_A}
+            strokeWidth={2}
+            name="Total"
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="lngDiff"
+            dot={false}
+            stroke="#6b7280"
+            strokeWidth={1}
+            strokeDasharray="4 2"
+            name="Longitude"
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="latDiff"
+            dot={false}
+            stroke="#a78bfa"
+            strokeWidth={1}
+            strokeDasharray="2 3"
+            name="Latitude"
+            isAnimationActive={false}
+          />
+        </LineChart>
       </ChartCard>
       <ChartCard>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
           Absolute {metric} times · {year}
         </p>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart
-            data={data}
-            margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="date"
-              ticks={tickDates}
-              tickFormatter={(d: string) =>
-                MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-              }
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-            />
-            <YAxis
-              tickFormatter={minsToTime}
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-              width={48}
-            />
-            <Tooltip
-              formatter={(v: number | undefined, n: string | undefined) => [
-                minsToTime(v),
-                n,
-              ]}
-              contentStyle={{
-                background: '#111827',
-                border: '1px solid #374151',
-                fontSize: 12,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-            <Line
-              type="monotone"
-              dataKey="valA"
-              name={locA.name}
-              dot={false}
-              stroke={COL_A}
-              strokeWidth={2}
-              isAnimationActive={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="valB"
-              name={locB.name}
-              dot={false}
-              stroke={COL_B}
-              strokeWidth={2}
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <LineChart
+          data={data}
+          margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+          responsive
+          style={{
+            width: '100%',
+            maxHeight: '80vh',
+            aspectRatio: 1.618,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis
+            dataKey="date"
+            ticks={tickDates}
+            tickFormatter={(d: string) =>
+              MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
+            }
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+          />
+          <YAxis
+            tickFormatter={minsToTime}
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+            width={48}
+          />
+          <Tooltip
+            formatter={(v: number | undefined, n: string | undefined) => [
+              minsToTime(v),
+              n,
+            ]}
+            contentStyle={{
+              background: '#111827',
+              border: '1px solid #374151',
+              fontSize: 12,
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
+          <Line
+            type="monotone"
+            dataKey="valA"
+            name={locA.name}
+            dot={false}
+            stroke={COL_A}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="valB"
+            name={locB.name}
+            dot={false}
+            stroke={COL_B}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
+        </LineChart>
       </ChartCard>
       <ChartCard>
         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
           Day length · {year}
         </p>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart
-            data={data}
-            margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="date"
-              ticks={tickDates}
-              tickFormatter={(d: string) =>
-                MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-              }
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-            />
-            <YAxis
-              tickFormatter={minsToHuman}
-              stroke="#6b7280"
-              tick={{ fill: '#9ca3af', fontSize: 11 }}
-              width={56}
-            />
-            <Tooltip
-              formatter={(v: number | undefined, n: string | undefined) => [
-                minsToHuman(v),
-                n,
-              ]}
-              contentStyle={{
-                background: '#111827',
-                border: '1px solid #374151',
-                fontSize: 12,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-            <Line
-              type="monotone"
-              dataKey="dayLengthA"
-              name={locA.name}
-              dot={false}
-              stroke={COL_A}
-              strokeWidth={1}
-              isAnimationActive={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="dayLengthB"
-              name={locB.name}
-              dot={false}
-              stroke={COL_B}
-              strokeWidth={1}
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <LineChart
+          data={data}
+          margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+          responsive
+          style={{
+            width: '100%',
+            maxHeight: '80vh',
+            aspectRatio: 1.618,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis
+            dataKey="date"
+            ticks={tickDates}
+            tickFormatter={(d: string) =>
+              MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
+            }
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+          />
+          <YAxis
+            tickFormatter={minsToHuman}
+            stroke="#6b7280"
+            tick={{ fill: '#9ca3af', fontSize: 11 }}
+            width={56}
+          />
+          <Tooltip
+            formatter={(v: number | undefined, n: string | undefined) => [
+              minsToHuman(v),
+              n,
+            ]}
+            contentStyle={{
+              background: '#111827',
+              border: '1px solid #374151',
+              fontSize: 12,
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
+          <Line
+            type="monotone"
+            dataKey="dayLengthA"
+            name={locA.name}
+            dot={false}
+            stroke={COL_A}
+            strokeWidth={1}
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="dayLengthB"
+            name={locB.name}
+            dot={false}
+            stroke={COL_B}
+            strokeWidth={1}
+            isAnimationActive={false}
+          />
+        </LineChart>
       </ChartCard>
     </div>
   );
