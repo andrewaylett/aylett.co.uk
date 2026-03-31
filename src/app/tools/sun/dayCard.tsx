@@ -25,7 +25,7 @@ export function DayCard({
     ['Day length', minsToHuman(dayLength)],
   ];
   return (
-    <div className="flex-1 min-w-50 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+    <>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
         {loc.name}
       </p>
@@ -57,6 +57,6 @@ export function DayCard({
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

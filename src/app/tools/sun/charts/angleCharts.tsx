@@ -19,7 +19,6 @@ import {
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildAngleData } from '@/app/tools/sun/buildAngleData';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
-import { ChartCard } from '@/app/tools/sun/charts/chartCard';
 
 /** Chart for hours above a given solar elevation angle across the year. */
 export function AngleCharts(): React.JSX.Element {
@@ -57,7 +56,7 @@ export function AngleCharts(): React.JSX.Element {
   }
 
   return (
-    <ChartCard>
+    <>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
         Hours above elevation · {year}
       </p>
@@ -117,6 +116,6 @@ export function AngleCharts(): React.JSX.Element {
           isAnimationActive={false}
         />
       </LineChart>
-    </ChartCard>
+    </>
   );
 }

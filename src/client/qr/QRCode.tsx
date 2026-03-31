@@ -5,6 +5,7 @@ import {
   useDebugDetails,
   useQRCode,
 } from '@/client/qr/thirdparty/qrcode.react';
+import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
 export interface QRCodeState {
   text: string;
@@ -115,29 +116,12 @@ export function QRCode({
       </div>
       {children}
       {showDebug && (
-        <details className="p-2 mt-4 w-full">
-          <summary>Debug Information</summary>
-          <dl className="columns-half-width">
-            <dt>Module count</dt>
-            <dd>{qrDebugDetails.moduleCount}</dd>
-            <dt>QR Version</dt>
-            <dd>{qrDebugDetails.qrVersion}</dd>
-            <dt>Error Correction Level</dt>
-            <dd>{qrDebugDetails.level}</dd>
-            <dt>Rendered value</dt>
-            <dd>{'"' + qrValue + '"'}</dd>
-            <dt>Render Generation</dt>
-            <dd>{state.generation}</dd>
-            <dt>Optimisation</dt>
-            <dd>{debugMessage()}</dd>
-            <dt>Segments</dt>
-            <dd>
-              {qrDebugDetails.segments
-                .map((s) => `${s.mode.toString()}(${s.numChars})`)
-                .join(', ')}
-            </dd>
-          </dl>
-        </details>
+        <QRDebugPanel
+          qrDebugDetails={qrDebugDetails}
+          qrValue={qrValue}
+          state={state}
+          debugMessage={debugMessage}
+        />
       )}
     </>
   );
