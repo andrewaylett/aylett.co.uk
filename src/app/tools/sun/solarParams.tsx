@@ -86,6 +86,7 @@ const ECC_RATE_2 = 0.000_000_126_7;
 export interface SolarParams {
   date: Temporal.PlainDate;
   jd: JulianDay;
+  cosDec: number;
   sinDec: number;
   dec: Radians;
   /** Mean longitude (radians) */
@@ -138,7 +139,8 @@ export function computeSolarParams(date: Temporal.PlainDate): SolarParams {
 
   const sinDec = Math.sin(obliq) * Math.sin(sunLon);
   const dec = Math.asin(sinDec) as Radians;
+  const cosDec = Math.cos(dec);
   const ecc = ECC_EPOCH - T * (ECC_RATE_1 + ECC_RATE_2 * T);
 
-  return { date, jd, sinDec, dec, L0, M, obliq, ecc };
+  return { date, jd, cosDec, sinDec, dec, L0, M, obliq, ecc };
 }

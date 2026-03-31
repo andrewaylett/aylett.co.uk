@@ -12,11 +12,8 @@ import {
   YAxis,
 } from 'recharts';
 
-import { useDeclinations, useSun } from '@/app/tools/sun/sunContext';
-import {
-  buildAngleData,
-  solarElevationRange,
-} from '@/app/tools/sun/buildAngleData';
+import { useSun } from '@/app/tools/sun/sunContext';
+import { buildAngleData } from '@/app/tools/sun/buildAngleData';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
 import { ChartCard } from '@/app/tools/sun/charts/chartCard';
 
@@ -27,21 +24,23 @@ export function AngleCharts(): React.JSX.Element {
   const locA = useDeferredValue(sun.a.loc);
   const locB = useDeferredValue(sun.b.loc);
   const year = useDeferredValue(sun.year);
-  const declinations = useDeferredValue(useDeclinations());
 
-  // Compute the union of both locations' annual elevation ranges so both
-  // lines share the same x-axis.
-  const rangeA = solarElevationRange(locA.lat, declinations);
-  const rangeB = solarElevationRange(locB.lat, declinations);
-  const minAngle = Math.min(rangeA.minAngle, rangeB.minAngle);
-  const maxAngle = Math.max(rangeA.maxAngle, rangeB.maxAngle);
-  const adA = buildAngleData(locA.lat, year, minAngle, maxAngle);
-  const adB = buildAngleData(locB.lat, year, minAngle, maxAngle);
-  const angleData = adA.map((p, i) => ({
-    angle: p.angle,
-    hoursA: p.hours,
-    hoursB: adB[i].hours,
-  }));
+  // Both datasets cover -90°..90°; merge by index, dropping points where the
+  // sun never reaches the angle (both zero) or always exceeds it (both at max).
+  const adA = buildAngleData(locA.lat, year);
+  const adB = buildAngleData(locB.lat, year);
+  const maxHours = adA[0]?.hours ?? 0; // hours at −90° = total hours in year
+  const angleData = adA
+    .map((pA, i) => ({
+      angle: pA.angle,
+      hoursA: pA.hours,
+      hoursB: adB[i].hours,
+    }))
+    .filter(
+      ({ hoursA, hoursB }) =>
+        !(hoursA === 0 && hoursB === 0) &&
+        !(hoursA === maxHours && hoursB === maxHours),
+    );
 
   const angleTicks: number[] = [];
   if (angleData.length > 0) {

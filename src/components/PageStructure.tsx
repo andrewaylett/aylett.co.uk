@@ -8,6 +8,7 @@ import React, {
 import { Footer, type FooterProps } from './Footer';
 
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { BasicFallback } from '@/components/BasicFallback';
 
 export interface PageStructureProps extends FooterProps {
   breadcrumbs?: Breadcrumbs;
@@ -45,21 +46,12 @@ export function PageStructure({
           <Breadcrumbs breadcrumbs={breadcrumbs} />
         )}
         <div className="">{header}</div>
-        <Suspense
-          fallback={
-            <div>
-              Rendering...{' '}
-              <span className="appear-10s">
-                do you have Javascript enabled?
-              </span>
-            </div>
-          }
-        >
+        <Suspense fallback={<BasicFallback />}>
           <main className="hyphens-manual">{children}</main>
-          <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible">
-            <Footer author={author} keywords={keywords} copyright={copyright} />
-          </div>
         </Suspense>
+        <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible">
+          <Footer author={author} keywords={keywords} copyright={copyright} />
+        </div>
       </div>
     </>
   );
