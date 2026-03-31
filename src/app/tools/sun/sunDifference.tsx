@@ -18,7 +18,7 @@ export function SunDifference(): React.JSX.Element {
     return <></>;
   }
   return (
-    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6">
+    <>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
         {metric.charAt(0).toUpperCase() + metric.slice(1)} difference on{' '}
         {date.toLocaleString('en-GB', {
@@ -36,6 +36,6 @@ export function SunDifference(): React.JSX.Element {
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
         {diff >= 0 ? a.name : b.name} has the later {metric}.
       </p>
-    </div>
+    </>
   );
 }

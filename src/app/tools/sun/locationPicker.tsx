@@ -26,7 +26,7 @@ export function LocationPicker({
   }
 
   return (
-    <div className="flex-1 min-w-55 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+    <>
       <p className="text-xs font-semibold mb-2" style={{ color }}>
         {label}
       </p>
@@ -100,6 +100,6 @@ export function LocationPicker({
       <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
         {loc.name} ({loc.lat.toFixed(4)}, {loc.lng.toFixed(4)})
       </p>
-    </div>
+    </>
   );
 }
