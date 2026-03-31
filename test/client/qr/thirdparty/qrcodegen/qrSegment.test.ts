@@ -66,10 +66,28 @@ describe('QrSegment.makeSegments', () => {
     expect(segs[0].mode).toBe(Mode.NUMERIC);
   });
 
-  it('returns a single ALPHANUMERIC segment for all-QR-alphanumeric input (fast path)', () => {
+  it('returns a single ALPHANUMERIC segment when that is genuinely optimal', () => {
+    // "ABCDE 12345" (11 chars): single ALPHA = 74 bits; ALPHA("ABCDE ") + NUMERIC("12345") = 77 bits.
+    // The DP correctly keeps it as one segment.
     const segs = QrSegment.makeSegments('ABCDE 12345');
     expect(segs).toHaveLength(1);
     expect(segs[0].mode).toBe(Mode.ALPHANUMERIC);
+  });
+
+  it('splits an uppercase-prefixed long numeric run into ALPHA + NUMERIC', () => {
+    // "A" + 51 nines: single ALPHA = 299 bits; ALPHA("A") + NUMERIC("9"×51) = 203 bits.
+    // Previously the alphanumeric fast path incorrectly returned a single ALPHA segment.
+    const text = 'A' + '9'.repeat(51);
+    const segs = QrSegment.makeSegments(text);
+    expect(segs.length).toBeGreaterThanOrEqual(2);
+    const last = segs.at(-1);
+    expect(last?.mode).toBe(Mode.NUMERIC);
+    // Must be strictly smaller than encoding the whole string as alphanumeric.
+    const alphaBits = QrSegment.getTotalBits(
+      [QrSegment.makeAlphanumeric(text)],
+      1,
+    );
+    expect(QrSegment.getTotalBits(segs, 1)).toBeLessThan(alphaBits);
   });
 
   // Versions 10-26 use wider character-count fields (BYTE: 16 bits, NUMERIC: 12 bits)
