@@ -60,6 +60,8 @@ export default tseslint.config(
         },
       ],
       'unicorn/import-style': ['off'],
+      'unicorn/no-array-sort': ['off'],
+      'unicorn/no-array-reverse': ['off'],
       'react/no-unescaped-entities': [
         'error',
         {

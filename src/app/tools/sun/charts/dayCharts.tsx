@@ -9,9 +9,11 @@ import {
   LineChart,
   ReferenceLine,
   Tooltip,
+  type TooltipValueType,
   XAxis,
   YAxis,
 } from 'recharts';
+import { type NameType } from 'recharts/types/component/DefaultTooltipContent';
 
 import { type Loc } from '@/app/tools/sun/locations';
 import { type Point } from '@/app/tools/sun/charts/point';
@@ -198,8 +200,8 @@ export function DayCharts(): React.JSX.Element {
             width={48}
           />
           <Tooltip
-            formatter={(v: number | undefined, n: string | undefined) => [
-              minsToTime(v),
+            formatter={(v?: TooltipValueType, n?: NameType) => [
+              minsToTime(Number(v)),
               n,
             ]}
             contentStyle={{
@@ -260,8 +262,8 @@ export function DayCharts(): React.JSX.Element {
             width={56}
           />
           <Tooltip
-            formatter={(v: number | undefined, n: string | undefined) => [
-              minsToHuman(v),
+            formatter={(v?: TooltipValueType, n?: NameType) => [
+              minsToHuman(Number(v)),
               n,
             ]}
             contentStyle={{
