@@ -11,6 +11,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import {
+  type NameType,
+  type ValueType,
+} from 'recharts/types/component/DefaultTooltipContent';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildAngleData } from '@/app/tools/sun/buildAngleData';
@@ -82,8 +86,8 @@ export function AngleCharts(): React.JSX.Element {
           width={48}
         />
         <Tooltip
-          formatter={(v: number | undefined, n: string | undefined) => [
-            v == null ? '—' : `${v}h`,
+          formatter={(v: ValueType | undefined, n: NameType | undefined) => [
+            v == null ? '—' : `${String(v)}h`,
             n,
           ]}
           labelFormatter={(v: unknown) => `${String(v)}° elevation`}

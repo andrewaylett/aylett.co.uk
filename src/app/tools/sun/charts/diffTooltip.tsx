@@ -1,10 +1,6 @@
 import React from 'react';
 
-import { type TooltipContentProps } from 'recharts/types/component/Tooltip';
-import {
-  type NameType,
-  type ValueType,
-} from 'recharts/types/component/DefaultTooltipContent';
+import { type TooltipContentProps } from 'recharts';
 
 import { type Point } from '@/app/tools/sun/charts/point';
 import { COL_NEG, COL_POS } from '@/app/tools/sun/colours';
@@ -14,7 +10,7 @@ import { minsToTime } from '@/app/tools/sun/minsToTime';
 export function DiffTooltip({
   active,
   payload,
-}: TooltipContentProps<ValueType, NameType>): React.JSX.Element | null {
+}: TooltipContentProps): React.JSX.Element | null {
   if (!active || payload.length === 0) return null;
   const d: Point = (payload[0] as { payload: Point }).payload;
   return (
