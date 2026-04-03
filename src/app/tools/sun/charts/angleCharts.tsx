@@ -4,9 +4,11 @@ import React, { useDeferredValue } from 'react';
 
 import {
   CartesianGrid,
+  createHorizontalChart,
   Legend,
   Line,
   LineChart,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
@@ -19,6 +21,13 @@ import {
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildAngleData } from '@/app/tools/sun/buildAngleData';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
+import { tooltipWrapperClassName } from '@/app/tools/sun/charts/point';
+
+interface AngleData {
+  angle: number;
+  hoursA: number;
+  hoursB: number;
+}
 
 /** Chart for hours above a given solar elevation angle across the year. */
 export function AngleCharts(): React.JSX.Element {
@@ -33,7 +42,7 @@ export function AngleCharts(): React.JSX.Element {
   const adA = buildAngleData(locA.lat, year);
   const adB = buildAngleData(locB.lat, year);
   const maxHours = adA[0]?.hours ?? 0; // hours at −90° = total hours in year
-  const angleData = adA
+  const angleData: AngleData[] = adA
     .map((pA, i) => ({
       angle: pA.angle,
       hoursA: pA.hours,
@@ -44,6 +53,17 @@ export function AngleCharts(): React.JSX.Element {
         !(hoursA === 0 && hoursB === 0) &&
         !(hoursA === maxHours && hoursB === maxHours),
     );
+
+  const Typed = createHorizontalChart<AngleData, number>()({
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ReferenceLine,
+    Tooltip,
+    XAxis,
+    YAxis,
+  });
 
   const angleTicks: number[] = [];
   if (angleData.length > 0) {
@@ -57,10 +77,8 @@ export function AngleCharts(): React.JSX.Element {
 
   return (
     <>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-        Hours above elevation · {year}
-      </p>
-      <LineChart
+      <p className="text-xs mb-3">Hours above elevation · {year}</p>
+      <Typed.LineChart
         data={angleData}
         margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
         responsive
@@ -70,52 +88,46 @@ export function AngleCharts(): React.JSX.Element {
           aspectRatio: 1.618,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-        <XAxis
-          dataKey="angle"
+        <Typed.CartesianGrid />
+        <Typed.XAxis
+          dataKey={(p) => p.angle}
+          type="number"
           ticks={angleTicks}
           tickFormatter={(v: number) => `${v}°`}
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
+          tick={{ fontSize: 11 }}
         />
-        <YAxis
+        <Typed.YAxis
           tickFormatter={(v: number) => `${v}h`}
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-          width={48}
+          tick={{ fontSize: 11 }}
         />
-        <Tooltip
-          formatter={(v: ValueType | undefined, n: NameType | undefined) => [
-            v == null ? '—' : `${String(v)}h`,
-            n,
-          ]}
-          labelFormatter={(v: unknown) => `${String(v)}° elevation`}
-          contentStyle={{
-            background: '#111827',
-            border: '1px solid #374151',
-            fontSize: 12,
+        <Typed.Tooltip
+          formatter={(v?: ValueType, n?: NameType) => {
+            const hours = v as number;
+            return [v == null ? '—' : `${Math.round(hours)}h`, n];
           }}
+          labelFormatter={(v: unknown) => `${String(v)}° elevation`}
+          wrapperClassName={tooltipWrapperClassName}
         />
-        <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-        <Line
+        <Typed.Legend wrapperStyle={{ fontSize: 11 }} />
+        <Typed.Line
           type="monotone"
-          dataKey="hoursA"
+          dataKey={(p) => p.hoursA}
           name={locA.name}
           dot={false}
           stroke={COL_A}
           strokeWidth={1}
           isAnimationActive={false}
         />
-        <Line
+        <Typed.Line
           type="monotone"
-          dataKey="hoursB"
+          dataKey={(p) => p.hoursB}
           name={locB.name}
           dot={false}
           stroke={COL_B}
           strokeWidth={1}
           isAnimationActive={false}
         />
-      </LineChart>
+      </Typed.LineChart>
     </>
   );
 }

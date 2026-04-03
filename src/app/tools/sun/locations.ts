@@ -11,6 +11,7 @@ export const PRESET_LOCATIONS: Loc[] = [
   { name: 'London', lat: 51.5074, lng: -0.1278 },
   { name: 'Aberdeen', lat: 57.1497, lng: -2.0943 },
   { name: 'Penzance, Cornwall', lat: 50.1186, lng: -5.537 },
+  { name: 'Ulva Ferry', lat: 56.4806, lng: -6.1528 },
 ];
 
 export const LOC_A = 'A' as const;
