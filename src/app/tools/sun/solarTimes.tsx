@@ -11,7 +11,7 @@ export interface SolarTimes {
   sunset?: number; // minutes from midnight UK local time (GMT/BST)
   dawn?: number; // civil dawn (sun 6° below horizon), minutes from midnight
   dusk?: number; // civil dusk (sun 6° below horizon), minutes from midnight
-  dayLength?: number; // in minutes
+  dayLength: number; // in minutes
   polar?: 'midnight sun' | 'polar night';
 }
 
@@ -76,8 +76,8 @@ export function solarTimes(
   const cosHA =
     (cos(SUNRISE_ZENITH) - sin(latR) * sinDec) / (cos(latR) * cos(dec));
 
-  if (cosHA < -1) return { polar: 'midnight sun' };
-  if (cosHA > 1) return { polar: 'polar night' };
+  if (cosHA < -1) return { polar: 'midnight sun', dayLength: 24 * 60 };
+  if (cosHA > 1) return { polar: 'polar night', dayLength: 0 };
 
   const ha = acos(cosHA) / RAD;
   const solarNoon = SOLAR_NOON_BASE - MIN_PER_DEG_LNG * lng - eot; // UTC minutes from midnight

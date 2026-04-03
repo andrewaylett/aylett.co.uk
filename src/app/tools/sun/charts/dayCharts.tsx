@@ -1,44 +1,34 @@
 'use client';
 
-import React, { useDeferredValue } from 'react';
+import React, { type ReactNode, useDeferredValue } from 'react';
 
 import {
   CartesianGrid,
+  createHorizontalChart,
   Legend,
   Line,
   LineChart,
   ReferenceLine,
   Tooltip,
+  type TooltipPayload,
   type TooltipValueType,
   XAxis,
   YAxis,
 } from 'recharts';
 import { type NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { Temporal } from 'temporal-polyfill';
 
 import { type Loc } from '@/app/tools/sun/locations';
-import { type Point } from '@/app/tools/sun/charts/point';
+import {
+  type Point,
+  tooltipWrapperClassName,
+} from '@/app/tools/sun/charts/point';
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildYearData, type DayTimes } from '@/app/tools/sun/buildYearData';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
-import { DiffTooltip } from '@/app/tools/sun/charts/diffTooltip';
 import { minsToTime } from '@/app/tools/sun/minsToTime';
-import { minsToHuman } from '@/app/tools/sun/minsToHuman';
-
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import { minsToHuman, minsToHumanHours } from '@/app/tools/sun/minsToHuman';
 
 function useYearData(loc: Loc): DayTimes[] {
   return buildYearData(loc.lat, loc.lng, useSun().year);
@@ -61,9 +51,25 @@ export function DayCharts(): React.JSX.Element {
 
   const rA = useYearData(locA);
   const rB = useYearData(locB);
+
+  const Typed = createHorizontalChart<Point, number>()({
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ReferenceLine,
+    Tooltip,
+    XAxis,
+    YAxis,
+  });
+
   const data = rA
     .flatMap((a, i): Point[] => {
       const b = rB[i];
+      console.assert(
+        a.date.dayOfYear === b.date.dayOfYear,
+        `Year data must be in chronological order, got ${a.date.toString()} !== ${b.date.toString()}`,
+      );
       const valA = a[metric];
       const valB = b[metric];
       const diff = valA != null && valB != null ? valA - valB : undefined;
@@ -72,11 +78,13 @@ export function DayCharts(): React.JSX.Element {
       // lngDiff > 0 means A is further west, so A's times are later.
       const lngDiff = Math.round((locA.lng - locB.lng) * -4);
       const latDiff = diff == null ? undefined : diff - lngDiff;
-      const [, mo, d] = a.date.split('-').map(Number);
       return [
         {
-          date: a.date,
-          label: `${d} ${MONTHS[mo - 1]}`,
+          day: a.date.dayOfYear,
+          label: a.date.toLocaleString('en-GB', {
+            month: 'short',
+            day: 'numeric',
+          }),
           diff,
           valA,
           valB,
@@ -90,22 +98,43 @@ export function DayCharts(): React.JSX.Element {
     .filter(Boolean);
 
   const tickDates = Array.from({ length: 12 }, (_, i) => {
-    const month = String(i + 1).padStart(2, '0');
-    return `${year}-${month}-01`;
+    const plainDate = Temporal.PlainDate.from({ year, month: i + 1, day: 1 });
+    return plainDate.dayOfYear;
   });
+
+  const base = Temporal.PlainDate.from({ year, month: 1, day: 1 }).subtract(
+    Temporal.Duration.from({ days: 1 }),
+  );
+
+  function dateLabelFormatter(label: ReactNode, payload: TooltipPayload) {
+    if (payload.length === 0) {
+      return label;
+    }
+    const d = (payload[0].payload as Point).day;
+    return base
+      .add(
+        Temporal.Duration.from({
+          days: d,
+        }),
+      )
+      .toLocaleString('en-GB', {
+        month: 'short',
+        day: 'numeric',
+      });
+  }
 
   return (
     <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
+      <p className="text-xs mb-0.5">
         <span style={{ color: COL_A }}>{locA.name}</span> {metric} minus{' '}
         <span style={{ color: COL_B }}>{locB.name}</span> {metric} · {year}
       </p>
-      <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-        Positive = A later · Negative = B later
+      <p className="text-xs mb-3">
+        Positive = <span style={{ color: COL_A }}>{locA.name}</span> later ·
+        Negative = <span style={{ color: COL_B }}>{locB.name}</span> later
       </p>
-      <LineChart
+      <Typed.LineChart
         data={data}
-        margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
         responsive
         style={{
           width: '100%',
@@ -113,175 +142,176 @@ export function DayCharts(): React.JSX.Element {
           aspectRatio: 1.618,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-        <XAxis
-          dataKey="date"
+        <Typed.CartesianGrid />
+        <Typed.XAxis
+          dataKey="day"
           ticks={tickDates}
-          tickFormatter={(d: string) =>
-            MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-          }
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-        />
-        <YAxis
-          tickFormatter={minutesToHHMM}
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-          width={72}
-        />
-        <Tooltip content={DiffTooltip} />
-        <Legend wrapperStyle={{ fontSize: 11, color: '#9ca3af' }} />
-        <ReferenceLine y={0} stroke="#4b5563" strokeDasharray="4 2" />
-        <Line
-          type="monotone"
-          dataKey="diff"
-          dot={false}
-          stroke={COL_A}
-          strokeWidth={2}
-          name="Total"
-          isAnimationActive={false}
-        />
-        <Line
-          type="monotone"
-          dataKey="lngDiff"
-          dot={false}
-          stroke="#6b7280"
-          strokeWidth={1}
-          strokeDasharray="4 2"
-          name="Longitude"
-          isAnimationActive={false}
-        />
-        <Line
-          type="monotone"
-          dataKey="latDiff"
-          dot={false}
-          stroke="#a78bfa"
-          strokeWidth={1}
-          strokeDasharray="2 3"
-          name="Latitude"
-          isAnimationActive={false}
-        />
-      </LineChart>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-        Absolute {metric} times · {year}
-      </p>
-      <LineChart
-        data={data}
-        margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-        responsive
-        style={{
-          width: '100%',
-          maxHeight: '80vh',
-          aspectRatio: 1.618,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-        <XAxis
-          dataKey="date"
-          ticks={tickDates}
-          tickFormatter={(d: string) =>
-            MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-          }
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-        />
-        <YAxis
-          tickFormatter={minsToTime}
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-          width={48}
-        />
-        <Tooltip
-          formatter={(v?: TooltipValueType, n?: NameType) => [
-            minsToTime(Number(v)),
-            n,
-          ]}
-          contentStyle={{
-            background: '#111827',
-            border: '1px solid #374151',
-            fontSize: 12,
+          tickFormatter={function (d: number) {
+            return base
+              .add(
+                Temporal.Duration.from({
+                  days: d,
+                }),
+              )
+              .toLocaleString('en-GB', {
+                month: 'short',
+              });
           }}
+          tick={{ fontSize: 11 }}
         />
-        <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-        <Line
-          type="monotone"
-          dataKey="valA"
-          name={locA.name}
-          dot={false}
-          stroke={COL_A}
-          strokeWidth={2}
-          isAnimationActive={false}
-        />
-        <Line
-          type="monotone"
-          dataKey="valB"
-          name={locB.name}
-          dot={false}
-          stroke={COL_B}
-          strokeWidth={2}
-          isAnimationActive={false}
-        />
-      </LineChart>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-        Day length · {year}
-      </p>
-      <LineChart
-        data={data}
-        margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-        responsive
-        style={{
-          width: '100%',
-          maxHeight: '80vh',
-          aspectRatio: 1.618,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-        <XAxis
-          dataKey="date"
-          ticks={tickDates}
-          tickFormatter={(d: string) =>
-            MONTHS[Number.parseInt(d.split('-')[1], 10) - 1]
-          }
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-        />
-        <YAxis
-          tickFormatter={minsToHuman}
-          stroke="#6b7280"
-          tick={{ fill: '#9ca3af', fontSize: 11 }}
-          width={56}
-        />
-        <Tooltip
+        <Typed.YAxis tickFormatter={minutesToHHMM} tick={{ fontSize: 11 }} />
+        <Typed.Tooltip
           formatter={(v?: TooltipValueType, n?: NameType) => [
             minsToHuman(Number(v)),
             n,
           ]}
-          contentStyle={{
-            background: '#111827',
-            border: '1px solid #374151',
-            fontSize: 12,
-          }}
+          labelFormatter={dateLabelFormatter}
+          wrapperClassName={tooltipWrapperClassName}
         />
-        <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-        <Line
+        <Typed.Legend wrapperStyle={{ fontSize: 11 }} />
+        <Typed.ReferenceLine y={0} />
+        <Typed.Line
           type="monotone"
-          dataKey="dayLengthA"
+          dataKey={(p) => p.diff ?? Number.NaN}
+          dot={false}
+          stroke={COL_A}
+          strokeWidth={1}
+          name="Total Δ"
+          isAnimationActive={false}
+        />
+        <Typed.Line
+          type="monotone"
+          dataKey={(p) => p.lngDiff}
+          dot={false}
+          strokeWidth={1}
+          strokeDasharray="4 2"
+          name="Longitude Δ"
+          isAnimationActive={false}
+        />
+        <Typed.Line
+          type="monotone"
+          dataKey={(p) => p.latDiff ?? Number.NaN}
+          dot={false}
+          strokeWidth={1}
+          strokeDasharray="2 3"
+          name="Latitude Δ"
+          isAnimationActive={false}
+        />
+      </Typed.LineChart>
+      <p className="text-xs mb-3">
+        Absolute {metric} times · {year}
+      </p>
+      <Typed.LineChart
+        data={data}
+        responsive
+        style={{
+          width: '100%',
+          maxHeight: '80vh',
+          aspectRatio: 1.618,
+        }}
+      >
+        <Typed.CartesianGrid />
+        <Typed.XAxis
+          dataKey="day"
+          ticks={tickDates}
+          tickFormatter={(d: number) =>
+            base
+              .add(
+                Temporal.Duration.from({
+                  days: d,
+                }),
+              )
+              .toLocaleString('en-GB', {
+                month: 'short',
+              })
+          }
+          tick={{ fontSize: 11 }}
+        />
+        <Typed.YAxis tickFormatter={minsToTime} tick={{ fontSize: 11 }} />
+        <Typed.Tooltip
+          formatter={(v?: TooltipValueType, n?: NameType) => [
+            minsToTime(Number(v)),
+            n,
+          ]}
+          labelFormatter={dateLabelFormatter}
+          wrapperClassName={tooltipWrapperClassName}
+        />
+        <Typed.Legend wrapperStyle={{ fontSize: 11 }} />
+        <Typed.Line
+          type="monotone"
+          dataKey={(p) => p.valA ?? Number.NaN}
           name={locA.name}
           dot={false}
           stroke={COL_A}
           strokeWidth={1}
           isAnimationActive={false}
         />
-        <Line
+        <Typed.Line
           type="monotone"
-          dataKey="dayLengthB"
+          dataKey={(p) => p.valB ?? Number.NaN}
           name={locB.name}
           dot={false}
           stroke={COL_B}
           strokeWidth={1}
           isAnimationActive={false}
         />
-      </LineChart>
+      </Typed.LineChart>
+      <p className="text-xs mb-3">Day length · {year}</p>
+      <Typed.LineChart
+        data={data}
+        responsive
+        style={{
+          width: '100%',
+          maxHeight: '80vh',
+          aspectRatio: 1.618,
+        }}
+      >
+        <Typed.CartesianGrid />
+        <Typed.XAxis
+          dataKey="day"
+          ticks={tickDates}
+          tickFormatter={(d: number) =>
+            base
+              .add(
+                Temporal.Duration.from({
+                  days: d,
+                }),
+              )
+              .toLocaleString('en-GB', {
+                month: 'short',
+              })
+          }
+          tick={{ fontSize: 11 }}
+        />
+        <Typed.YAxis tickFormatter={minsToHumanHours} tick={{ fontSize: 11 }} />
+        <Typed.Tooltip
+          formatter={(v?: TooltipValueType, n?: NameType) => [
+            minsToHuman(Number(v)),
+            n,
+          ]}
+          labelFormatter={dateLabelFormatter}
+          wrapperClassName={tooltipWrapperClassName}
+        />
+        <Typed.Legend wrapperStyle={{ fontSize: 11 }} />
+        <Typed.Line
+          type="monotone"
+          dataKey={(p) => p.dayLengthA}
+          name={locA.name}
+          dot={false}
+          stroke={COL_A}
+          strokeWidth={1}
+          isAnimationActive={false}
+        />
+        <Typed.Line
+          type="monotone"
+          dataKey={(p) => p.dayLengthB}
+          name={locB.name}
+          dot={false}
+          stroke={COL_B}
+          strokeWidth={1}
+          isAnimationActive={false}
+        />
+      </Typed.LineChart>
     </div>
   );
 }

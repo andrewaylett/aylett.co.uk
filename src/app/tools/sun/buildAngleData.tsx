@@ -36,6 +36,14 @@ function computeDeclinationsInternal(year: number): Declination[] {
 }
 
 /**
+ * Precompute cosZenith for each integer angle; index i corresponds to angle = i − 90,
+ * zenith = 90° − angle = 180° − i.
+ */
+const cosZeniths = Array.from({ length: 181 }, (_, i) =>
+  Math.cos(((180 - i) * Math.PI) / 180),
+);
+
+/**
  * For each integer elevation angle from -90° to 90°, compute the total hours
  * per year the sun is at or above that angle at the given location.
  *
@@ -51,18 +59,13 @@ export function buildAngleData(lat: number, year: number): AnglePoint[] {
   const cosLat = Math.cos(latR);
   const sinLat = Math.sin(latR);
 
-  // Precompute cosZenith for each integer angle; index i corresponds to angle = i − 90,
-  // zenith = 90° − angle = 180° − i.
-  const cosZeniths = Array.from({ length: 181 }, (_, i) =>
-    Math.cos(((180 - i) * Math.PI) / 180),
-  );
   const totalMinutes: number[] = Array.from({ length: 181 }, () => 0);
 
-  for (const { sinDec, dec } of days) {
-    const cosDec = Math.cos(dec);
+  for (const { sinDec, cosDec } of days) {
     const denom = cosLat * cosDec;
-    for (let i = 0; i <= 180; i++) {
-      const cosHA = (cosZeniths[i] - sinLat * sinDec) / denom;
+    const num = sinLat * sinDec;
+    for (const [i, cosZ] of cosZeniths.entries()) {
+      const cosHA = (cosZ - num) / denom;
       if (cosHA < -1) {
         // Sun never sets below this angle — always above it
         totalMinutes[i] += 1440;
@@ -76,6 +79,6 @@ export function buildAngleData(lat: number, year: number): AnglePoint[] {
 
   return totalMinutes.map((m, i) => ({
     angle: i - 90,
-    hours: Math.round(m / 60),
+    hours: m / 60,
   }));
 }

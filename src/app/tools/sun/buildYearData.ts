@@ -4,7 +4,7 @@ import { type SolarTimes, solarTimes } from '@/app/tools/sun/solarTimes';
 import { computeSolarParams } from '@/app/tools/sun/solarParams';
 
 export interface DayTimes extends SolarTimes {
-  date: string; // YYYY-MM-DD
+  date: Temporal.PlainDate;
 }
 
 export function buildYearData(
@@ -17,7 +17,7 @@ export function buildYearData(
   let d = new Temporal.PlainDate(year, 1, 1);
   while (d.year === year) {
     results.push({
-      date: d.toString(),
+      date: d,
       ...solarTimes(computeSolarParams(d), lat, lng),
     });
     d = d.add({ days: 1 });
