@@ -10,15 +10,19 @@
     "dev": "next dev --turbopack",
     "build": "next build --experimental-app-only",
     "start": "next start",
-    "format": "eslint --fix . && tsc -b .",
-    "prelint": "next typegen",
-    "lint": "eslint && tsc -b . && pnpm run react-compiler",
+    "postinstall": "pnpm typegen",
+    "format": "pnpm run lint --fix",
+    "typegen": "next typegen",
+    "posttypecheck": "pnpm run react-compiler",
+    "typecheck": "tsc -b .",
+    "prelint": "pnpm run typegen",
+    "postlint": "pnpm run typecheck",
+    "lint": "eslint",
     "pretest": "pnpm run lint",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
     "react-compiler": "react-compiler-marker ."
   },
   "dependencies": {
-    "@types/jest": "^30.0.0",
     "client-only": "0.0.1",
     "date-fns": "4.1.0",
     "html-to-image": "1.11.13",
@@ -33,8 +37,6 @@
     "parse-english": "7.0.0",
     "qrcode.react": "4.2.0",
     "react": "19.2.4",
-    "react-compiler-marker": "0.1.0",
-    "react-dom": "19.2.4",
     "react-is": "19.2.4",
     "recharts": "3.8.1",
     "rehype-format": "5.0.1",
@@ -70,13 +72,17 @@
     "@testing-library/react": "16.3.2",
     "@testing-library/user-event": "14.6.1",
     "@types/hast": "3.0.4",
+    "@types/jest": "30.0.0",
     "@types/mdast": "4.0.4",
     "@types/nlcst": "2.0.3",
     "@types/node": "24.10.12",
-    "@types/react": "19.2.13",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/rss": "0.0.32",
     "babel-plugin-react-compiler": "19.1.0-rc.1",
+    "baseline-browser-mapping": "2.10.14",
+    "browserslist": "4.28.2",
+    "caniuse-lite": "1.0.30001785",
     "encoding": "0.1.13",
     "eslint": "9.39.2",
     "eslint-config-andrewaylett": "7.0.0",
@@ -97,7 +103,7 @@
     "jsdom": "28.0.0",
     "postcss": "8.5.6",
     "prettier": "3.8.1",
-    "react-dom": "19.2.4",
+    "react-compiler-marker": "0.1.0",
     "tailwindcss": "4.1.18",
     "ts-jest": "29.4.9",
     "typescript": "6.0.2",
@@ -107,7 +113,8 @@
     "overrides": {
       "jsdom": "$jsdom",
       "react": "$react",
-      "react-dom": "$react-dom",
+      "react-dom": "$react",
+      "react-is": "$react",
       "next-plausible>next": "$next",
       "glob": "$glob",
       "eslint-import-resolver-typescript": "$eslint-import-resolver-typescript"
@@ -118,16 +125,11 @@
       "unrs-resolver"
     ]
   },
-  "browserslist": {
-    "production": [
-      "baseline widely available",
-      "current node"
-    ],
-    "development": [
-      "baseline widely available",
-      "current node"
-    ]
-  },
+  "browserslist": [
+    "defaults",
+    "> 0.5% in GB and not dead",
+    "current node"
+  ],
   "engines": {
     "node": "^24.0.0"
   },
