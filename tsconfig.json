@@ -1,13 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "ES2023",
     "lib": [
       "ES2023",
       "DOM"
     ],
-    "skipLibCheck": true,
-    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "emitDeclarationOnly": true,
     "outDir": "./build",
@@ -18,8 +15,13 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "typeRoots": [
-      "types"
+      "types",
+      "./node_modules/@types"
     ],
+    "types": [
+      "jsx"
+    ],
+    "rootDir": "./",
     "incremental": true,
     "composite": true,
     "allowJs": true,
@@ -48,8 +50,7 @@
   "include": [
     "types/**/*.ts",
     "next-env.d.ts",
-    "next.config.ts",
-    ".next/types/**/*.ts"
+    "next.config.ts"
   ],
   "references": [
     {
