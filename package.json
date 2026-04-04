@@ -18,7 +18,7 @@
     "react-compiler": "react-compiler-marker ."
   },
   "dependencies": {
-    "@types/jest": "^30.0.0",
+    "@types/jest": "30.0.0",
     "client-only": "0.0.1",
     "date-fns": "4.1.0",
     "html-to-image": "1.11.13",
