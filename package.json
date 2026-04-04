@@ -58,7 +58,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.3",
+    "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.39.2",
     "@jest/globals": "30.2.0",
     "@next/eslint-plugin-next": "16.2.1",
