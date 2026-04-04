@@ -18,6 +18,7 @@
     "react-compiler": "react-compiler-marker ."
   },
   "dependencies": {
+    "@types/jest": "^30.0.0",
     "client-only": "0.0.1",
     "date-fns": "4.1.0",
     "html-to-image": "1.11.13",
@@ -58,7 +59,6 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.3",
     "@eslint/js": "9.39.2",
     "@jest/globals": "30.2.0",
     "@next/eslint-plugin-next": "16.2.1",
@@ -83,7 +83,7 @@
     "eslint-config-next": "16.1.7",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jest": "29.12.2",
+    "eslint-plugin-jest": "29.15.1",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "7.0.1",
@@ -99,9 +99,9 @@
     "prettier": "3.8.1",
     "react-dom": "19.2.4",
     "tailwindcss": "4.1.18",
-    "ts-jest": "29.4.6",
-    "typescript": "5.9.3",
-    "typescript-eslint": "8.54.0"
+    "ts-jest": "29.4.9",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.58.0"
   },
   "pnpm": {
     "overrides": {

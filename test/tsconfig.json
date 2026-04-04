@@ -3,6 +3,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../build/test",
+    "types": [
+      "jest"
+    ],
     "paths": {
       "@/*": [
         "../src/*"
@@ -13,7 +16,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.mdx",
-    "../.next/types/**/*.ts"
+    "../next-env.d.ts"
   ],
   "references": [
     {
