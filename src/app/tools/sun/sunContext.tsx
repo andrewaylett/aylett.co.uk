@@ -11,10 +11,8 @@ interface SunState {
   a: Loc;
   b: Loc;
   date: Temporal.PlainDate;
-  year: number;
   metric: SunriseOrSunset;
   setDate: (date: Temporal.PlainDate) => void;
-  setYear: (year: number) => void;
   setMetric: (metric: SunriseOrSunset) => void;
 
   setLoc(

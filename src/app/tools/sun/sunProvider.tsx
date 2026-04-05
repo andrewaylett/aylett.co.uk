@@ -20,9 +20,6 @@ export function SunProvider({
   const [date, setDate] = useState<Temporal.PlainDate>(() =>
     Temporal.Now.plainDateISO(),
   );
-  const [year, setYear] = useState<number>(
-    () => Temporal.Now.plainDateISO().year,
-  );
   const [metric, setMetric] = useState<SunriseOrSunset>('sunset');
 
   const [a, setA] = useState(PRESET_LOCATIONS[0]);
@@ -50,10 +47,8 @@ export function SunProvider({
         a,
         b,
         date,
-        year,
         metric,
         setDate,
-        setYear,
         setMetric,
         setLoc,
       }}

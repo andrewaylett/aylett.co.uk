@@ -116,6 +116,7 @@ export function toJulianDay(date: Temporal.PlainDate): JulianDay {
 }
 
 export function useSolarParams(): SolarParams {
+  'use memo';
   return computeSolarParams(useSun().date);
 }
 

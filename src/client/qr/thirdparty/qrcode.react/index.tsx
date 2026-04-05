@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: ISC
  */
 
-import React, { useDebugValue, useMemo } from 'react';
+import React, { useDebugValue } from 'react';
 
 import * as qrcodegen from '../qrcodegen';
 import { type QrCode, type QrSegment } from '../qrcodegen';
@@ -249,18 +249,17 @@ export const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
 );
 
 export function useDebugDetails(details: QrCodeDetails): DebugDetails {
-  return useMemo(() => {
-    const moduleCount = details.numCells - details.margin * 2;
-    const qrVersion = (moduleCount - 17) / 4;
-    const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
-    return {
-      ...details,
-      moduleCount,
-      qrVersion,
-      level,
-      segments: details.segments,
-    };
-  }, [details]);
+  'use memo';
+  const moduleCount = details.numCells - details.margin * 2;
+  const qrVersion = (moduleCount - 17) / 4;
+  const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
+  return {
+    ...details,
+    moduleCount,
+    qrVersion,
+    level,
+    segments: details.segments,
+  };
 }
 
 export const QRCodeSVGDetails = React.forwardRef<

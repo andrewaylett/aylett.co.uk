@@ -35,7 +35,9 @@ export function AngleCharts(): React.JSX.Element {
 
   const locA = useDeferredValue(sun.a);
   const locB = useDeferredValue(sun.b);
-  const year = useDeferredValue(sun.year);
+  const year = useDeferredValue(sun.date.year);
+
+  const isPending = locA !== sun.a || locB !== sun.b || year !== sun.date.year;
 
   // Both datasets cover -90°..90°; merge by index, dropping points where the
   // sun never reaches the angle (both zero) or always exceeds it (both at max).
@@ -76,7 +78,7 @@ export function AngleCharts(): React.JSX.Element {
   }
 
   return (
-    <>
+    <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
       <p className="text-xs mb-3">Hours above elevation · {year}</p>
       <Typed.LineChart
         data={angleData}
@@ -128,6 +130,6 @@ export function AngleCharts(): React.JSX.Element {
           isAnimationActive={false}
         />
       </Typed.LineChart>
-    </>
+    </div>
   );
 }
