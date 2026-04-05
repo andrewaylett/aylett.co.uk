@@ -124,7 +124,11 @@ export default function nextConfig(
     ...defaultConfig,
     ...({
       typedRoutes: true,
-      reactCompiler: true,
+      reactCompiler: {
+        compilationMode: 'infer',
+        panicThreshold:
+          process.env.NODE_ENV === 'production' ? 'all_errors' : 'none',
+      },
       reactStrictMode: true,
       pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
       productionBrowserSourceMaps: true,

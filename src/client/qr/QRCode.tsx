@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren, type RefObject, useMemo } from 'react';
+import React, { type PropsWithChildren, type RefObject } from 'react';
 
 import {
   QRCodeSVGDetails,
@@ -25,18 +25,18 @@ export const URL_SPLITTER =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
 
 function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
-  return useMemo(() => {
-    const match = URL_SPLITTER.exec(text);
-    if (shouldOptimiseUrl && match?.groups?.start) {
-      const start = match.groups.start.toUpperCase();
-      const rest = match.groups.rest;
-      return start + rest;
-    }
-    return text;
-  }, [shouldOptimiseUrl, text]);
+  'use memo';
+  const match = URL_SPLITTER.exec(text);
+  if (shouldOptimiseUrl && match?.groups?.start) {
+    const start = match.groups.start.toUpperCase();
+    const rest = match.groups.rest;
+    return start + rest;
+  }
+  return text;
 }
 
 function useOptimisedQr(state: QRCodeState) {
+  'use memo';
   const optimisedValue: string = useQrValue(
     state.text,
     state.shouldOptimiseUrl,

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useTransition } from 'react';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 
@@ -13,7 +13,8 @@ const sunriseAndSunset: SunriseOrSunset[] = [
 ];
 
 export function SunriseSunsetInner(): React.JSX.Element {
-  const { year, metric, setYear, setMetric } = useSun();
+  const [_, startTransition] = useTransition();
+  const { date, metric, setDate, setMetric } = useSun();
 
   return (
     <>
@@ -23,11 +24,13 @@ export function SunriseSunsetInner(): React.JSX.Element {
         </label>
         <input
           type="number"
-          value={year}
+          value={date.year}
           min={2000}
           max={2099}
           onChange={(e) => {
-            setYear(Number.parseInt(e.target.value, 10));
+            startTransition(() => {
+              setDate(date.with({ year: Number.parseInt(e.target.value, 10) }));
+            });
           }}
           className="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-md px-2.5 py-1 text-sm w-24"
         />
@@ -41,7 +44,9 @@ export function SunriseSunsetInner(): React.JSX.Element {
             <button
               key={m}
               onClick={() => {
-                setMetric(m);
+                startTransition(() => {
+                  setMetric(m);
+                });
               }}
               className={`text-xs px-3 py-1 rounded-md cursor-pointer bg-transparent border ${
                 metric === m
