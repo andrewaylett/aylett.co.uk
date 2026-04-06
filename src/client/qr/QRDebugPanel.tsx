@@ -17,7 +17,7 @@ export function QRDebugPanel({
   const [open, setOpen] = useState(false);
   return (
     <details
-      className="p-2 mt-4 w-full"
+      className="p-2 mt-4 w-full contain-content"
       onToggle={(c) => {
         setOpen(c.currentTarget.open);
       }}

@@ -6,18 +6,14 @@ import { ListingEntry } from './ListingEntry';
 import { PageStructure } from './PageStructure';
 import { TitleHeader } from './TitleHeader';
 
-import { type Markdown } from '@/remark/traverse';
-import { type Thought } from '@/types';
+import { Metadata, type MDFile } from '@/remark/traverse';
+import { ThoughtSchema } from '@/types';
 import { asyncSortByKey } from '@/utilities';
 
-export function Thoughts({
-  pages,
-}: {
-  pages: Promise<Markdown<Thought>[]>;
-}): ReactNode {
-  const resolved = use(pages);
+export function Thoughts({ files }: { files: MDFile[] }): ReactNode {
+  const pages = files.map((f) => new Metadata(f, ThoughtSchema));
   const sorted = use(
-    asyncSortByKey(resolved, async (page) => (await page.metadata).date),
+    asyncSortByKey(pages, async (page) => (await page.data).date),
   );
   return (
     <PageStructure
@@ -31,9 +27,9 @@ export function Thoughts({
           What is this?
         </Link>
       </p>
-      {sorted.reverse().map(({ id: name, metadata }) => (
+      {sorted.reverse().map(({ id: name, data }) => (
         <Suspense key={name}>
-          <ListingEntry name={name} metadata={metadata} />
+          <ListingEntry name={name} metadata={data} />
         </Suspense>
       ))}
     </PageStructure>

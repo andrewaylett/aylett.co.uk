@@ -61,6 +61,19 @@ export const baseProcessor: Processor = unified()
         file.data.frontMatter = yamlNode as Yaml;
         return tree;
       },
+  ])
+  .freeze();
+
+export const metadataProcessor: Processor = baseProcessor()
+  .use([
+    function nullCompiler(this: Processor) {
+      this.compiler = () => 'no output';
+    },
+  ])
+  .freeze();
+
+export const baseContentProcessor: Processor = baseProcessor()
+  .use([
     // Then we convert the markdown back to text, to process the text
     remarkRetextEnglish,
     [retextSmartypants, { dashes: false, quotes: true }],
@@ -84,7 +97,7 @@ const prodJsx = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
 const devJsx = { jsxDEV: dev.jsxDEV };
 
 /** Extends base processor to produce React elements via rehype, with component overrides for Mermaid diagrams. */
-export const intoReact: Processor = baseProcessor()
+export const intoReact: Processor = baseContentProcessor()
   .use([
     remarkRehype,
     () =>
@@ -138,6 +151,6 @@ export const intoReact: Processor = baseProcessor()
   .freeze();
 
 /** Extends base processor to serialize back to plain markdown text. */
-export const intoText: Processor = baseProcessor()
+export const intoText: Processor = baseContentProcessor()
   .use([remarkStringify])
   .freeze();
