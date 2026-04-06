@@ -3,7 +3,7 @@ import React from 'react';
 import { ListingEntry } from '@/components/ListingEntry';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
-import { type Markdown } from '@/remark/traverse';
+import { type Metadata } from '@/remark/traverse';
 import { type Article, type Thought } from '@/types';
 
 export function TagPageContent({
@@ -13,8 +13,8 @@ export function TagPageContent({
   unmangledTag,
 }: {
   tag: string;
-  filteredArticles: Markdown<Article>[];
-  filteredThoughts: Markdown<Thought>[];
+  filteredArticles: Metadata<Article>[];
+  filteredThoughts: Metadata<Thought>[];
   unmangledTag: string;
 }) {
   const articles =
@@ -24,7 +24,7 @@ export function TagPageContent({
         <ul>
           {filteredArticles.map((article) => (
             <li key={article.id}>
-              <ListingEntry metadata={article.metadata} name={article.id} />
+              <ListingEntry metadata={article.data} name={article.id} />
             </li>
           ))}
         </ul>
@@ -39,7 +39,7 @@ export function TagPageContent({
         <ul>
           {filteredThoughts.map((thought) => (
             <li key={thought.id}>
-              <ListingEntry metadata={thought.metadata} name={thought.id} />
+              <ListingEntry metadata={thought.data} name={thought.id} />
             </li>
           ))}
         </ul>

@@ -97,7 +97,9 @@ function Thought({ page }: { page: Promise<Markdown<Thought>> }) {
       keywords={tags}
     >
       <Suspense>
-        <div property="articleBody">{use(content)}</div>
+        <div className="article-body" property="articleBody">
+          {use(content)}
+        </div>
       </Suspense>
     </PageStructure>
   );

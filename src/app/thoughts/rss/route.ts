@@ -4,6 +4,8 @@ import RSS from 'rss';
 import { allThoughts } from '../thoughts';
 
 import { asyncSortByKey } from '@/utilities';
+import { ThoughtSchema } from '@/types';
+import { Metadata } from '@/remark/traverse';
 
 export async function GET() {
   // Create RSS XML
@@ -13,15 +15,18 @@ export async function GET() {
     feed_url: 'https://www.aylett.co.uk/thoughts/rss',
   });
 
-  const articles = await allThoughts();
+  const thoughtFiles = await allThoughts();
+  const thoughts = thoughtFiles.map(
+    (file) => new Metadata(file, ThoughtSchema),
+  );
 
   const sorted = await asyncSortByKey(
-    articles,
-    async (page) => (await page.metadata).date,
+    thoughts,
+    async (thought) => (await thought.data).date,
   );
 
   for (const article of sorted) {
-    const metadata = await article.metadata;
+    const metadata = await article.data;
     feed.item({
       title: metadata.title,
       url: `https://www.aylett.co.uk/thoughts/${article.id}`,

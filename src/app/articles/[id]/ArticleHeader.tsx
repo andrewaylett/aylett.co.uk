@@ -2,7 +2,6 @@ import React, { use } from 'react';
 
 import { Revisions } from './Revisions';
 
-import { useExploded } from '@/client/hooks/useExploded';
 import { Description } from '@/components/Description';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { type Markdown } from '@/remark/traverse';
@@ -13,13 +12,13 @@ export function ArticleHeader({
   page,
 }: {
   id: string;
-  page: Promise<Markdown<Article>>;
+  page: Markdown<Article>;
 }) {
-  const { metadata } = useExploded(page);
+  const { metadata } = page;
   const data = use(metadata);
 
   return (
-    <header>
+    <header className="contain-content">
       <h1 property="headline">{data.title}</h1>
       {data.abstract ? (
         <p property="alternativeHeadline">{data.abstract}</p>

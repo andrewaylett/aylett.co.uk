@@ -7,16 +7,26 @@ import { PageStructure } from '@/components/PageStructure';
 import { type Markdown } from '@/remark/traverse';
 import { type Article } from '@/types';
 
+async function makeCopyrightString(
+  copyright: Promise<string | undefined> | undefined,
+  revised: Promise<string>,
+): Promise<string> {
+  return (
+    (copyright ? await copyright : undefined) ?? (await revised).split('/')[0]
+  );
+}
+
 export function ArticlePage({
   id,
   page,
 }: {
-  page: Promise<Markdown<Article>>;
+  page: Markdown<Article>;
   id: string;
 }): ReactElement {
-  const { content, metadata } = useExploded(page);
+  const { content, metadata } = page;
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
 
+  const copyrightString = makeCopyrightString(copyright, revised);
   return (
     <PageStructure
       lifecycle={lifecycle}
@@ -29,12 +39,12 @@ export function ArticlePage({
         </Suspense>
       }
       author={author}
-      copyright={copyright?.then(
-        (c) => c ?? revised.then((r) => r.split('/')[0]),
-      )}
+      copyright={copyrightString}
       keywords={tags}
     >
-      <div property="articleBody">{use(content)}</div>
+      <div className="article-body" property="articleBody">
+        {use(content)}
+      </div>
     </PageStructure>
   );
 }

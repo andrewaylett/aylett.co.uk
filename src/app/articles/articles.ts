@@ -4,18 +4,21 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { findMarkdown, type Markdown } from '@/remark/traverse';
+import { Markdown, type MDFile, traverse } from '@/remark/traverse';
 import { type Article, ArticleSchema } from '@/types';
 
 async function articleForIdFn(params: {
   id: string;
 }): Promise<Markdown<Article>> {
   const articles = await allArticles();
-  return articles.find((article) => article.id === params.id) ?? notFound();
+  return new Markdown(
+    articles.find((article) => article.id === params.id) ?? notFound(),
+    ArticleSchema,
+  );
 }
 
 export const articleForId = cache(articleForIdFn);
 
-export const allArticles = cache(() =>
-  findMarkdown('articles/md', ArticleSchema),
+export const allArticles: () => Promise<MDFile[]> = cache(() =>
+  traverse('articles/md'),
 );

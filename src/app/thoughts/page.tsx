@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page(): ReactNode {
-  const pages = allThoughts();
-  return <Thoughts pages={pages} />;
+export default async function Page(): Promise<ReactNode> {
+  const files = await allThoughts();
+  return <Thoughts files={files} />;
 }

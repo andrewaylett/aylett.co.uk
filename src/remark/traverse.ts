@@ -10,18 +10,17 @@ import * as path from 'node:path';
 
 import { type ReactElement } from 'react';
 
-import { read } from 'to-vfile';
 import { type VFile } from 'vfile';
 import { parse } from 'yaml';
 import { type ZodType } from 'zod';
+import { read } from 'to-vfile';
 
 import { type Content } from '@/types';
-import { intoReact } from '@/remark/process_markdown';
+import { intoReact, metadataProcessor } from '@/remark/process_markdown';
 
-interface MDFile {
+export interface MDFile {
   path: string;
   id: string;
-  vfile: Promise<VFile>;
 }
 
 async function findProjectDirectory(): Promise<string> {
@@ -56,7 +55,6 @@ export async function traverse(dir: string): Promise<MDFile[]> {
         yield {
           path: fullPath,
           id: name,
-          vfile: read(fullPath),
         };
       }
     }
@@ -87,7 +85,7 @@ async function extractResult(vfile: Promise<VFile>): Promise<ReactElement> {
 export class Markdown<out P extends Content> {
   constructor(mdFile: MDFile, schema: ZodType<P>) {
     this.id = mdFile.id;
-    const vfile = mdFile.vfile.then((v) => intoReact.process(v));
+    const vfile = read(mdFile.path).then((v) => intoReact.process(v));
     this.content = extractResult(vfile);
     this.metadata = extractMetadata(vfile, schema);
   }
@@ -97,12 +95,13 @@ export class Markdown<out P extends Content> {
   metadata: Promise<P>;
 }
 
-/** Discovers and wraps all markdown files in a directory, validating each against the given schema. */
-export async function findMarkdown<P extends Content>(
-  dir: string,
-  schema: ZodType<P>,
-): Promise<Markdown<P>[]> {
-  const mdFiles = await traverse(dir);
+export class Metadata<out P extends Content> {
+  constructor(mdFile: MDFile, schema: ZodType<P>) {
+    this.id = mdFile.id;
+    const vfile = read(mdFile.path).then((v) => metadataProcessor.process(v));
+    this.data = extractMetadata(vfile, schema);
+  }
 
-  return mdFiles.map((f) => new Markdown(f, schema));
+  id: string;
+  data: Promise<P>;
 }
