@@ -119,20 +119,13 @@ const PLEX_SANS = localFont({
 });
 
 function RootLayout({ children }: PropsWithChildren): ReactNode {
-  const plexSans = PLEX_SANS;
-  const nodeEnv = process.env.NODE_ENV;
-
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 overflow-y-scroll`}
+      className={`${PLEX_SANS.variable} bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 overflow-y-scroll`}
     >
       <body className="oldstyle-nums">
-        <PlausibleProvider
-          domain="aylett.co.uk"
-          scriptProps={{ src: '/js/script.js' }}
-          enabled={nodeEnv === 'production'}
-        >
+        <PlausibleProvider>
           <BackgroundImage />
           {children}
         </PlausibleProvider>
