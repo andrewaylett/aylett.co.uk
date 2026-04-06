@@ -38,7 +38,12 @@
 @utility grid-cols-centre {
     & > * {
         width: var(--column-width);
+        contain-intrinsic-width: var(--column-width);
+        contain: inline-size layout style;
         align-self: center;
+    }
+    & > .contain-content {
+        contain: inline-size layout style paint;
     }
     :is(& > :not(.bg-transparent)), :is(& > :is(.bg-transparent) > *) {
         @apply bg-slate-50/90 dark:bg-slate-900/90 px-4;
@@ -71,6 +76,34 @@
     animation: opacityOn 300ms normal forwards;
     animation-delay: 10s;
     opacity: 0;
+}
+
+@utility cva {
+    content-visibility: auto;
+}
+
+@utility intrinsic-h-* {
+    content-visibility: auto;
+    contain-intrinsic-height: auto --value([length]);
+}
+
+@utility intrinsic-h-none {
+    content-visibility: auto;
+    contain-intrinsic-height: auto none;
+}
+
+@utility intrinsic-w-* {
+    content-visibility: auto;
+    contain-intrinsic-width: auto --value([length]);
+}
+
+@utility intrinsic-w-none {
+    content-visibility: auto;
+    contain-intrinsic-width: auto none;
+}
+
+@utility contain-content {
+    contain: content;
 }
 
 @keyframes opacityOn {

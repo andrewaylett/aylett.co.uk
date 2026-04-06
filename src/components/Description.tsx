@@ -8,7 +8,7 @@ export function Description({
   data: { description: string };
 }): React.JSX.Element {
   return (
-    <blockquote>
+    <blockquote className="contain-content">
       <span property="abstract">{data.description}</span>
       <sup>
         <Link href="/thoughts/descriptions">?</Link>

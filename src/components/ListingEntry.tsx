@@ -19,8 +19,13 @@ export function ListingEntry({
   const href = `/${path}/${name}`;
 
   return (
-    <div property="itemListElement" typeof="Article" resource={href}>
-      <div className="flex flex-row flex-wrap gap-x-[1ch]">
+    <div
+      property="itemListElement"
+      typeof="Article"
+      resource={href}
+      className="contain-content"
+    >
+      <div className="flex flex-row flex-wrap gap-x-[1ch] contain-content">
         <span className="inline-block">
           {isArticle && data.lifecycle === 'draft' ? 'Draft: ' : ''}
           <Link property="url" href={href}>

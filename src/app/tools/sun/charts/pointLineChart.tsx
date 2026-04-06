@@ -54,7 +54,11 @@ export function PointLineChart({
   }
 
   return (
-    <Typed.LineChart data={data} responsive className="w-full aspect-video">
+    <Typed.LineChart
+      data={data}
+      responsive
+      className="w-full aspect-video intrinsic-h-[calc(var(--column-width-max)/16*9)]"
+    >
       <Typed.CartesianGrid />
       <Typed.XAxis
         dataKey="day"

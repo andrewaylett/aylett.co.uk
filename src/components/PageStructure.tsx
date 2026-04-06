@@ -45,11 +45,11 @@ export function PageStructure({
         {breadcrumbs === undefined ? null : (
           <Breadcrumbs breadcrumbs={breadcrumbs} />
         )}
-        <div className="">{header}</div>
+        <div className="contain-content">{header}</div>
         <Suspense fallback={<BasicFallback />}>
           <main className="hyphens-manual">{children}</main>
         </Suspense>
-        <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible">
+        <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible contain-content">
           <Footer author={author} keywords={keywords} copyright={copyright} />
         </div>
       </div>
