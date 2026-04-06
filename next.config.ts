@@ -3,7 +3,7 @@ import {
   PHASE_PRODUCTION_BUILD,
   PHASE_PRODUCTION_SERVER,
 } from 'next/constants';
-import { type Header, type Rewrite } from 'next/dist/lib/load-custom-routes';
+import { type Header } from 'next/dist/lib/load-custom-routes';
 import { withPlausibleProxy } from 'next-plausible';
 
 const BASIC_HEADERS: Header['headers'] = [
@@ -113,14 +113,9 @@ export default function nextConfig(
     },
   ] satisfies Header[]);
 
-  const rewriteSets = Promise.resolve([
-    {
-      source: '/api/event',
-      destination: 'https://plausible.io/api/event',
-    },
-  ] satisfies Rewrite[]);
-
-  return withPlausibleProxy()({
+  return withPlausibleProxy({
+    src: 'https://plausible.io/js/pa-L4CqDovlyP-38NFOBumxf.js',
+  })({
     ...defaultConfig,
     ...({
       typedRoutes: true,
@@ -133,7 +128,6 @@ export default function nextConfig(
       pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
       productionBrowserSourceMaps: true,
       headers: () => headerSets,
-      rewrites: () => rewriteSets,
     } satisfies NextConfig),
   });
 }
