@@ -84,11 +84,7 @@ export function AngleCharts(): React.JSX.Element {
         data={angleData}
         margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
         responsive
-        style={{
-          width: '100%',
-          maxHeight: '80vh',
-          aspectRatio: 1.618,
-        }}
+        className="w-full aspect-video intrinsic-h-[calc(var(--column-width-max)/16*9)]"
       >
         <Typed.CartesianGrid />
         <Typed.XAxis

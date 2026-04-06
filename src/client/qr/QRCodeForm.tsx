@@ -257,7 +257,7 @@ export function QRCodeForm() {
   const canOptimiseUrl = URL_SPLITTER.test(state.qrState.text);
 
   return (
-    <form className="flex items-center flex-col">
+    <form className="flex items-center flex-col contain-content">
       <input
         key={state.qrState.generation}
         type="text"

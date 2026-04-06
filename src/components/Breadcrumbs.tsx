@@ -15,7 +15,11 @@ export interface BreadcrumbsProps {
 
 export function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps) {
   return (
-    <nav property="breadcrumb" typeof="BreadcrumbList">
+    <nav
+      property="breadcrumb"
+      typeof="BreadcrumbList"
+      className="intrinsic-h-[1lh] contain-content"
+    >
       <span property="itemListElement" typeof="ListItem">
         <Link property="item" typeof="WebPage" href="/">
           <span property="name">Home</span>

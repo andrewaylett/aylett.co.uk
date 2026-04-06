@@ -291,6 +291,11 @@ export const QRCodeSVGDetails = React.forwardRef<
     <svg
       height={finalSize}
       width={finalSize}
+      style={{
+        containIntrinsicHeight: `${finalSize}px`,
+        containIntrinsicWidth: `${finalSize}px`,
+        contain: 'strict',
+      }}
       viewBox={`0 0 ${numCells} ${numCells}`}
       ref={forwardedRef}
       role="img"
