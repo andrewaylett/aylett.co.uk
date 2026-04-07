@@ -10,10 +10,8 @@ overrides:
   react-dom: 19.2.4
   react-is: 19.2.4
   next-plausible>next: 16.1.7
-  glob: 13.0.1
+  glob: 13.0.6
   eslint-import-resolver-typescript: 4.4.4
-
-pnpmfileChecksum: sha256-MQGj3hqKdw7bg1vS/HVA4+6FLJd883DOenNeCruHvB8=
 
 importers:
 
@@ -225,8 +223,8 @@ importers:
         specifier: 30.2.0
         version: 30.2.0
       glob:
-        specifier: 13.0.1
-        version: 13.0.1
+        specifier: 13.0.6
+        version: 13.0.6
       globals:
         specifier: 17.3.0
         version: 17.3.0
@@ -2605,9 +2603,9 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@13.0.1:
-    resolution: {integrity: sha512-B7U/vJpE3DkJ5WXTgTpTRN63uV42DseiXXKMwG14LQBXmsdeIoHAPbU/MEo6II0k5ED74uc2ZGTC6MwHFQhF6w==}
-    engines: {node: 20 || >=22}
+  glob@13.0.6:
+    resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
+    engines: {node: 18 || 20 || >=22}
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
@@ -5071,7 +5069,7 @@ snapshots:
       chalk: 4.1.2
       collect-v8-coverage: 1.0.3
       exit-x: 0.2.2
-      glob: 13.0.1
+      glob: 13.0.6
       graceful-fs: 4.2.11
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-instrument: 6.0.3
@@ -7050,7 +7048,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@13.0.1:
+  glob@13.0.6:
     dependencies:
       minimatch: 10.2.5
       minipass: 7.1.3
@@ -7506,7 +7504,7 @@ snapshots:
       chalk: 4.1.2
       ci-info: 4.4.0
       deepmerge: 4.3.1
-      glob: 13.0.1
+      glob: 13.0.6
       graceful-fs: 4.2.11
       jest-circus: 30.2.0
       jest-docblock: 30.2.0
@@ -7676,7 +7674,7 @@ snapshots:
       chalk: 4.1.2
       cjs-module-lexer: 2.2.0
       collect-v8-coverage: 1.0.3
-      glob: 13.0.1
+      glob: 13.0.6
       graceful-fs: 4.2.11
       jest-haste-map: 30.2.0
       jest-message-util: 30.2.0
@@ -9153,7 +9151,7 @@ snapshots:
   test-exclude@6.0.0:
     dependencies:
       '@istanbuljs/schema': 0.1.3
-      glob: 13.0.1
+      glob: 13.0.6
       minimatch: 3.1.5
 
   tiny-invariant@1.3.3: {}
