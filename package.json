@@ -15,7 +15,7 @@
     "typegen": "next typegen",
     "posttypecheck": "pnpm run react-compiler",
     "typecheck": "tsc -b .",
-    "prelint": "pnpm run typegen",
+    "prelint": "pnpm install --frozen-lockfile",
     "postlint": "pnpm run typecheck",
     "lint": "eslint",
     "pretest": "pnpm run lint",
