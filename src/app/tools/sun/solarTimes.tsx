@@ -1,10 +1,11 @@
-import { type Loc } from '@/app/tools/sun/locations';
-import { ukOffsetMinutes } from '@/app/tools/sun/ukOffsetMinutes';
+import type { Loc } from '@/app/tools/sun/locations';
+
 import {
   type Radians,
   type SolarParams,
   useSolarParams,
 } from '@/app/tools/sun/solarParams';
+import { ukOffsetMinutes } from '@/app/tools/sun/ukOffsetMinutes';
 
 export interface SolarTimes {
   sunrise?: number; // minutes from midnight UK local time (GMT/BST)

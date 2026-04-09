@@ -3,11 +3,11 @@ export class VisiblePromise<T> implements Promise<T>, PromiseLike<T> {
   #resolved = false;
   readonly [Symbol.toStringTag] = 'VisiblePromise';
 
-  get resolved() {
+  get resolved(): boolean {
     return this.#resolved;
   }
 
-  #resolve() {
+  #resolve(): void {
     this.#resolved = true;
   }
 

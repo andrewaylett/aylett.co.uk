@@ -1,10 +1,11 @@
 import 'server-only';
 
-import React, { type PropsWithChildren, type ReactNode } from 'react';
+import type { PropsWithChildren, JSX } from 'react';
 
-import { type Metadata, type Viewport } from 'next';
 import localFont from 'next/font/local';
 import PlausibleProvider from 'next-plausible';
+
+import type { Metadata, Viewport } from 'next';
 
 import { BackgroundImage } from '@/components/BackgroundImage';
 
@@ -118,7 +119,7 @@ const PLEX_SANS = localFont({
   ],
 });
 
-function RootLayout({ children }: PropsWithChildren): ReactNode {
+function RootLayout({ children }: PropsWithChildren): JSX.Element {
   return (
     <html
       lang="en"

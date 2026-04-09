@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useDeferredValue } from 'react';
+import { useDeferredValue } from 'react';
 
 import {
   CartesianGrid,
@@ -13,10 +13,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  type NameType,
-  type ValueType,
-} from 'recharts/types/component/DefaultTooltipContent';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 import { buildAngleData } from '@/app/tools/sun/buildAngleData';
@@ -30,7 +26,7 @@ interface AngleData {
 }
 
 /** Chart for hours above a given solar elevation angle across the year. */
-export function AngleCharts(): React.JSX.Element {
+export function AngleCharts(): JSX.Element {
   const sun = useSun();
 
   const locA = useDeferredValue(sun.a);
@@ -99,7 +95,7 @@ export function AngleCharts(): React.JSX.Element {
           tick={{ fontSize: 11 }}
         />
         <Typed.Tooltip
-          formatter={(v?: ValueType, n?: NameType) => {
+          formatter={(v?: unknown, n?: string | number) => {
             const hours = v as number;
             return [v == null ? '—' : `${Math.round(hours)}h`, n];
           }}

@@ -1,9 +1,10 @@
 import 'server-only';
 
-import React from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
-import { type Metadata } from 'next';
+
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   description: 'Miscellaneous tools',
 } as const;
 
-export default function ToolsPage() {
+export default function ToolsPage(): JSX.Element {
   return (
     <PageStructure
       breadcrumbs={[]}

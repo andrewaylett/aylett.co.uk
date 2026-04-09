@@ -1,11 +1,10 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, type Context } from 'react';
 
-import { type Temporal } from 'temporal-polyfill';
-
-import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
-import { type Loc, type LocationRef } from '@/app/tools/sun/locations';
+import type { Temporal } from 'temporal-polyfill';
+import type { SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
+import type { Loc, LocationRef } from '@/app/tools/sun/locations';
 
 interface SunState {
   a: Loc;
@@ -23,7 +22,9 @@ interface SunState {
   ): void;
 }
 
-export const SunContext = createContext<SunState | undefined>(undefined);
+export const SunContext: Context<SunState | undefined> = createContext<
+  SunState | undefined
+>(undefined);
 
 export function useSun(): SunState {
   const ctx = useContext(SunContext);

@@ -7,7 +7,7 @@ import { asyncSortByKey } from '@/utilities';
 import { Metadata } from '@/remark/traverse';
 import { ArticleSchema } from '@/types';
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
   // Create RSS XML
   const feed = new RSS({
     title: 'Articles - aylett.co.uk',

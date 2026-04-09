@@ -6,7 +6,9 @@
 /* eslint-disable unicorn/prefer-string-raw */
 import { type NextRequest, NextResponse } from 'next/server';
 
-export const config = {
+export const config: {
+  matcher: string[];
+} = {
   matcher: [
     '/((?!api|_next/static|favicon.ico)[^A-Z]*[A-Z](?!.*\\.(?:js|css)(?:\\.map)?$).*)',
   ],

@@ -1,19 +1,20 @@
 import 'server-only';
 
-import React, { Suspense, use } from 'react';
+import { Suspense, use } from 'react';
 
-import { type Metadata } from 'next';
 import Link from 'next/link';
 
 import { allThoughts, thoughtForId } from '../thoughts';
+
+import type { Metadata } from 'next';
+import type { Markdown } from '@/remark/traverse';
+import type { Thought } from '@/types';
 
 import { useExploded } from '@/client/hooks/useExploded';
 import { Description } from '@/components/Description';
 import { Optional } from '@/components/Optional';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
-import { type Markdown } from '@/remark/traverse';
-import { type Thought } from '@/types';
 import { gitHubUrl } from '@/utilities';
 
 export const dynamicParams = false;
@@ -47,14 +48,14 @@ export async function generateMetadata({
   };
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ id: string }[]> {
   const thoughts = await allThoughts();
   return thoughts.map((thought) => ({
     id: thought.id,
   }));
 }
 
-function Revisions({ date, url }: { date: string; url: string }) {
+function Revisions({ date, url }: { date: string; url: string }): JSX.Element {
   return (
     <div className="flex flex-row flex-wrap gap-x-[1ch]">
       <Optional condition={date}>
@@ -72,7 +73,7 @@ function Revisions({ date, url }: { date: string; url: string }) {
   );
 }
 
-function ThoughtPage({ params }: ThoughtProps) {
+function ThoughtPage({ params }: ThoughtProps): JSX.Element {
   const page = thoughtForId(params);
   return (
     <Suspense>

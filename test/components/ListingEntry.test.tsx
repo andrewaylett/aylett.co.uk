@@ -1,31 +1,18 @@
-import React from 'react';
-
 import { afterEach, describe, expect, it } from '@jest/globals';
 import { cleanup, render, screen, act } from '@testing-library/react';
 
+import type { Article } from '@/types';
+
 import { ListingEntry } from '@/components/ListingEntry';
-import { type Article } from '@/types';
 
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/jest-globals';
-
-function resolvablePromise<T>(): {
-  resolve: (value: T) => void;
-  promise: Promise<T>;
-} {
-  let resolve: (value: T) => void;
-  const promise = new Promise<T>((res) => {
-    resolve = res;
-  });
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return { resolve: resolve!, promise };
-}
 
 describe('ArticleEntry', () => {
   afterEach(cleanup);
 
   it('renders article title and author when metadata is resolved', async () => {
-    const { resolve, promise: metadata } = resolvablePromise<Article>();
+    const { resolve, promise: metadata } = Promise.withResolvers<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="example-article" />),
@@ -54,7 +41,7 @@ describe('ArticleEntry', () => {
   });
 
   it('renders "Draft" label for draft articles', async () => {
-    const { resolve, promise: metadata } = resolvablePromise<Article>();
+    const { resolve, promise: metadata } = Promise.withResolvers<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="draft-article" />),
@@ -83,7 +70,7 @@ describe('ArticleEntry', () => {
   });
 
   it('renders revision and revised date correctly', async () => {
-    const { resolve, promise: metadata } = resolvablePromise<Article>();
+    const { resolve, promise: metadata } = Promise.withResolvers<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="revised-article" />),
@@ -109,7 +96,7 @@ describe('ArticleEntry', () => {
   });
 
   it('renders abstract when provided', async () => {
-    const { resolve, promise: metadata } = resolvablePromise<Article>();
+    const { resolve, promise: metadata } = Promise.withResolvers<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="abstract-article" />),
@@ -138,7 +125,7 @@ describe('ArticleEntry', () => {
   });
 
   it('handles missing metadata gracefully', async () => {
-    const { resolve, promise: metadata } = resolvablePromise<Article>();
+    const { resolve, promise: metadata } = Promise.withResolvers<Article>();
 
     await act(async () =>
       render(<ListingEntry metadata={metadata} name="empty-article" />),

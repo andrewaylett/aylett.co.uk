@@ -1,5 +1,5 @@
-import React from 'react';
+import type { JSX } from 'react';
 
-export function TitleSeparator() {
+export function TitleSeparator(): JSX.Element {
   return <hr className="mx-[15%] contain-content" />;
 }

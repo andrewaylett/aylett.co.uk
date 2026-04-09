@@ -1,4 +1,4 @@
-import React, { type ReactNode, Suspense, use } from 'react';
+import { Suspense, use, type JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -6,11 +6,11 @@ import { ListingEntry } from './ListingEntry';
 import { PageStructure } from './PageStructure';
 import { TitleHeader } from './TitleHeader';
 
-import { Metadata, type MDFile } from '@/remark/traverse';
+import { type MDFile, Metadata } from '@/remark/traverse';
 import { ThoughtSchema } from '@/types';
 import { asyncSortByKey } from '@/utilities';
 
-export function Thoughts({ files }: { files: MDFile[] }): ReactNode {
+export function Thoughts({ files }: { files: MDFile[] }): JSX.Element {
   const pages = files.map((f) => new Metadata(f, ThoughtSchema));
   const sorted = use(
     asyncSortByKey(pages, async (page) => (await page.data).date),

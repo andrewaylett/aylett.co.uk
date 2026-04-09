@@ -1,4 +1,4 @@
-import { type Temporal } from 'temporal-polyfill';
+import type { Temporal } from 'temporal-polyfill';
 
 export function ukOffsetMinutes(date: Temporal.PlainDate): number {
   // BST (UTC+1): last Sunday of March → last Sunday of October

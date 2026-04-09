@@ -1,8 +1,8 @@
 import 'server-only';
 
-import React from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: 'Compare sunrise and sunset times across UK locations',
 } as const;
 
-export default function SunPage() {
+export default function SunPage(): JSX.Element {
   return (
     <PageStructure
       breadcrumbs={[{ href: '/tools', text: 'Tools' }]}

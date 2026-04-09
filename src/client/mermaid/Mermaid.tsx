@@ -1,13 +1,14 @@
 'use client';
 
-import React, { type PropsWithChildren, Suspense } from 'react';
+import { Suspense, type PropsWithChildren } from 'react';
 
-import { type MermaidConfig } from 'mermaid';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import dynamic from 'next/dynamic';
 
 import { ErrorComponent } from './ErrorComponent';
 import { LoadingComponent } from './LoadingComponent';
+
+import type { MermaidConfig } from 'mermaid';
 
 import { useDarkMode } from '@/client/hooks/useDarkMode';
 
@@ -23,7 +24,7 @@ const MermaidInner = dynamic(() => import('./MermaidInner'), {
 export default function Mermaid({
   children,
   ...props
-}: PropsWithChildren<MermaidProps>) {
+}: PropsWithChildren<MermaidProps>): JSX.Element {
   const isDarkMode = useDarkMode();
   return (
     <ErrorBoundary errorComponent={ErrorComponent}>

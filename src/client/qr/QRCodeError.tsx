@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from 'react';
-
-import { type ErrorComponent } from 'next/dist/client/components/error-boundary';
+import { useContext, useEffect } from 'react';
 
 import { QRCodeErrorContext } from './QRCodeErrorContext';
+
+import type { ErrorComponent } from 'next/dist/client/components/error-boundary';
 
 export const QRCodeError: ErrorComponent = ({
   error,

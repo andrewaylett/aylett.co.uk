@@ -6,11 +6,11 @@ type int = number;
 export class Mode {
   /*-- Constants --*/
 
-  public static readonly NUMERIC = new Mode(0x1, [10, 12, 14]);
-  public static readonly ALPHANUMERIC = new Mode(0x2, [9, 11, 13]);
-  public static readonly BYTE = new Mode(0x4, [8, 16, 16]);
-  public static readonly KANJI = new Mode(0x8, [8, 10, 12]);
-  public static readonly ECI = new Mode(0x7, [0, 0, 0]);
+  public static readonly NUMERIC: Mode = new Mode(0x1, [10, 12, 14]);
+  public static readonly ALPHANUMERIC: Mode = new Mode(0x2, [9, 11, 13]);
+  public static readonly BYTE: Mode = new Mode(0x4, [8, 16, 16]);
+  public static readonly KANJI: Mode = new Mode(0x8, [8, 10, 12]);
+  public static readonly ECI: Mode = new Mode(0x7, [0, 0, 0]);
 
   /*-- Constructor and fields --*/
 

@@ -1,7 +1,7 @@
-import React, { Activity, useState } from 'react';
+import { Activity, useState } from 'react';
 
-import { type DebugDetails } from '@/client/qr/thirdparty/qrcode.react';
-import { type QRCodeState } from '@/client/qr/QRCode';
+import type { QRCodeState } from '@/client/qr/QRCode';
+import type { DebugDetails } from '@/client/qr/thirdparty/qrcode.react';
 
 export function QRDebugPanel({
   qrDebugDetails,
@@ -13,7 +13,7 @@ export function QRDebugPanel({
   qrValue: string;
   state: QRCodeState;
   debugMessage: () => string;
-}) {
+}): JSX.Element {
   const [open, setOpen] = useState(false);
   return (
     <details

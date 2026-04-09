@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import type { JSX } from 'react';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 import { COL_NEG, COL_POS } from '@/app/tools/sun/colours';
 import { minutesToHHMM } from '@/app/tools/sun/minutesToHHMM';
 import { useSolarTimes } from '@/app/tools/sun/solarTimes';
 
-export function SunDifference(): React.JSX.Element {
+export function SunDifference(): JSX.Element {
   const { a, b, date, metric } = useSun();
 
   const kA = useSolarTimes(a)[metric];

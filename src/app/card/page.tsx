@@ -1,9 +1,10 @@
 import 'server-only';
 
-import React, { type ReactElement } from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
 import Link from 'next/link';
+
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   title: 'QR Code',
 };
 
-function Card(): ReactElement {
+function Card(): JSX.Element {
   return (
     <PageStructure
       schemaType="Organization"

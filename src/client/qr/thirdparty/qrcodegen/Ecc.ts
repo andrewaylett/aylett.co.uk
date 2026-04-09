@@ -6,10 +6,10 @@ type int = number;
 export class Ecc {
   /*-- Constants --*/
 
-  public static readonly LOW = new Ecc(0, 1); // The QR Code can tolerate about  7% erroneous codewords
-  public static readonly MEDIUM = new Ecc(1, 0); // The QR Code can tolerate about 15% erroneous codewords
-  public static readonly QUARTILE = new Ecc(2, 3); // The QR Code can tolerate about 25% erroneous codewords
-  public static readonly HIGH = new Ecc(3, 2); // The QR Code can tolerate about 30% erroneous codewords
+  public static readonly LOW: Ecc = new Ecc(0, 1); // The QR Code can tolerate about  7% erroneous codewords
+  public static readonly MEDIUM: Ecc = new Ecc(1, 0); // The QR Code can tolerate about 15% erroneous codewords
+  public static readonly QUARTILE: Ecc = new Ecc(2, 3); // The QR Code can tolerate about 25% erroneous codewords
+  public static readonly HIGH: Ecc = new Ecc(3, 2); // The QR Code can tolerate about 30% erroneous codewords
 
   /*-- Constructor and fields --*/
 

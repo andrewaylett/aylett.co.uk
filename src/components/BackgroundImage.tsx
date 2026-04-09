@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import type { JSX } from 'react';
 
 import Image from 'next/image';
 
 import field from '../../public/PXL_20220610_201053680~2.jpg';
 import night from '../../public/PXL_20250407_202232580.NIGHT.jpg';
 
-export function BackgroundImage() {
+export function BackgroundImage(): JSX.Element {
   return (
     <div className="fixed w-full h-full -z-50">
       <Image

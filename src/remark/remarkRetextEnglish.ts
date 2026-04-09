@@ -1,16 +1,12 @@
-import { type Root as MdastRoot } from 'mdast';
 import {
-  type Options as ToMarkdownExtension,
   toMarkdown,
+  type Options as ToMarkdownExtension,
 } from 'mdast-util-to-markdown';
-import {
-  type Nodes,
-  type Paragraph,
-  type Root as NlcstRoot,
-  type Sentence,
-} from 'nlcst';
 import { ParseEnglish } from 'parse-english';
-import { type Plugin, type Processor } from 'unified';
+
+import type { Nodes, Paragraph, Root as NlcstRoot, Sentence } from 'nlcst';
+import type { Plugin, Processor } from 'unified';
+import type { Root as MdastRoot } from 'mdast';
 
 export type Options = Omit<ToMarkdownExtension, 'extensions'>;
 

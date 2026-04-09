@@ -8,14 +8,15 @@
 import { readdir, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 
-import { type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
-import { type VFile } from 'vfile';
 import { parse } from 'yaml';
-import { type ZodType } from 'zod';
 import { read } from 'to-vfile';
 
-import { type Content } from '@/types';
+import type { VFile } from 'vfile';
+import type { ZodType } from 'zod';
+import type { Content } from '@/types';
+
 import { intoReact, metadataProcessor } from '@/remark/process_markdown';
 
 export interface MDFile {

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { type ReactNode, useState } from 'react';
+import { useState, type JSX, type PropsWithChildren } from 'react';
 
 import { Temporal } from 'temporal-polyfill';
 
-import { type SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
+import type { SunriseOrSunset } from '@/app/tools/sun/sunriseSunsetInner';
+
 import {
   type Loc,
   type LocationRef,
@@ -12,11 +13,7 @@ import {
 } from '@/app/tools/sun/locations';
 import { SunContext } from '@/app/tools/sun/sunContext';
 
-export function SunProvider({
-  children,
-}: {
-  children: ReactNode;
-}): React.JSX.Element {
+export function SunProvider({ children }: PropsWithChildren): JSX.Element {
   const [date, setDate] = useState<Temporal.PlainDate>(() =>
     Temporal.Now.plainDateISO(),
   );

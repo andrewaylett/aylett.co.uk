@@ -1,10 +1,11 @@
-import React from 'react';
+import type { JSX } from 'react';
+
+import type { Metadata } from '@/remark/traverse';
+import type { Article, Thought } from '@/types';
 
 import { ListingEntry } from '@/components/ListingEntry';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
-import { type Metadata } from '@/remark/traverse';
-import { type Article, type Thought } from '@/types';
 
 export function TagPageContent({
   filteredArticles,
@@ -16,7 +17,7 @@ export function TagPageContent({
   filteredArticles: Metadata<Article>[];
   filteredThoughts: Metadata<Thought>[];
   unmangledTag: string;
-}) {
+}): JSX.Element {
   const articles =
     filteredArticles.length > 0 ? (
       <>

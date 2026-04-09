@@ -1,10 +1,10 @@
 import 'server-only';
 
-import React, { type ReactNode } from 'react';
-
-import { type Metadata } from 'next';
+import type { JSX } from 'react';
 
 import { allArticles } from './articles';
+
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function articles(): Promise<ReactNode> {
+export default async function articles(): Promise<JSX.Element> {
   const files = await allArticles();
   return (
     <PageStructure

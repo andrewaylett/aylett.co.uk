@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
+import type { JSX } from 'react';
 
-export function ErrorComponent({ error }: { error: Error }) {
+export function ErrorComponent({ error }: { error: Error }): JSX.Element {
   return <>Error loading diagram: {error.message}</>;
 }

@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import type { JSX } from 'react';
 
-import { type LocationRef } from '@/app/tools/sun/locations';
+import type { LocationRef } from '@/app/tools/sun/locations';
+
 import { useSolarTimes } from '@/app/tools/sun/solarTimes';
 import { minsToTime } from '@/app/tools/sun/minsToTime';
 import { minsToHuman } from '@/app/tools/sun/minsToHuman';
@@ -14,7 +15,7 @@ export function DayCard({
 }: {
   locRef: LocationRef;
   color: string;
-}): React.JSX.Element {
+}): JSX.Element {
   const [loc, _] = useLoc(locRef);
   const { sunrise, sunset, dawn, dusk, dayLength, polar } = useSolarTimes(loc);
   const labels: [string, string][] = [

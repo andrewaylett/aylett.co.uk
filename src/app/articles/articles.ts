@@ -4,8 +4,8 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { Markdown, type MDFile, traverse } from '@/remark/traverse';
 import { type Article, ArticleSchema } from '@/types';
+import { type MDFile, Markdown, traverse } from '@/remark/traverse';
 
 async function articleForIdFn(params: {
   id: string;
@@ -17,7 +17,9 @@ async function articleForIdFn(params: {
   );
 }
 
-export const articleForId = cache(articleForIdFn);
+export const articleForId: (params: {
+  id: string;
+}) => Promise<Markdown<Article>> = cache(articleForIdFn);
 
 export const allArticles: () => Promise<MDFile[]> = cache(() =>
   traverse('articles/md'),

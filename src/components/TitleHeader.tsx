@@ -1,6 +1,6 @@
-import React, { type PropsWithChildren, type ReactNode } from 'react';
+import type { PropsWithChildren, JSX } from 'react';
 
-export function TitleHeader({ children }: PropsWithChildren): ReactNode {
+export function TitleHeader({ children }: PropsWithChildren): JSX.Element {
   return (
     <header className="contain-content">
       <h1 property="name">{children}</h1>

@@ -4,8 +4,8 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import { Markdown, traverse } from '@/remark/traverse';
 import { type Thought, ThoughtSchema } from '@/types';
+import { type MDFile, Markdown, traverse } from '@/remark/traverse';
 
 export async function thoughtForId(
   params: Promise<{ id: string }>,
@@ -18,4 +18,6 @@ export async function thoughtForId(
   );
 }
 
-export const allThoughts = cache(() => traverse('thoughts/md'));
+export const allThoughts: () => Promise<MDFile[]> = cache(() =>
+  traverse('thoughts/md'),
+);
