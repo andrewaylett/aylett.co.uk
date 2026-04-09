@@ -1,6 +1,6 @@
-import React from 'react';
+import type { JSX } from 'react';
 
-export function BasicFallback() {
+export function BasicFallback(): JSX.Element {
   return (
     <div>
       Rendering...{' '}

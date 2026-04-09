@@ -1,12 +1,12 @@
 import 'server-only';
 
-import React, { type ReactNode } from 'react';
-
-import { type Metadata } from 'next';
+import type { JSX } from 'react';
 
 import { allArticles, articleForId } from '../articles';
 
 import { ArticlePage } from './ArticlePage';
+
+import type { Metadata } from 'next';
 
 export const dynamicParams = false;
 export const dynamic = 'error';
@@ -48,7 +48,7 @@ export async function generateMetadata({
   };
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ id: string }[]> {
   const pages = await allArticles();
   return pages.map((page) => ({
     id: page.id,
@@ -57,7 +57,7 @@ export async function generateStaticParams() {
 
 export default async function Page({
   params,
-}: ArticleProps): Promise<ReactNode> {
+}: ArticleProps): Promise<JSX.Element> {
   const { id } = await params;
   const page = await articleForId({ id });
   return <ArticlePage page={page} id={id} />;

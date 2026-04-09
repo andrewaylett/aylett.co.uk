@@ -7,7 +7,6 @@
  *    then convert back to mdast
  * 3. Convert to either React elements ({@link intoReact}) or plain text ({@link intoText})
  */
-import { type Root, type Yaml } from 'mdast';
 import * as dev from 'react/jsx-dev-runtime';
 import * as prod from 'react/jsx-runtime';
 import rehypeFormat from 'rehype-format';
@@ -19,16 +18,18 @@ import remarkParse from 'remark-parse';
 import retextSmartypants from 'retext-smartypants';
 import remarkRehype from 'remark-rehype';
 import remarkStringify from 'remark-stringify';
-import { type Processor, unified } from 'unified';
+import { unified, type Processor } from 'unified';
 import { is } from 'unist-util-is';
 import { visit } from 'unist-util-visit';
 import { visitParents, SKIP } from 'unist-util-visit-parents';
-import { type VFile } from 'vfile';
-import { type Element } from 'hast';
 
 import { components } from './components';
 import retextRemark from './retextRemark';
 import remarkRetextEnglish from './remarkRetextEnglish';
+
+import type { VFile } from 'vfile';
+import type { Root, Yaml } from 'mdast';
+import type { Element } from 'hast';
 
 declare module 'vfile' {
   // Extends the interface used by Unified, so we can use it for our own data

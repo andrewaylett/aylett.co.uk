@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import { Fragment, use, type JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -8,7 +8,11 @@ export interface FooterProps {
   keywords?: Promise<string[]>;
 }
 
-export function Footer({ author, copyright, keywords }: FooterProps) {
+export function Footer({
+  author,
+  copyright,
+  keywords,
+}: FooterProps): JSX.Element {
   const resolvedKeywords = keywords ? use(keywords) : [];
   const resolvedAuthor = (author && use(author)) ?? 'Andrew Aylett';
   const resolvedCopyright = copyright && use(copyright);
@@ -23,10 +27,10 @@ export function Footer({ author, copyright, keywords }: FooterProps) {
             .map((s, index) => {
               const encoded = encodeURIComponent(s.toLowerCase());
               return (
-                <React.Fragment key={s}>
+                <Fragment key={s}>
                   {index > 0 && ', '}
                   <Link href={`/tags/${encoded}`}>{s}</Link>
-                </React.Fragment>
+                </Fragment>
               );
             })}
         </div>

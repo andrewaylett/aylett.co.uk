@@ -1,8 +1,10 @@
-import React from 'react';
+import type { JSX } from 'react';
 
-import { type DynamicOptionsLoadingProps } from 'next/dist/shared/lib/dynamic';
+import type { DynamicOptionsLoadingProps } from 'next/dist/shared/lib/dynamic';
 
-export function LoadingComponent(props: DynamicOptionsLoadingProps) {
+export function LoadingComponent(
+  props: DynamicOptionsLoadingProps,
+): JSX.Element {
   return (
     <div>
       {props.error ? (

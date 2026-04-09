@@ -1,21 +1,21 @@
-import React from 'react';
+import type { JSX } from 'react';
 
 import { notFound } from 'next/navigation';
 
 import { allTags } from '../allTags';
 
+import {
+  type Article,
+  type Thought,
+  ArticleSchema,
+  ThoughtSchema,
+} from '@/types';
 import { allArticles } from '@/app/articles/articles';
 import { TagPageContent } from '@/app/tags/[tag]/TagPageContent';
 import { allThoughts } from '@/app/thoughts/thoughts';
 import { Metadata } from '@/remark/traverse';
-import {
-  type Article,
-  ArticleSchema,
-  type Thought,
-  ThoughtSchema,
-} from '@/types';
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ tag: string }[]> {
   const tags = await allTags();
   return [...tags].map((tag) => ({
     tag: encodeURIComponent(tag.toLowerCase()),
@@ -26,7 +26,7 @@ export default async function TagPage({
   params,
 }: {
   params: Promise<{ tag: string }>;
-}) {
+}): Promise<JSX.Element> {
   const { tag: encodedTag } = await params;
   const tag = decodeURIComponent(encodedTag);
   const articles = await allArticles();

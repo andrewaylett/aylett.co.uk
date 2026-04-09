@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 import { SunProvider } from '@/app/tools/sun/sunProvider';
 import { SunriseSunsetInner } from '@/app/tools/sun/sunriseSunsetInner';
@@ -11,7 +11,7 @@ import { DayCharts } from '@/app/tools/sun/charts/dayCharts';
 import { BasicFallback } from '@/components/BasicFallback';
 import { Card } from '@/components/Card';
 
-export function SunriseSunset(): React.JSX.Element {
+export function SunriseSunset(): JSX.Element {
   return (
     <SunProvider>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">

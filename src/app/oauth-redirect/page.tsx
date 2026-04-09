@@ -1,8 +1,8 @@
 import 'server-only';
 
-import React, { type ReactNode } from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-function Redirect(): ReactNode {
+function Redirect(): JSX.Element {
   return (
     <PageStructure
       header={

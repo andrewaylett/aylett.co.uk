@@ -1,8 +1,8 @@
 import 'server-only';
 
-import React from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Schemas',
 };
 
-function Schema() {
+function Schema(): JSX.Element {
   return (
     <PageStructure
       schemaType="ItemList"

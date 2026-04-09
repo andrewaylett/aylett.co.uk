@@ -1,11 +1,12 @@
-import React, { use } from 'react';
+import { use, type JSX } from 'react';
 
 import { Revisions } from './Revisions';
 
+import type { Markdown } from '@/remark/traverse';
+import type { Article } from '@/types';
+
 import { Description } from '@/components/Description';
 import { TitleSeparator } from '@/components/TitleSeparator';
-import { type Markdown } from '@/remark/traverse';
-import { type Article } from '@/types';
 
 export function ArticleHeader({
   id,
@@ -13,7 +14,7 @@ export function ArticleHeader({
 }: {
   id: string;
   page: Markdown<Article>;
-}) {
+}): JSX.Element {
   const { metadata } = page;
   const data = use(metadata);
 
@@ -22,9 +23,7 @@ export function ArticleHeader({
       <h1 property="headline">{data.title}</h1>
       {data.abstract ? (
         <p property="alternativeHeadline">{data.abstract}</p>
-      ) : (
-        ''
-      )}
+      ) : null}
       <div className="flex flex-row flex-wrap-reverse justify-between mt-[1ex] my-[0.5lh]">
         {data.author && (
           <div className="author" property="author" typeof="Person">

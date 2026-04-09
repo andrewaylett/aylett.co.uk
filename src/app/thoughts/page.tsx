@@ -1,10 +1,10 @@
 import 'server-only';
 
-import React, { type ReactNode } from 'react';
-
-import { type Metadata } from 'next';
+import type { JSX } from 'react';
 
 import { allThoughts } from './thoughts';
+
+import type { Metadata } from 'next';
 
 import { Thoughts } from '@/components/Thoughts';
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page(): Promise<ReactNode> {
+export default async function Page(): Promise<JSX.Element> {
   const files = await allThoughts();
   return <Thoughts files={files} />;
 }

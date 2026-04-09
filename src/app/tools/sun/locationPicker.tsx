@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type { JSX } from 'react';
 
 import {
   type Loc,
@@ -17,7 +17,7 @@ export function LocationPicker({
   label: string;
   locRef: LocationRef;
   color: string;
-}) {
+}): JSX.Element {
   const [loc, setLoc] = useLoc(locRef);
   const mode = PRESET_LOCATIONS.includes(loc) ? 'preset' : 'custom';
 

@@ -3,15 +3,15 @@ import { allThoughts } from '../thoughts/thoughts';
 
 import {
   type Article,
-  ArticleSchema,
   type Thought,
-  ThoughtSchema,
   type Content,
+  ArticleSchema,
+  ThoughtSchema,
 } from '@/types';
 import { Metadata } from '@/remark/traverse';
 import { yieldWhenResolved } from '@/yieldWhenResolved';
 
-export async function allTags() {
+export async function allTags(): Promise<Set<string>> {
   const articles = await allArticles();
   const thoughts = await allThoughts();
 

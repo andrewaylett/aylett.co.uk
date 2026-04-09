@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useDeferredValue } from 'react';
+import { useDeferredValue } from 'react';
 
-import { type Loc } from '@/app/tools/sun/locations';
+import type { Loc } from '@/app/tools/sun/locations';
+
+import { type DayTimes, buildYearData } from '@/app/tools/sun/buildYearData';
 import { type Point, Typed } from '@/app/tools/sun/charts/point';
 import { useSun } from '@/app/tools/sun/sunContext';
-import { buildYearData, type DayTimes } from '@/app/tools/sun/buildYearData';
 import { COL_A, COL_B } from '@/app/tools/sun/colours';
 import { PointLineChart } from '@/app/tools/sun/charts/pointLineChart';
 import { minsToTime } from '@/app/tools/sun/minsToTime';
@@ -16,7 +17,7 @@ function useYearData(loc: Loc): DayTimes[] {
 }
 
 /** Charts for time-of-day metrics: diff, absolute times, and day length. */
-export function DayCharts(): React.JSX.Element {
+export function DayCharts(): JSX.Element {
   const sun = useSun();
 
   const locA = useDeferredValue(sun.a);

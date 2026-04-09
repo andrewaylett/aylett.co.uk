@@ -4,10 +4,17 @@
  * SPDX-License-Identifier: ISC
  */
 
-import React, { useDebugValue } from 'react';
+import {
+  useDebugValue,
+  type ForwardRefExoticComponent,
+  type PropsWithoutRef,
+  type RefAttributes,
+  forwardRef,
+} from 'react';
 
 import * as qrcodegen from '../qrcodegen';
-import { type QrCode, type QrSegment } from '../qrcodegen';
+
+import type { QrCode, QrSegment } from '../qrcodegen';
 
 type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
 type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
@@ -228,7 +235,9 @@ export function useQRCode({
   }
 }
 
-export const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
+export const QRCodeSVG: ForwardRefExoticComponent<
+  PropsWithoutRef<QRPropsSVG> & RefAttributes<SVGSVGElement>
+> = forwardRef<SVGSVGElement, QRPropsSVG>(
   function QRCodeSVG(props, forwardedRef) {
     const {
       value,
@@ -262,7 +271,11 @@ export function useDebugDetails(details: QrCodeDetails): DebugDetails {
   };
 }
 
-export const QRCodeSVGDetails = React.forwardRef<
+export const QRCodeSVGDetails: ForwardRefExoticComponent<
+  Omit<QRPropsSVG, 'value'> & {
+    details: QrCodeDetails;
+  } & React.RefAttributes<SVGSVGElement>
+> = forwardRef<
   SVGSVGElement,
   Omit<QRPropsSVG, 'value'> & { details: QrCodeDetails }
 >(function QRCodeSVGDetails(props, forwardedRef) {

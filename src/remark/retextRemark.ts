@@ -7,16 +7,17 @@
  */
 // noinspection JSUnusedGlobalSymbols
 
-import { type Root as MdastRoot } from 'mdast';
 import {
-  type Extension as FromMarkdownExtension,
   fromMarkdown,
+  type Extension as FromMarkdownExtension,
   type Options as FromMarkdownOptions,
 } from 'mdast-util-from-markdown';
-import { type Extension as MicromarkExtension } from 'micromark-util-types';
-import { type Root as NlcstRoot } from 'nlcst';
-import { type Processor, type Plugin } from 'unified';
 import { toString } from 'nlcst-to-string';
+
+import type { Root as NlcstRoot } from 'nlcst';
+import type { Root as MdastRoot } from 'mdast';
+import type { Extension as MicromarkExtension } from 'micromark-util-types';
+import type { Processor, Plugin } from 'unified';
 
 export type Options = Omit<
   FromMarkdownOptions,

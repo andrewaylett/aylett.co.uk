@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren, type RefObject } from 'react';
+import type { JSX, PropsWithChildren, RefObject } from 'react';
 
 import {
   QRCodeSVGDetails,
@@ -21,7 +21,7 @@ export const BUTTON_TEXT = {
 } as const;
 export type ButtonText = (typeof BUTTON_TEXT)[keyof typeof BUTTON_TEXT];
 
-export const URL_SPLITTER =
+export const URL_SPLITTER: RegExp =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
 
 function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
@@ -105,7 +105,7 @@ export function QRCode({
   state: QRCodeState;
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
-}>) {
+}>): JSX.Element {
   const { actualValue, qrDetails, debugMessage } = useOptimisedQr(state);
   const qrDebugDetails = useDebugDetails(qrDetails);
 

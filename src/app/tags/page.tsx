@@ -1,4 +1,4 @@
-import React from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -7,7 +7,7 @@ import { allTags } from './allTags';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
-export default async function TagsPage() {
+export default async function TagsPage(): Promise<JSX.Element> {
   const tags = await allTags();
 
   const sortedTags = [...tags].sort();

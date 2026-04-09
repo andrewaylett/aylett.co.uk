@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useTransition } from 'react';
+import { useTransition } from 'react';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 
@@ -12,7 +12,7 @@ const sunriseAndSunset: SunriseOrSunset[] = [
   'dusk',
 ];
 
-export function SunriseSunsetInner(): React.JSX.Element {
+export function SunriseSunsetInner(): JSX.Element {
   const [_, startTransition] = useTransition();
   const { date, metric, setDate, setMetric } = useSun();
 

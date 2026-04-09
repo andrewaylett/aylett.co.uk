@@ -1,8 +1,7 @@
-import React from 'react';
+import { createElement } from 'react';
 
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { cleanup, render, screen } from '@testing-library/react';
-
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/jest-globals';
 
@@ -13,8 +12,8 @@ import '@testing-library/jest-dom/jest-globals';
 jest.unstable_mockModule('next/dynamic', () => ({
   __esModule: true,
   default: () => {
-    const MockDynamic = ({ children }: { children?: React.ReactNode }) =>
-      React.createElement('div', { 'data-testid': 'mock-mermaid' }, children);
+    const MockDynamic = ({ children }: { children?: React.JSX.Element }) =>
+      createElement('div', { 'data-testid': 'mock-mermaid' }, children);
     MockDynamic.displayName = 'MockDynamic';
     return MockDynamic;
   },

@@ -1,4 +1,4 @@
-import { type Temporal } from 'temporal-polyfill';
+import type { Temporal } from 'temporal-polyfill';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 

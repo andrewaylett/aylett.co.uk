@@ -1,4 +1,4 @@
-import React from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -6,7 +6,7 @@ export function Description({
   data,
 }: {
   data: { description: string };
-}): React.JSX.Element {
+}): JSX.Element {
   return (
     <blockquote className="contain-content">
       <span property="abstract">{data.description}</span>

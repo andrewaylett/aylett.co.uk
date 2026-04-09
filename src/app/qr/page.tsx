@@ -1,8 +1,8 @@
 import 'server-only';
 
-import React from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import { QRCodeForm } from '@/client/qr/QRCodeForm';
 import { PageStructure } from '@/components/PageStructure';
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Pure JS QR Code Generator',
 } as const;
 
-export default function QRPage() {
+export default function QRPage(): JSX.Element {
   return (
     <PageStructure
       breadcrumbs={[]}

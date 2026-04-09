@@ -1,4 +1,4 @@
-import { type RefObject, useRef } from 'react';
+import { useRef, type RefObject } from 'react';
 
 export interface DarkModeStore {
   subscribe: (onStoreChange: () => void) => () => void;

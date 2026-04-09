@@ -1,11 +1,11 @@
-import React, { Suspense, use } from 'react';
+import { Suspense, use } from 'react';
 
-import { ArticleSchema } from '@/types';
 import { type MDFile, Metadata } from '@/remark/traverse';
+import { ArticleSchema } from '@/types';
 import { asyncSortByKey } from '@/utilities';
 import { ListingEntry } from '@/components/ListingEntry';
 
-export function Articles({ files }: { files: MDFile[] }): React.JSX.Element {
+export function Articles({ files }: { files: MDFile[] }): JSX.Element {
   const pages = files.map((f) => new Metadata(f, ArticleSchema));
   const sorted = use(
     asyncSortByKey(pages, async (page) => {

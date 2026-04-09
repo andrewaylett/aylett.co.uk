@@ -1,4 +1,4 @@
-import React from 'react';
+import type { JSX } from 'react';
 
 import { Optional } from '@/components/Optional';
 import { gitHubUrl } from '@/utilities';
@@ -15,7 +15,7 @@ export function Revisions({
   revised: string;
   revision?: string;
   url: string;
-}) {
+}): JSX.Element {
   return (
     <div className="flex flex-row flex-wrap gap-x-[1ch]">
       <Optional condition={revision}>

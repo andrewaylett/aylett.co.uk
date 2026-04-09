@@ -1,10 +1,11 @@
-import { type NextConfig } from 'next';
 import {
   PHASE_PRODUCTION_BUILD,
   PHASE_PRODUCTION_SERVER,
 } from 'next/constants';
-import { type Header } from 'next/dist/lib/load-custom-routes';
 import { withPlausibleProxy } from 'next-plausible';
+
+import type { NextConfig } from 'next';
+import type { Header } from 'next/dist/lib/load-custom-routes';
 
 const BASIC_HEADERS: Header['headers'] = [
   {

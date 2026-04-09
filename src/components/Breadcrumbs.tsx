@@ -1,4 +1,4 @@
-import React from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -13,7 +13,7 @@ export interface BreadcrumbsProps {
   breadcrumbs: Breadcrumbs;
 }
 
-export function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps) {
+export function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps): JSX.Element {
   return (
     <nav
       property="breadcrumb"

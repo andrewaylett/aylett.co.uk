@@ -1,12 +1,13 @@
 'use client';
 
-import React, {
-  type ChangeEvent,
+import {
   useEffect,
   useEffectEvent,
   useReducer,
   useRef,
   useTransition,
+  type ChangeEvent,
+  type JSX,
 } from 'react';
 
 import { useSearchParams } from 'next/navigation';
@@ -17,14 +18,14 @@ import { toBlob, toPng } from 'html-to-image';
 import { QRCodeError } from './QRCodeError';
 import { QRCodeErrorContext } from './QRCodeErrorContext';
 
-import { encodeQueryComponent, nullToError } from '@/utilities';
 import {
-  BUTTON_TEXT,
   type ButtonText,
-  QRCode,
   type QRCodeState,
+  BUTTON_TEXT,
+  QRCode,
   URL_SPLITTER,
 } from '@/client/qr/QRCode';
+import { encodeQueryComponent, nullToError } from '@/utilities';
 
 export interface QRCodeFormState {
   nextPushStateText?: string;
@@ -132,7 +133,7 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
   };
 }
 
-export function QRCodeForm() {
+export function QRCodeForm(): JSX.Element {
   const resetRef = useRef<() => void>(undefined);
   const ref = useRef<HTMLDivElement>(null);
 

@@ -1,11 +1,12 @@
-import React, { type ReactElement, Suspense, use } from 'react';
+import { Suspense, use, type JSX } from 'react';
 
 import { ArticleHeader } from './ArticleHeader';
 
+import type { Markdown } from '@/remark/traverse';
+import type { Article } from '@/types';
+
 import { useExploded } from '@/client/hooks/useExploded';
 import { PageStructure } from '@/components/PageStructure';
-import { type Markdown } from '@/remark/traverse';
-import { type Article } from '@/types';
 
 async function makeCopyrightString(
   copyright: Promise<string | undefined> | undefined,
@@ -22,7 +23,7 @@ export function ArticlePage({
 }: {
   page: Markdown<Article>;
   id: string;
-}): ReactElement {
+}): JSX.Element {
   const { content, metadata } = page;
   const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
 

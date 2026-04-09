@@ -1,12 +1,13 @@
-import React, {
-  type PropsWithChildren,
-  type ReactNode,
+import {
   useDeferredValue,
+  type PropsWithChildren,
+  type JSX,
+  type ReactNode,
 } from 'react';
 
 import { Temporal } from 'temporal-polyfill';
-import { type NameType } from 'recharts/types/component/DefaultTooltipContent';
-import { type TooltipPayload, type TooltipValueType } from 'recharts';
+
+import type { TooltipPayload, TooltipValueType } from 'recharts';
 
 import {
   type Point,
@@ -24,7 +25,7 @@ export function PointLineChart({
   data: Point[];
   tickFormatter: (value: number) => string;
   tooltipValueFormatter?: (value: number) => string;
-}>): React.JSX.Element {
+}>): JSX.Element {
   const year = useDeferredValue(useSun().date.year);
 
   const tickDates = Array.from({ length: 12 }, (_, i) => {
@@ -79,7 +80,7 @@ export function PointLineChart({
       />
       <Typed.YAxis tickFormatter={tickFormatter} tick={{ fontSize: 11 }} />
       <Typed.Tooltip
-        formatter={(v?: TooltipValueType, n?: NameType) => [
+        formatter={(v?: TooltipValueType, n?: string | number) => [
           (tooltipValueFormatter ?? tickFormatter)(Number(v)),
           n,
         ]}

@@ -26,7 +26,7 @@ import {
 } from '@/client/qr/thirdparty/qrcodegen/helpers';
 
 export class QrCode {
-  static Ecc = Ecc; // Expose the Ecc class for convenience
+  static Ecc: typeof Ecc = Ecc; // Expose the Ecc class for convenience
   /*-- Static factory functions (high level) --*/
 
   // Returns a QR Code representing the given Unicode text string at the given error correction level.
@@ -227,7 +227,7 @@ export class QrCode {
   }
 
   // Modified to expose modules for easy access
-  public getModules() {
+  public getModules(): boolean[][] {
     return this.modules;
   }
 

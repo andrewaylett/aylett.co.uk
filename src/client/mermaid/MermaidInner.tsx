@@ -1,19 +1,19 @@
 'use client';
 import 'client-only';
 
-import React, {
-  type PropsWithChildren,
+import {
   useCallback,
   useEffect,
   useRef,
   useState,
+  type PropsWithChildren,
 } from 'react';
 
 import mermaid, { type MermaidConfig } from 'mermaid';
 
 import { useDarkMode } from '../hooks/useDarkMode';
 
-import { type MermaidProps } from './Mermaid';
+import type { MermaidProps } from './Mermaid';
 
 const DEFAULT_CONFIG: MermaidConfig = {
   startOnLoad: false,
@@ -57,7 +57,7 @@ const DEFAULT_CONFIG: MermaidConfig = {
 export default function MermaidInner({
   children,
   config,
-}: PropsWithChildren<MermaidProps>) {
+}: PropsWithChildren<MermaidProps>): JSX.Element {
   const [isRendered, setIsRendered] = useState(false);
 
   const mermaidDiv = useRef<HTMLDivElement>(null);

@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import type { JSX } from 'react';
 
 import { Temporal } from 'temporal-polyfill';
 
 import { useSun } from '@/app/tools/sun/sunContext';
 
-export function DatePicker(): React.JSX.Element {
+export function DatePicker(): JSX.Element {
   const { date, setDate } = useSun();
   return (
     <>

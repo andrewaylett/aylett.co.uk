@@ -1,9 +1,10 @@
 import 'server-only';
 
-import React, { type ReactNode } from 'react';
+import type { JSX } from 'react';
 
-import { type Metadata } from 'next';
 import Link from 'next/link';
+
+import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
 
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   },
 };
 
-function Home(): ReactNode {
+function Home(): JSX.Element {
   return (
     <PageStructure
       header={

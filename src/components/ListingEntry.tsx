@@ -1,9 +1,10 @@
-import React, { use } from 'react';
+import { use, type JSX } from 'react';
 
 import Link from 'next/link';
 
+import type { Content } from '@/types';
+
 import { Description } from '@/components/Description';
-import { type Content } from '@/types';
 
 export function ListingEntry({
   metadata,
@@ -11,7 +12,7 @@ export function ListingEntry({
 }: {
   metadata: Promise<Content>;
   name: string;
-}) {
+}): JSX.Element {
   const data = use(metadata);
   const isArticle = data.tag === 'article';
 
