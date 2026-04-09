@@ -13,8 +13,6 @@ overrides:
   glob: 13.0.6
   eslint-import-resolver-typescript: 4.4.4
 
-pnpmfileChecksum: sha256-MQGj3hqKdw7bg1vS/HVA4+6FLJd883DOenNeCruHvB8=
-
 importers:
 
   .:
