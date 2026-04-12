@@ -60,7 +60,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.4",
+    "@eslint/js": "10.0.1",
     "@jest/globals": "30.3.0",
     "@next/eslint-plugin-next": "16.2.2",
     "@prettier/plugin-xml": "3.4.2",
@@ -83,7 +83,7 @@
     "browserslist": "4.28.2",
     "caniuse-lite": "1.0.30001786",
     "encoding": "0.1.13",
-    "eslint": "9.39.4",
+    "eslint": "10.2.0",
     "eslint-config-andrewaylett": "7.0.0",
     "eslint-config-next": "16.1.7",
     "eslint-import-resolver-typescript": "4.4.4",
