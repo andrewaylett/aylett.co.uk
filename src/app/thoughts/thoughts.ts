@@ -19,5 +19,5 @@ export async function thoughtForId(
 }
 
 export const allThoughts: () => Promise<MDFile[]> = cache(() =>
-  traverse('thoughts/md'),
+  traverse('thoughts'),
 );

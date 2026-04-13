@@ -38,9 +38,9 @@ async function findProjectDirectory(): Promise<string> {
   throw new Error(`Could not find project directory from ${process.cwd()}`);
 }
 
-/** Reads a directory under `src/app/` and returns all `.md` files with lazy-loaded vfile promises. */
+/** Reads a directory under `md/` and returns all `.md` files with lazy-loaded vfile promises. */
 export async function traverse(dir: string): Promise<MDFile[]> {
-  const app = path.resolve(await findProjectDirectory(), 'src/app');
+  const app = path.resolve(await findProjectDirectory(), 'md');
   const target = path.join(app, dir);
   const filenames = await readdir(target);
   const filesAndStats = await Promise.all(
