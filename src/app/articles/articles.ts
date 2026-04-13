@@ -22,5 +22,5 @@ export const articleForId: (params: {
 }) => Promise<Markdown<Article>> = cache(articleForIdFn);
 
 export const allArticles: () => Promise<MDFile[]> = cache(() =>
-  traverse('articles/md'),
+  traverse('articles'),
 );

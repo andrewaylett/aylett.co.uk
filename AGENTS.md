@@ -18,15 +18,16 @@ Personal website for Andrew Aylett, hosted at https://www.aylett.co.uk/.
 ## Directory Structure
 
 ```
+md/
+  articles/               # Markdown files for articles
+  thoughts/               # Markdown files for thoughts
 src/
   app/                    # Next.js App Router pages and routes
     articles/
-      md/                 # Article markdown files
       [id]/page.tsx       # Dynamic article route
       articles.ts         # Data fetching (cached)
       rss/                # RSS feed route
     thoughts/
-      md/                 # Thought markdown files
       [id]/page.tsx       # Dynamic thought route
       thoughts.ts         # Data fetching (cached)
       rss/                # RSS feed route

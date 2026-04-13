@@ -26,7 +26,7 @@ export function encodeQueryComponent(component: string): string {
 
 /** Returns a GitHub URL pointing to the commit history for a given page's markdown source. */
 export const gitHubUrl = (pageName: string): string =>
-  `https://github.com/andrewaylett/aylett.co.uk/commits/main/src/pages${pageName.replace(
+  `https://github.com/andrewaylett/aylett.co.uk/commits/main/md${pageName.replace(
     /#.*/,
     '',
   )}.md`;
