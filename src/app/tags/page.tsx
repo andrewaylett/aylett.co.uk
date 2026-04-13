@@ -21,10 +21,10 @@ export default async function TagsPage(): Promise<JSX.Element> {
     >
       <div className="flex flex-row flex-wrap gap-x-[1ch]">
         {sortedTags.map((tag) => {
-          const encoded = encodeURIComponent(tag.toLowerCase());
+          const encoded = encodeURIComponent(tag[0].toLowerCase());
           return (
-            <span key={tag}>
-              <Link href={`/tags/${encoded}`}>{tag}</Link>
+            <span key={tag[0]}>
+              <Link href={`/tags/${encoded}`}>{tag[0]}</Link>
             </span>
           );
         })}

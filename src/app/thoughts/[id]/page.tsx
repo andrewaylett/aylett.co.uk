@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { Suspense, use } from 'react';
 
 import Link from 'next/link';

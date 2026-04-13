@@ -4,21 +4,12 @@ import { notFound } from 'next/navigation';
 
 import { allTags } from '../allTags';
 
-import {
-  type Article,
-  type Thought,
-  ArticleSchema,
-  ThoughtSchema,
-} from '@/types';
-import { allArticles } from '@/app/articles/articles';
 import { TagPageContent } from '@/app/tags/[tag]/TagPageContent';
-import { allThoughts } from '@/app/thoughts/thoughts';
-import { Metadata } from '@/remark/traverse';
 
 export async function generateStaticParams(): Promise<{ tag: string }[]> {
   const tags = await allTags();
-  return [...tags].map((tag) => ({
-    tag: encodeURIComponent(tag.toLowerCase()),
+  return [...tags.values()].map((tag) => ({
+    tag: encodeURIComponent(tag.tagUriSegment),
   }));
 }
 
@@ -28,43 +19,14 @@ export default async function TagPage({
   params: Promise<{ tag: string }>;
 }): Promise<JSX.Element> {
   const { tag: encodedTag } = await params;
-  const tag = decodeURIComponent(encodedTag);
-  const articles = await allArticles();
-  const thoughts = await allThoughts();
-  let originalTag;
-  let recalledTag;
+  const requested = decodeURIComponent(encodedTag);
+  const tagMap = await allTags();
 
-  const filteredArticles: Metadata<Article>[] = [];
-  for (const article of articles) {
-    const metadata = new Metadata(article, ArticleSchema);
-    const data = await metadata.data;
-    if ((recalledTag = data.tags.find((s) => s.toLowerCase() === tag))) {
-      originalTag = recalledTag;
-      filteredArticles.push(metadata);
-    }
+  const tag = tagMap.get(requested);
+  if (tag && tag.data.length > 0) {
+    return <TagPageContent tag={tag} />;
   }
 
-  const filteredThoughts: Metadata<Thought>[] = [];
-  for (const thought of thoughts) {
-    const metadata = new Metadata(thought, ThoughtSchema);
-    const data = await metadata.data;
-    if ((recalledTag = data.tags.find((s) => s.toLowerCase() === tag))) {
-      originalTag = recalledTag;
-      filteredThoughts.push(metadata);
-    }
-  }
-
-  if (!originalTag) {
-    // Didn't find the tag, so why are we trying to render the page?
-    notFound();
-  }
-
-  return (
-    <TagPageContent
-      tag={tag}
-      filteredArticles={filteredArticles}
-      filteredThoughts={filteredThoughts}
-      unmangledTag={originalTag}
-    />
-  );
+  // Didn't find the tag, so why are we trying to render the page?
+  notFound();
 }
