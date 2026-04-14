@@ -79,7 +79,7 @@
     "@types/react-dom": "19.2.3",
     "@types/rss": "0.0.32",
     "babel-plugin-react-compiler": "1.0.0",
-    "baseline-browser-mapping": "2.10.17",
+    "baseline-browser-mapping": "2.10.18",
     "browserslist": "4.28.2",
     "caniuse-lite": "1.0.30001787",
     "encoding": "0.1.13",
