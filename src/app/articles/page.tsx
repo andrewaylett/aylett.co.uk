@@ -1,5 +1,3 @@
-import 'server-only';
-
 import type { JSX } from 'react';
 
 import { allArticles } from './articles';

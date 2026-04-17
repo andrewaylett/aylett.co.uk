@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articles.map((a) => ({ url: `/articles/${a.id}` })),
     ...thoughts.map((t) => ({ url: `/thoughts/${t.id}` })),
     ...[...tags].map((t) => ({
-      url: `/tags/${encodeURIComponent(t.toLowerCase())}`,
+      url: `/tags/${encodeURIComponent(t[1].tagUriSegment)}`,
     })),
   ];
 }
