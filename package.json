@@ -81,7 +81,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "baseline-browser-mapping": "2.10.20",
     "browserslist": "4.28.2",
-    "caniuse-lite": "1.0.30001788",
+    "caniuse-lite": "1.0.30001790",
     "encoding": "0.1.13",
     "eslint": "9.39.4",
     "eslint-config-andrewaylett": "7.0.0",
