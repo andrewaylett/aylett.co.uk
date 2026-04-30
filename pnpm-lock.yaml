@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  jsdom: 29.0.2
+  jsdom: 29.1.0
   react: 19.2.4
   react-dom: 19.2.4
   react-is: 19.2.4
@@ -238,8 +238,8 @@ importers:
         specifier: 2.6.1
         version: 2.6.1
       jsdom:
-        specifier: 29.0.2
-        version: 29.0.2
+        specifier: 29.1.0
+        version: 29.1.0
       postcss:
         specifier: 8.5.12
         version: 8.5.12
@@ -791,7 +791,7 @@ packages:
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
-      jsdom: 29.0.2
+      jsdom: 29.1.0
     peerDependenciesMeta:
       canvas:
         optional: true
@@ -3109,8 +3109,8 @@ packages:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
-  jsdom@29.0.2:
-    resolution: {integrity: sha512-9VnGEBosc/ZpwyOsJBCQ/3I5p7Q5ngOY14a9bf5btenAORmZfDse1ZEheMiWcJ3h81+Fv7HmJFdS0szo/waF2w==}
+  jsdom@29.1.0:
+    resolution: {integrity: sha512-YNUc7fB9QuvSSQWfrH0xF+TyABkxUwx8sswgIDaCrw4Hol8BghdZDkITtZheRJeMtzWlnTfsM3bBBusRvpO1wg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -4994,7 +4994,7 @@ snapshots:
 
   '@jest/diff-sequences@30.3.0': {}
 
-  '@jest/environment-jsdom-abstract@30.3.0(jsdom@29.0.2)':
+  '@jest/environment-jsdom-abstract@30.3.0(jsdom@29.1.0)':
     dependencies:
       '@jest/environment': 30.3.0
       '@jest/fake-timers': 30.3.0
@@ -5003,7 +5003,7 @@ snapshots:
       '@types/node': 24.12.2
       jest-mock: 30.3.0
       jest-util: 30.3.0
-      jsdom: 29.0.2
+      jsdom: 29.1.0
 
   '@jest/environment@30.3.0':
     dependencies:
@@ -7504,8 +7504,8 @@ snapshots:
   jest-environment-jsdom@30.3.0:
     dependencies:
       '@jest/environment': 30.3.0
-      '@jest/environment-jsdom-abstract': 30.3.0(jsdom@29.0.2)
-      jsdom: 29.0.2
+      '@jest/environment-jsdom-abstract': 30.3.0(jsdom@29.1.0)
+      jsdom: 29.1.0
     transitivePeerDependencies:
       - '@noble/hashes'
 
@@ -7731,7 +7731,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jsdom@29.0.2:
+  jsdom@29.1.0:
     dependencies:
       '@asamuzakjp/css-color': 5.1.11
       '@asamuzakjp/dom-selector': 7.1.1
