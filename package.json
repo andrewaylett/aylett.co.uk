@@ -97,7 +97,7 @@
     "identity-obj-proxy": "3.0.0",
     "jest": "30.3.0",
     "jest-environment-jsdom": "30.3.0",
-    "jiti": "2.6.1",
+    "jiti": "2.7.0",
     "jsdom": "29.1.1",
     "postcss": "8.5.14",
     "prettier": "3.8.3",
