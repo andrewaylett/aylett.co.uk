@@ -27,8 +27,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       immer:
-        specifier: 11.1.6
-        version: 11.1.6
+        specifier: 11.1.7
+        version: 11.1.7
       mdast-util-from-markdown:
         specifier: 2.0.3
         version: 2.0.3
@@ -2786,8 +2786,8 @@ packages:
   immer@10.2.0:
     resolution: {integrity: sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw==}
 
-  immer@11.1.6:
-    resolution: {integrity: sha512-uwrF08UBQfxk49i9WcUeCx045wjB1zXEHNJmbYHPVVspxmjwSeWCoKbB8DEIvs3XkBJV6lcRAyLaWJ2+u3MMCw==}
+  immer@11.1.7:
+    resolution: {integrity: sha512-LFVFtAROHcDy1er5UI6nodRFnZ2SgdCXhfNSI+DpObO8N7Pur/muBGsjzH5wpnFHCYhYVQxZskCkV4koQ//3/Q==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -5257,7 +5257,7 @@ snapshots:
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@standard-schema/utils': 0.3.0
-      immer: 11.1.6
+      immer: 11.1.7
       redux: 5.0.1
       redux-thunk: 3.1.0(redux@5.0.1)
       reselect: 5.1.1
@@ -7276,7 +7276,7 @@ snapshots:
 
   immer@10.2.0: {}
 
-  immer@11.1.6: {}
+  immer@11.1.7: {}
 
   import-fresh@3.3.1:
     dependencies:
