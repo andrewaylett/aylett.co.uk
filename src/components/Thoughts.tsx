@@ -1,4 +1,4 @@
-import { Suspense, use, type JSX } from 'react';
+import { use, type JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -28,9 +28,7 @@ export function Thoughts({ files }: { files: MDFile[] }): JSX.Element {
         </Link>
       </p>
       {sorted.reverse().map(({ id: name, data }) => (
-        <Suspense key={name}>
-          <ListingEntry name={name} metadata={data} />
-        </Suspense>
+        <ListingEntry key={name} id={name} content={use(data)} />
       ))}
     </PageStructure>
   );

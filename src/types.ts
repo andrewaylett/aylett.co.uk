@@ -61,3 +61,5 @@ export const ContentSchema: ZodDiscriminatedUnion<
   [typeof ArticleSchema, typeof ThoughtSchema]
 > = z.discriminatedUnion('tag', [ArticleSchema, ThoughtSchema]);
 export type Content = z.infer<typeof ContentSchema>;
+
+export type Identified<T> = T & { id: string };

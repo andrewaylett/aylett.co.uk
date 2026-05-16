@@ -1,4 +1,4 @@
-import { use, type JSX } from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -7,17 +7,16 @@ import type { Content } from '@/types';
 import { Description } from '@/components/Description';
 
 export function ListingEntry({
-  metadata,
-  name,
+  content,
+  id,
 }: {
-  metadata: Promise<Content>;
-  name: string;
+  content: Content;
+  id: string;
 }): JSX.Element {
-  const data = use(metadata);
-  const isArticle = data.tag === 'article';
+  const isArticle = content.tag === 'article';
 
   const path = isArticle ? 'articles' : 'thoughts';
-  const href = `/${path}/${name}`;
+  const href = `/${path}/${id}`;
 
   return (
     <div
@@ -28,18 +27,18 @@ export function ListingEntry({
     >
       <div className="flex flex-row flex-wrap gap-x-[1ch] contain-content">
         <span className="inline-block">
-          {isArticle && data.lifecycle === 'draft' ? 'Draft: ' : ''}
+          {isArticle && content.lifecycle === 'draft' ? 'Draft: ' : ''}
           <Link property="url" href={href}>
-            <span property="headline">{data.title}</span>
+            <span property="headline">{content.title}</span>
           </Link>
-          {isArticle && data.author && (
+          {isArticle && content.author && (
             <span
               property="author"
               typeof="Person"
-              resource={`#${data.author}`}
+              resource={`#${content.author}`}
             >
               {' - '}
-              <span property="name">{data.author}</span>
+              <span property="name">{content.author}</span>
             </span>
           )}
         </span>
@@ -47,20 +46,20 @@ export function ListingEntry({
           <>
             <span className="inline-block">
               <span className="wrap-parens text-smaller">
-                {data.revision && `v${data.revision}, `}
-                {data.revised.split('/')[0]}
+                {content.revision && `v${content.revision}, `}
+                {content.revised.split('/')[0]}
               </span>
-              {data.abstract && ':'}
+              {content.abstract && ':'}
             </span>
-            {data.abstract && (
+            {content.abstract && (
               <span className="inline-block" property="alternativeHeadline">
-                {data.abstract}
+                {content.abstract}
               </span>
             )}
           </>
         )}
       </div>
-      <Description data={data} />
+      <Description data={content} />
     </div>
   );
 }
