@@ -6,6 +6,8 @@
 
 import {
   useDebugValue,
+  useEffect,
+  useState,
   type ForwardRefExoticComponent,
   type PropsWithoutRef,
   type RefAttributes,
@@ -95,17 +97,23 @@ interface QRProps {
   /**
    * Rendering style for data modules. 'square' (default) fills every module;
    * 'dot' renders data/alignment modules as circles while keeping structural
-   * modules (finders, timing, format/version info) square.
+   * modules (finders, timing, format/version info) square; 'text' splits each
+   * module into a 3×3 sub-cell grid where the centre carries the QR value and
+   * the outer eight cells show a rasterised text pattern.
    * @defaultValue square
    */
-  dotStyle?: 'square' | 'dot';
+  dotStyle?: 'square' | 'dot' | 'text';
   /**
    * Radius of each dot in dot mode, as a fraction of the module size (0–0.5).
    * A value of 0.5 fills the full cell; 0.25 (default) renders at half diameter.
-   * Ignored when dotStyle is 'square'.
+   * Ignored when dotStyle is not 'dot'.
    * @defaultValue 0.25
    */
   dotRadius?: number;
+  /** Text to rasterise into the outer sub-cells of each module in text mode. */
+  rasterText?: string;
+  /** CSS font-family for raster text rendering. @defaultValue Impact */
+  rasterFont?: string;
 }
 export type QRPropsSVG = QRProps & React.SVGAttributes<SVGSVGElement>;
 
@@ -234,6 +242,169 @@ function generateDotPath(
         ops.push(
           `M${sx},${cy}a${radius},${radius} 0 1,0 ${d},0a${radius},${radius} 0 1,0-${d},0`,
         );
+      }
+    }
+  }
+  return ops.join('');
+}
+
+// Structural zones: top 9 rows (TL+TR finders + format info) and bottom 8 rows
+// (BL finder + format info). Interior data rows: 9 … size−9 = size−17 rows total.
+const STRUCTURAL_TOP_ROWS = 9;
+const STRUCTURAL_BOTTOM_ROWS = 8;
+
+// Renders rasterText onto an off-screen canvas covering only the interior data
+// region (between the locator squares): width size*3, height (size−17)*3.
+// Returns null while loading or when rasterText is empty.
+// Stale cached pixels are suppressed by gating the return on rasterText.
+function useRasterPixels(
+  rasterText: string,
+  rasterFont: string,
+  size: number,
+): Uint8ClampedArray | null {
+  const [pixels, setPixels] = useState<Uint8ClampedArray | null>(null);
+
+  useEffect(() => {
+    if (!rasterText) return;
+    let cancelled = false;
+
+    async function render() {
+      const cw = size * 3;
+      const ch = Math.max(
+        3,
+        (size - STRUCTURAL_TOP_ROWS - STRUCTURAL_BOTTOM_ROWS) * 3,
+      );
+      await document.fonts.load(`bold 72px "${rasterFont}"`);
+      if (cancelled) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = cw;
+      canvas.height = ch;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.fillStyle = '#000000';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'center';
+
+      // Largest font where the actual ink bounds fit — not the nominal em size,
+      // so text without descenders (e.g. "QR") can use a larger font.
+      let lo = 1,
+        hi = Math.max(cw, ch) * 2;
+      while (lo < hi - 1) {
+        const mid = (lo + hi) >> 1;
+        ctx.font = `bold ${mid}px "${rasterFont}"`;
+        const m = ctx.measureText(rasterText);
+        const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+        // Fall back to font size when actual bounds are unavailable (e.g. jsdom)
+        if (m.width <= cw && (inkH > 0 ? inkH : mid) <= ch) lo = mid;
+        else hi = mid;
+      }
+
+      // Center by ink bounds rather than the em box so the visual weight sits
+      // in the middle of the data region regardless of descenders.
+      ctx.font = `bold ${lo}px "${rasterFont}"`;
+      const fm = ctx.measureText(rasterText);
+      const inkCy =
+        fm.actualBoundingBoxAscent > 0
+          ? ch / 2 +
+            (fm.actualBoundingBoxAscent - fm.actualBoundingBoxDescent) / 2
+          : ch / 2;
+      ctx.fillText(rasterText, cw / 2, inkCy);
+
+      // After the final await + cancellation check, cancelled is always false here.
+      setPixels(ctx.getImageData(0, 0, cw, ch).data);
+    }
+
+    render().catch(console.error);
+    return () => {
+      cancelled = true;
+    };
+  }, [rasterText, rasterFont, size]);
+
+  // When rasterText is empty, suppress any stale cached pixels immediately
+  // without needing an extra state update from inside the effect.
+  return rasterText ? pixels : null;
+}
+
+// Renders data/alignment and timing modules as 3×3 sub-cell grids.
+//
+// Data/alignment modules: centre sub-cell (dx=1,dy=1) carries the QR value;
+//   the eight outer sub-cells carry text pixels for interior rows.
+//
+// Timing modules: the middle row (horizontal strip, y=6) or middle column
+//   (vertical strip, x=6) of three sub-cells carries the QR value; the other
+//   six sub-cells carry text pixels for interior rows.
+//
+// Structural square modules are excluded (handled by fgPath/whitePath).
+// pixelData is sized size*3 wide × (size−17)*3 tall; py is offset by 9 rows.
+function generateTextPath(
+  modules: Modules,
+  margin: number,
+  pixelData: Uint8ClampedArray | null,
+  size: number,
+): string {
+  const ops: string[] = [];
+  const s = 1 / 3;
+  const interiorTop = STRUCTURAL_TOP_ROWS;
+  const interiorBottom = size - STRUCTURAL_BOTTOM_ROWS - 1;
+  const canvasWidth = size * 3;
+
+  for (const [y, row] of modules.entries()) {
+    for (const [x, cell] of row.entries()) {
+      if (isStructuralSquareModule(x, y, size)) continue;
+
+      const bx = x + margin;
+      const by = y + margin;
+      const hasText =
+        pixelData !== null && y >= interiorTop && y <= interiorBottom;
+
+      if (isTimingModule(x, y, size)) {
+        // Horizontal strip (y=6): middle row of sub-cells is the timing bar.
+        // Vertical strip (x=6): middle column of sub-cells is the timing bar.
+        const horiz = y === 6;
+        if (cell) {
+          ops.push(
+            horiz
+              ? `M${bx},${by + s}h1v${s}H${bx}z`
+              : `M${bx + s},${by}h${s}v1H${bx + s}z`,
+          );
+        }
+        if (hasText) {
+          for (let dy = 0; dy < 3; dy++) {
+            for (let dx = 0; dx < 3; dx++) {
+              if (horiz ? dy === 1 : dx === 1) continue;
+              const i =
+                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
+              if ((pixelData[i] ?? 255) < 128) {
+                ops.push(
+                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
+                );
+              }
+            }
+          }
+        }
+      } else {
+        // Data/alignment module: centre sub-cell = QR value, outer 8 = text.
+        if (cell) {
+          ops.push(`M${bx + s},${by + s}h${s}v${s}H${bx + s}z`);
+        }
+        if (hasText) {
+          for (let dy = 0; dy < 3; dy++) {
+            for (let dx = 0; dx < 3; dx++) {
+              if (dx === 1 && dy === 1) continue;
+              const i =
+                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
+              if ((pixelData[i] ?? 255) < 128) {
+                ops.push(
+                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
+                );
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -380,28 +551,31 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
     cellSize = DEFAULT_CELL_SIZE,
     dotStyle = 'square',
     dotRadius = 0.25,
+    rasterText = '',
+    rasterFont = 'Impact',
     ...otherProps
   } = props;
 
   const { cells, margin, numCells } = details;
+  const size = cells.length;
+  const pixelData = useRasterPixels(rasterText, rasterFont, size);
 
   const finalSize = numCells * cellSize;
 
   // Drawing strategy: no solid background rect — the SVG is transparent where no
-  // colour is required. Three categories of explicit fill:
+  // colour is required. Rendering categories:
   //   1. Border frame (quiet zone): bgColor even-odd frame.
-  //   2. bgColor path: structural light squares + light timing narrow rects.
-  //   3. fgColor path: dark squares (or structural squares in dot mode) + dark timing
-  //      narrow rects. In dot mode, per-cell circles replace data/alignment modules.
+  //   2. bgColor path: structural light squares + light timing narrow rects (dot mode).
+  //   3. fgColor path: varies by dotStyle — see below.
   // Timing modules are always rendered as 50%-width rectangles centred on the cell,
   // full-length in the timing direction, half-width in the perpendicular direction.
-  const size = cells.length;
 
   // 1. Quiet-zone frame: fills the margin band around the modules grid.
   const innerWidth = numCells - 2 * margin;
   const borderPath = `M0,0 h${numCells}v${numCells}H0zM${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`;
 
-  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light timing narrow rects.
+  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light
+  //    timing narrow rects (text mode renders timing inside generateTextPath).
   const whitePath =
     generatePath(
       cells.map((row, y) =>
@@ -410,22 +584,30 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
       margin,
     ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin, false) : '');
 
-  // 3. fgColor: in square mode, all dark cells as full squares; in dot mode, structural
-  //    squares + narrow timing rects, with per-cell circles for data/alignment modules.
+  // 3. fgColor paths differ by style:
+  //   square — all dark cells as full squares
+  //   dot    — structural squares + timing narrow rects + per-cell circles
+  //   text   — structural squares only; timing and data modules handled by
+  //            generateTextPath (middle row/col for timing, centre sub-cell
+  //            for data, outer sub-cells for text overlay)
   const fgPath =
-    dotStyle === 'dot'
-      ? generatePath(
+    dotStyle === 'square'
+      ? generatePath(cells, margin)
+      : generatePath(
           cells.map((row, y) =>
             row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
           ),
           margin,
-        ) + generateTimingPath(cells, margin)
-      : generatePath(cells, margin);
+        ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin) : '');
   const dotPath =
     dotStyle === 'dot' ? generateDotPath(cells, margin, dotRadius) : null;
   const lightDotPath =
     dotStyle === 'dot'
       ? generateDotPath(cells, margin, dotRadius, false)
+      : null;
+  const textPath =
+    dotStyle === 'text'
+      ? generateTextPath(cells, margin, pixelData, size)
       : null;
 
   return (
@@ -449,6 +631,13 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
         d={borderPath}
         shapeRendering="crispEdges"
       />
+      {dotStyle === 'text' && (
+        <path
+          fill={bgColor}
+          d={`M${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`}
+          shapeRendering="crispEdges"
+        />
+      )}
       <path fill={bgColor} d={whitePath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
       {lightDotPath && (
@@ -460,6 +649,9 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
       )}
       {dotPath && (
         <path fill={fgColor} d={dotPath} shapeRendering="geometricPrecision" />
+      )}
+      {textPath && (
+        <path fill={fgColor} d={textPath} shapeRendering="crispEdges" />
       )}
     </svg>
   );

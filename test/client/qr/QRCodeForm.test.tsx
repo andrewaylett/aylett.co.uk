@@ -196,14 +196,15 @@ describe('QRCodeForm', () => {
   });
 
   it('renders dot mode when toggled', async () => {
-    const user = userEvent.setup();
     const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
     await act(async () => render(<QRCodeForm />));
 
-    await setFormText(TEST_VALUE, user);
+    await setFormText(TEST_VALUE, userEvent.setup());
 
-    const dotCheckbox = screen.getByLabelText(/dot modules/i);
-    await act(async () => user.click(dotCheckbox));
+    const moduleStyleSelect = screen.getByLabelText(/module style/i);
+    await act(async () =>
+      fireEvent.change(moduleStyleSelect, { target: { value: 'dot' } }),
+    );
 
     const qrCode = await screen.findByTestId('qr-code');
     const paths = [...qrCode.querySelectorAll('path')];
@@ -213,15 +214,18 @@ describe('QRCodeForm', () => {
   });
 
   it('returns to square mode when dot mode is toggled off', async () => {
-    const user = userEvent.setup();
     const { QRCodeForm } = await import('@/client/qr/QRCodeForm');
     await act(async () => render(<QRCodeForm />));
 
-    await setFormText(TEST_VALUE, user);
+    await setFormText(TEST_VALUE, userEvent.setup());
 
-    const dotCheckbox = screen.getByLabelText(/dot modules/i);
-    await act(async () => user.click(dotCheckbox));
-    await act(async () => user.click(dotCheckbox));
+    const moduleStyleSelect = screen.getByLabelText(/module style/i);
+    await act(async () =>
+      fireEvent.change(moduleStyleSelect, { target: { value: 'dot' } }),
+    );
+    await act(async () =>
+      fireEvent.change(moduleStyleSelect, { target: { value: 'square' } }),
+    );
 
     const qrCode = await screen.findByTestId('qr-code');
     const paths = [...qrCode.querySelectorAll('path')];
