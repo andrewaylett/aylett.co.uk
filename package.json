@@ -7,6 +7,7 @@
   "type": "module",
   "packageManager": "pnpm@10.33.4",
   "scripts": {
+    "predev": "pnpm install --frozen-lockfile",
     "dev": "next dev --turbopack",
     "build": "next build --experimental-app-only",
     "start": "next start",

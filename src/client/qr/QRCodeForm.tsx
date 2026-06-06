@@ -18,6 +18,8 @@ import { toBlob, toPng } from 'html-to-image';
 import { QRCodeError } from './QRCodeError';
 import { QRCodeErrorContext } from './QRCodeErrorContext';
 
+import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react';
+
 import {
   type ButtonText,
   type QRCodeState,
@@ -65,6 +67,21 @@ interface QRCodeStatePopState {
   text: string;
 }
 
+interface QRCodeStateSetDotStyle {
+  type: 'setDotStyle';
+  dotStyle: 'square' | 'dot';
+}
+
+interface QRCodeStateSetDotRadius {
+  type: 'setDotRadius';
+  dotRadius: number;
+}
+
+interface QRCodeStateSetMinErrorCorrectionLevel {
+  type: 'setMinErrorCorrectionLevel';
+  minErrorCorrectionLevel: ErrorCorrectionLevel;
+}
+
 type QRCodeStateUpdate =
   | QRCodeStateSetShouldOptimiseUrl
   | QRCodeStateSetText
@@ -72,7 +89,10 @@ type QRCodeStateUpdate =
   | QRCodeResetNextPushStateText
   | QRCodeStateSetButtonText
   | QRCodeStateUpdateGeneration
-  | QRCodeStatePopState;
+  | QRCodeStatePopState
+  | QRCodeStateSetDotStyle
+  | QRCodeStateSetDotRadius
+  | QRCodeStateSetMinErrorCorrectionLevel;
 
 function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
   switch (instructions.type) {
@@ -102,6 +122,19 @@ function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
       draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
       break;
     }
+    case 'setDotStyle': {
+      draft.qrState.dotStyle = instructions.dotStyle;
+      break;
+    }
+    case 'setDotRadius': {
+      draft.qrState.dotRadius = instructions.dotRadius;
+      break;
+    }
+    case 'setMinErrorCorrectionLevel': {
+      draft.qrState.minErrorCorrectionLevel =
+        instructions.minErrorCorrectionLevel;
+      break;
+    }
     case 'setButtonText': {
       draft.qrState.buttonText = instructions.buttonText;
       break;
@@ -129,6 +162,9 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
       buttonText: BUTTON_TEXT.INITIAL_TEXT,
       generation: 0,
       shouldOptimiseUrl: true,
+      dotStyle: 'square',
+      dotRadius: 0.25,
+      minErrorCorrectionLevel: 'L',
     },
   };
 }
@@ -279,28 +315,94 @@ export function QRCodeForm(): JSX.Element {
         data-generation={state.qrState.generation}
         aria-label="Text to render as a QR code"
       />
-      <label
-        className={
-          'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-          (canOptimiseUrl ? ' h-lh' : ' h-0')
-        }
-      >
-        <input
-          type="checkbox"
-          disabled={!canOptimiseUrl}
-          className="m-1"
-          defaultChecked={state.qrState.shouldOptimiseUrl}
-          onChange={(event) => {
-            startTransition(() => {
-              dispatch({
-                type: 'setShouldOptimiseUrl',
-                shouldOptimiseUrl: event.target.checked,
+      <details className="w-full mt-2">
+        <summary>Advanced options</summary>
+        <label
+          className={
+            'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+            (canOptimiseUrl ? ' h-lh' : ' h-0')
+          }
+        >
+          <input
+            type="checkbox"
+            disabled={!canOptimiseUrl}
+            className="m-1"
+            defaultChecked={state.qrState.shouldOptimiseUrl}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setShouldOptimiseUrl',
+                  shouldOptimiseUrl: event.target.checked,
+                });
               });
-            });
-          }}
-        />
-        Optimise URL
-      </label>
+            }}
+          />
+          Optimise URL
+        </label>
+        <label className="w-full">
+          <input
+            type="checkbox"
+            className="m-1"
+            checked={state.qrState.dotStyle === 'dot'}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setDotStyle',
+                  dotStyle: event.target.checked ? 'dot' : 'square',
+                });
+              });
+            }}
+          />
+          Dot modules
+        </label>
+        <label
+          className={
+            'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+            (state.qrState.dotStyle === 'dot' ? ' h-lh' : ' h-0')
+          }
+        >
+          Dot size
+          <input
+            type="range"
+            className="flex-1"
+            min={30}
+            max={100}
+            step={5}
+            value={Math.round(state.qrState.dotRadius * 200)}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setDotRadius',
+                  dotRadius: Number(event.target.value) / 200,
+                });
+              });
+            }}
+          />
+          <output className="w-[3ch] text-right">
+            {Math.round(state.qrState.dotRadius * 200)}%
+          </output>
+        </label>
+        <label className="w-full flex flex-row items-center gap-2">
+          Min error correction
+          <select
+            value={state.qrState.minErrorCorrectionLevel}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setMinErrorCorrectionLevel',
+                  minErrorCorrectionLevel: event.target
+                    .value as ErrorCorrectionLevel,
+                });
+              });
+            }}
+          >
+            <option value="L">L — Low</option>
+            <option value="M">M — Medium</option>
+            <option value="Q">Q — Quartile</option>
+            <option value="H">H — High</option>
+          </select>
+        </label>
+      </details>
       <QRCodeErrorContext
         value={{
           resetText: () => {

@@ -4,6 +4,7 @@ import {
   QRCodeSVGDetails,
   useDebugDetails,
   useQRCode,
+  type ErrorCorrectionLevel,
 } from '@/client/qr/thirdparty/qrcode.react';
 import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
@@ -12,6 +13,9 @@ export interface QRCodeState {
   buttonText: ButtonText;
   shouldOptimiseUrl: boolean;
   generation: number;
+  dotStyle: 'square' | 'dot';
+  dotRadius: number;
+  minErrorCorrectionLevel: ErrorCorrectionLevel;
 }
 
 export const BUTTON_TEXT = {
@@ -44,12 +48,12 @@ function useOptimisedQr(state: QRCodeState) {
 
   const nonOptimisedQr = useQRCode({
     value: state.text,
-    level: 'L',
+    level: state.minErrorCorrectionLevel,
     minVersion: 1,
   });
   const optimisedQr = useQRCode({
     value: optimisedValue,
-    level: 'L',
+    level: state.minErrorCorrectionLevel,
     minVersion: 1,
   });
 
@@ -115,6 +119,8 @@ export function QRCode({
         <QRCodeSVGDetails
           details={qrDetails}
           cellSize={4}
+          dotStyle={state.dotStyle}
+          dotRadius={state.dotRadius}
           data-testid="qr-code"
           className="transition-[height,width] duration-300 ease even:transition-all even:duration-300 even:ease max-w-screen max-h-[100vw]"
           aria-description={`A QR code that contains the text: ${state.text}`}
