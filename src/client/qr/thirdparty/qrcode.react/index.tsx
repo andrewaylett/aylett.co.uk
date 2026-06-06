@@ -17,7 +17,7 @@ import * as qrcodegen from '../qrcodegen';
 import type { QrCode, QrSegment } from '../qrcodegen';
 
 type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
-type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 
 type ERROR_LEVEL_MAPPED_TYPE = Record<
   ErrorCorrectionLevel,
@@ -92,6 +92,20 @@ interface QRProps {
    * If set, makes the overall QR code size such that each module is this many pixels.
    */
   cellSize?: number;
+  /**
+   * Rendering style for data modules. 'square' (default) fills every module;
+   * 'dot' renders data/alignment modules as circles while keeping structural
+   * modules (finders, timing, format/version info) square.
+   * @defaultValue square
+   */
+  dotStyle?: 'square' | 'dot';
+  /**
+   * Radius of each dot in dot mode, as a fraction of the module size (0–0.5).
+   * A value of 0.5 fills the full cell; 0.25 (default) renders at half diameter.
+   * Ignored when dotStyle is 'square'.
+   * @defaultValue 0.25
+   */
+  dotRadius?: number;
 }
 export type QRPropsSVG = QRProps & React.SVGAttributes<SVGSVGElement>;
 
@@ -141,6 +155,85 @@ function generatePath(modules: Modules, margin = 0): string {
 
       if (cell && start === null) {
         start = x;
+      }
+    }
+  }
+  return ops.join('');
+}
+
+// True for finder/format-info/version-info modules that are rendered as full squares.
+// Timing modules are excluded — they get separate narrow-rectangle rendering.
+function isStructuralSquareModule(x: number, y: number, size: number): boolean {
+  if (x <= 8 && y <= 8) return true; // TL finder + format info
+  if (x >= size - 8 && y <= 8) return true; // TR finder + format info
+  if (x <= 8 && y >= size - 8) return true; // BL finder + format info
+  // Version information blocks (only present in versions 7+, size >= 45)
+  if (size >= 45) {
+    if (x >= size - 11 && x <= size - 9 && y <= 5) return true;
+    if (y >= size - 11 && y <= size - 9 && x <= 5) return true;
+  }
+  return false;
+}
+
+// True for timing modules that lie between the finder zones (not inside them).
+// Row 6 and column 6 within a finder zone are overwritten by finder values and
+// treated as structural-square modules instead.
+function isTimingModule(x: number, y: number, size: number): boolean {
+  if (x !== 6 && y !== 6) return false;
+  if (x <= 8 && y <= 8) return false; // inside TL finder zone
+  if (x >= size - 8 && y <= 8) return false; // inside TR finder zone
+  if (x <= 8 && y >= size - 8) return false; // inside BL finder zone
+  return true;
+}
+
+// Used to exclude structural modules from dot/circle rendering.
+function isSquareModule(x: number, y: number, size: number): boolean {
+  return isStructuralSquareModule(x, y, size) || isTimingModule(x, y, size);
+}
+
+// Generates SVG rect paths for timing modules, narrowed to 50% in the perpendicular
+// axis and centred. Row-6 modules are full-width, half-height; column-6 modules are
+// half-width, full-height.
+function generateTimingPath(
+  modules: Modules,
+  margin: number,
+  isDark = true,
+): string {
+  const size = modules.length;
+  const ops: string[] = [];
+  for (const [y, row] of modules.entries()) {
+    for (const [x, cell] of row.entries()) {
+      if (cell !== isDark || !isTimingModule(x, y, size)) continue;
+      if (y === 6) {
+        ops.push(`M${x + margin},${y + margin + 0.25}h1v.5H${x + margin}z`);
+      } else {
+        ops.push(
+          `M${x + margin + 0.25},${y + margin}h.5v1H${x + margin + 0.25}z`,
+        );
+      }
+    }
+  }
+  return ops.join('');
+}
+
+// Generates SVG arc paths for non-square modules that match `isDark`.
+function generateDotPath(
+  modules: Modules,
+  margin: number,
+  radius = 0.25,
+  isDark = true,
+): string {
+  const size = modules.length;
+  const ops: string[] = [];
+  for (const [y, row] of modules.entries()) {
+    for (const [x, cell] of row.entries()) {
+      if (cell === isDark && !isSquareModule(x, y, size)) {
+        const sx = x + margin + 0.5 - radius;
+        const cy = y + margin + 0.5;
+        const d = 2 * radius;
+        ops.push(
+          `M${sx},${cy}a${radius},${radius} 0 1,0 ${d},0a${radius},${radius} 0 1,0-${d},0`,
+        );
       }
     }
   }
@@ -285,6 +378,8 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
     fgColor = DEFAULT_FGCOLOR,
     title,
     cellSize = DEFAULT_CELL_SIZE,
+    dotStyle = 'square',
+    dotRadius = 0.25,
     ...otherProps
   } = props;
 
@@ -292,13 +387,46 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
 
   const finalSize = numCells * cellSize;
 
-  // Drawing strategy: instead of a rect per module, we're going to create a
-  // single path for the dark modules and layer that on top of a light rect,
-  // for a total of 2 DOM nodes. We pay a bit more in string concat but that's
-  // way faster than DOM ops.
-  // For level 1, 441 nodes -> 2
-  // For level 40, 31329 -> 2
-  const fgPath = generatePath(cells, margin);
+  // Drawing strategy: no solid background rect — the SVG is transparent where no
+  // colour is required. Three categories of explicit fill:
+  //   1. Border frame (quiet zone): bgColor even-odd frame.
+  //   2. bgColor path: structural light squares + light timing narrow rects.
+  //   3. fgColor path: dark squares (or structural squares in dot mode) + dark timing
+  //      narrow rects. In dot mode, per-cell circles replace data/alignment modules.
+  // Timing modules are always rendered as 50%-width rectangles centred on the cell,
+  // full-length in the timing direction, half-width in the perpendicular direction.
+  const size = cells.length;
+
+  // 1. Quiet-zone frame: fills the margin band around the modules grid.
+  const innerWidth = numCells - 2 * margin;
+  const borderPath = `M0,0 h${numCells}v${numCells}H0zM${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`;
+
+  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light timing narrow rects.
+  const whitePath =
+    generatePath(
+      cells.map((row, y) =>
+        row.map((cell, x) => !cell && isStructuralSquareModule(x, y, size)),
+      ),
+      margin,
+    ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin, false) : '');
+
+  // 3. fgColor: in square mode, all dark cells as full squares; in dot mode, structural
+  //    squares + narrow timing rects, with per-cell circles for data/alignment modules.
+  const fgPath =
+    dotStyle === 'dot'
+      ? generatePath(
+          cells.map((row, y) =>
+            row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
+          ),
+          margin,
+        ) + generateTimingPath(cells, margin)
+      : generatePath(cells, margin);
+  const dotPath =
+    dotStyle === 'dot' ? generateDotPath(cells, margin, dotRadius) : null;
+  const lightDotPath =
+    dotStyle === 'dot'
+      ? generateDotPath(cells, margin, dotRadius, false)
+      : null;
 
   return (
     <svg
@@ -317,10 +445,22 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
       {!!title && <title>{title}</title>}
       <path
         fill={bgColor}
-        d={`M0,0 h${numCells}v${numCells}H0z`}
+        fillRule="evenodd"
+        d={borderPath}
         shapeRendering="crispEdges"
       />
+      <path fill={bgColor} d={whitePath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      {lightDotPath && (
+        <path
+          fill={bgColor}
+          d={lightDotPath}
+          shapeRendering="geometricPrecision"
+        />
+      )}
+      {dotPath && (
+        <path fill={fgColor} d={dotPath} shapeRendering="geometricPrecision" />
+      )}
     </svg>
   );
 });
