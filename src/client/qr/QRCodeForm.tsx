@@ -29,6 +29,27 @@ import {
 } from '@/client/qr/QRCode';
 import { encodeQueryComponent, nullToError } from '@/utilities';
 
+const DEFAULTS = {
+  shouldOptimiseUrl: true,
+  dotStyle: 'square' as const,
+  dotRadius: 0.25,
+  minErrorCorrectionLevel: 'L' as ErrorCorrectionLevel,
+};
+
+function buildQrUrl(qrState: QRCodeState): string {
+  const parts: string[] = [];
+  if (qrState.text) parts.push(`text=${encodeQueryComponent(qrState.text)}`);
+  if (!qrState.shouldOptimiseUrl) parts.push('optimise=false');
+  if (qrState.dotStyle === 'dot') {
+    parts.push('dotStyle=dot');
+    if (qrState.dotRadius !== DEFAULTS.dotRadius)
+      parts.push(`dotRadius=${Math.round(qrState.dotRadius * 200)}`);
+  }
+  if (qrState.minErrorCorrectionLevel !== 'L')
+    parts.push(`ecl=${qrState.minErrorCorrectionLevel}`);
+  return parts.length > 0 ? `?${parts.join('&')}` : './qr';
+}
+
 export interface QRCodeFormState {
   nextPushStateText?: string;
   previousPushStateText?: string;
@@ -156,15 +177,31 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
   const text = isQuine
     ? `https://www.aylett.co.uk/qr/?text=${paramText}`
     : paramText;
+
+  const dotStyle =
+    searchParams.get('dotStyle') === 'dot' ? 'dot' : DEFAULTS.dotStyle;
+  const rawRadius = searchParams.get('dotRadius');
+  const dotRadius =
+    rawRadius !== null && !Number.isNaN(Number(rawRadius))
+      ? Number(rawRadius) / 200
+      : DEFAULTS.dotRadius;
+  const eclParam = searchParams.get('ecl') ?? 'L';
+  const minErrorCorrectionLevel = (['L', 'M', 'Q', 'H'] as const).includes(
+    eclParam as ErrorCorrectionLevel,
+  )
+    ? (eclParam as ErrorCorrectionLevel)
+    : DEFAULTS.minErrorCorrectionLevel;
+  const shouldOptimiseUrl = searchParams.get('optimise') !== 'false';
+
   return {
     qrState: {
       text,
       buttonText: BUTTON_TEXT.INITIAL_TEXT,
       generation: 0,
-      shouldOptimiseUrl: true,
-      dotStyle: 'square',
-      dotRadius: 0.25,
-      minErrorCorrectionLevel: 'L',
+      shouldOptimiseUrl,
+      dotStyle,
+      dotRadius,
+      minErrorCorrectionLevel,
     },
   };
 }
@@ -237,6 +274,32 @@ export function QRCodeForm(): JSX.Element {
 
   const onPopState = useEffectEvent(() => {
     dispatch({ type: 'popState', text: searchParams.get('text') ?? '' });
+    dispatch({
+      type: 'setDotStyle',
+      dotStyle:
+        searchParams.get('dotStyle') === 'dot' ? 'dot' : DEFAULTS.dotStyle,
+    });
+    const rawRadius = searchParams.get('dotRadius');
+    dispatch({
+      type: 'setDotRadius',
+      dotRadius:
+        rawRadius !== null && !Number.isNaN(Number(rawRadius))
+          ? Number(rawRadius) / 200
+          : DEFAULTS.dotRadius,
+    });
+    const eclParam = searchParams.get('ecl') ?? 'L';
+    dispatch({
+      type: 'setMinErrorCorrectionLevel',
+      minErrorCorrectionLevel: (['L', 'M', 'Q', 'H'] as const).includes(
+        eclParam as ErrorCorrectionLevel,
+      )
+        ? (eclParam as ErrorCorrectionLevel)
+        : DEFAULTS.minErrorCorrectionLevel,
+    });
+    dispatch({
+      type: 'setShouldOptimiseUrl',
+      shouldOptimiseUrl: searchParams.get('optimise') !== 'false',
+    });
     if (resetRef.current) {
       startTransition(resetRef.current);
     }
@@ -253,26 +316,24 @@ export function QRCodeForm(): JSX.Element {
     };
   }, []);
 
+  const pushStateUrl =
+    state.nextPushStateText !== undefined &&
+    state.nextPushStateText !== state.qrState.text
+      ? buildQrUrl({ ...state.qrState, text: state.nextPushStateText })
+      : null;
+
   useEffect(() => {
-    if (
-      state.nextPushStateText !== undefined &&
-      state.nextPushStateText !== state.qrState.text
-    ) {
-      const pushStateUrl = `?text=${encodeQueryComponent(state.nextPushStateText)}`;
+    if (pushStateUrl !== null) {
       globalThis.history.pushState({}, '', pushStateUrl);
-      dispatch({
-        type: 'resetNextPushStateText',
-      });
+      dispatch({ type: 'resetNextPushStateText' });
     }
-  }, [state.nextPushStateText, state.qrState.text]);
+  }, [pushStateUrl]);
+
+  const replaceStateUrl = buildQrUrl(state.qrState);
 
   useEffect(() => {
-    const linkUrl = state.qrState.text
-      ? `?text=${encodeQueryComponent(state.qrState.text)}`
-      : './qr';
-
-    globalThis.history.replaceState({}, '', linkUrl);
-  }, [state.qrState.text]);
+    globalThis.history.replaceState({}, '', replaceStateUrl);
+  }, [replaceStateUrl]);
 
   function setText(newText: string, updateGeneration?: boolean) {
     dispatch({
