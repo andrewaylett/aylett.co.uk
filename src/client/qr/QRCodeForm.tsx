@@ -21,7 +21,8 @@ import {
   type ButtonText,
   QRCode,
   type QRCodeContent,
-  URL_SPLITTER,
+  SVG_BUTTON_TEXT,
+  type SvgButtonText,
 } from '@/client/qr/QRCode';
 import { nullToError } from '@/utilities';
 import { useSearchParamsWithEdit } from '@/client/hooks/useSearchParamsWithEdit';
@@ -31,6 +32,7 @@ import { BoundEditableInput } from '@/components/BoundEditableInput';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
+  isQuine: false,
   dotStyle: 'square' as const,
   dotRadius: 0.25,
   minErrorCorrectionLevel: 'L' as ErrorCorrectionLevel,
@@ -42,6 +44,9 @@ function buildSearchParams(qrState: QRCodeContent): URLSearchParams {
   const params = new URLSearchParams();
   if (qrState.text) {
     params.set('text', qrState.text);
+  }
+  if (qrState.renderAsQuine) {
+    params.set('quine', 'true');
   }
   if (qrState.shouldOptimiseUrl) {
     params.set('optimise', 'true');
@@ -67,11 +72,8 @@ function buildSearchParams(qrState: QRCodeContent): URLSearchParams {
 }
 
 function extractContent(searchParams: URLSearchParams): QRCodeContent {
-  const isQuine = searchParams.get('quine') === 'true';
-  const paramText = searchParams.get('text') ?? '';
-  const text = isQuine
-    ? `https://www.aylett.co.uk/qr?${searchParams.toString()}`
-    : paramText;
+  const renderAsQuine = searchParams.get('quine') === 'true';
+  const text = searchParams.get('text') ?? '';
 
   const dotStyleParam = searchParams.get('dotStyle');
   const dotStyle: 'square' | 'dot' | 'text' | 'cutout' =
@@ -99,6 +101,7 @@ function extractContent(searchParams: URLSearchParams): QRCodeContent {
 
   return {
     text,
+    renderAsQuine,
     shouldOptimiseUrl,
     dotStyle,
     dotRadius,
@@ -112,7 +115,7 @@ export function QRCodeForm(): JSX.Element {
   const resetRef = useRef<() => void>(undefined);
   const ref = useRef<HTMLDivElement>(null);
 
-  const [searchParams, setSearchParams] = useSearchParamsWithEdit();
+  const [href, searchParams, setSearchParams] = useSearchParamsWithEdit();
   const [qrContent, setQRContent] = useTransformedState(
     searchParams,
     setSearchParams,
@@ -123,7 +126,11 @@ export function QRCodeForm(): JSX.Element {
   const [buttonText, setButtonText] = useState<ButtonText>(
     BUTTON_TEXT.INITIAL_TEXT,
   );
+  const [svgButtonText, setSvgButtonText] = useState<SvgButtonText>(
+    SVG_BUTTON_TEXT.INITIAL,
+  );
   const [_inTransition, startTransition] = useTransition();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   function copyToClipboard() {
     startTransition(async () => {
@@ -157,6 +164,20 @@ export function QRCodeForm(): JSX.Element {
 
   const alphanumericValue = qrContent.text.replaceAll(/[^A-Z0-9]/gi, '-');
 
+  function copyPngText(buttonText: ButtonText): string {
+    switch (buttonText) {
+      case BUTTON_TEXT.INITIAL_TEXT: {
+        return 'Copy as PNG';
+      }
+      case BUTTON_TEXT.SUCCESS_TEXT: {
+        return 'Copied as PNG!';
+      }
+      case BUTTON_TEXT.FAILED_TEXT: {
+        return 'Failed to copy PNG';
+      }
+    }
+  }
+
   function download() {
     startTransition(async () => {
       if (!ref.current) {
@@ -175,6 +196,42 @@ export function QRCodeForm(): JSX.Element {
     });
   }
 
+  function downloadSvg() {
+    startTransition(() => {
+      const svgEl = ref.current?.querySelector('svg');
+      if (!svgEl) {
+        throw new Error('QR Code SVG is not ready');
+      }
+      const svgStr = new XMLSerializer().serializeToString(svgEl);
+      const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `qr-${alphanumericValue}.svg`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  function copyAsSvg() {
+    startTransition(async () => {
+      const svgEl = ref.current?.querySelector('svg');
+      if (!svgEl) {
+        throw new Error('QR Code SVG is not ready');
+      }
+      try {
+        const svgStr = new XMLSerializer().serializeToString(svgEl);
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/svg+xml': svgStr }),
+        ]);
+        setSvgButtonText(SVG_BUTTON_TEXT.SUCCESS);
+      } catch (error) {
+        console.error(error);
+        setSvgButtonText(SVG_BUTTON_TEXT.FAILED);
+      }
+    });
+  }
+
   function setText(newText: string, inputChanged: boolean = false) {
     startTransition(() => {
       setQRContent((draft) => {
@@ -187,8 +244,6 @@ export function QRCodeForm(): JSX.Element {
       }
     });
   }
-
-  const canOptimiseUrl = URL_SPLITTER.test(qrContent.text);
 
   return (
     <form className="flex items-center flex-col contain-content">
@@ -209,17 +264,20 @@ export function QRCodeForm(): JSX.Element {
         data-testid="qr-code-input"
         aria-label="Text to render as a QR code"
       />
-      <details className="w-full mt-2">
+      <details
+        className="w-full mt-2"
+        onToggle={(e) => {
+          setAdvancedOpen(e.currentTarget.open);
+        }}
+      >
         <summary>Advanced options</summary>
         <label
           className={
-            'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (canOptimiseUrl ? ' h-lh' : ' h-0')
+            'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease h-lh'
           }
         >
           <input
             type="checkbox"
-            disabled={!canOptimiseUrl}
             className="m-1"
             checked={qrContent.shouldOptimiseUrl}
             onChange={(event) => {
@@ -230,7 +288,22 @@ export function QRCodeForm(): JSX.Element {
               });
             }}
           />
-          Optimise URL
+          Optimise URLs
+        </label>
+        <label className="w-full">
+          <input
+            type="checkbox"
+            className="m-1"
+            checked={qrContent.renderAsQuine}
+            onChange={(event) => {
+              startTransition(() => {
+                setQRContent((draft) => {
+                  draft.renderAsQuine = event.target.checked;
+                });
+              });
+            }}
+          />
+          Quine (encode a link back to this page)
         </label>
         <label className="w-full flex flex-row items-center gap-2">
           Module style
@@ -326,7 +399,12 @@ export function QRCodeForm(): JSX.Element {
         }}
       >
         <ErrorBoundary errorComponent={QRCodeError}>
-          <QRCode content={qrContent} ref={ref} showDebug={true}>
+          <QRCode
+            content={qrContent}
+            quineValue={href}
+            ref={ref}
+            showDebug={true}
+          >
             <div className="mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
               <button
                 type="button"
@@ -334,7 +412,7 @@ export function QRCodeForm(): JSX.Element {
                   startTransition(copyToClipboard);
                 }}
               >
-                {buttonText}
+                {advancedOpen ? copyPngText(buttonText) : buttonText}
               </button>
               <button
                 type="button"
@@ -342,8 +420,29 @@ export function QRCodeForm(): JSX.Element {
                   startTransition(download);
                 }}
               >
-                Download
+                {advancedOpen ? 'Download as PNG' : 'Download'}
               </button>
+              {advancedOpen && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      copyAsSvg();
+                    }}
+                    disabled={!ClipboardItem.supports('image/svg+xml')}
+                  >
+                    {svgButtonText}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      downloadSvg();
+                    }}
+                  >
+                    Download as SVG
+                  </button>
+                </>
+              )}
             </div>
           </QRCode>
         </ErrorBoundary>

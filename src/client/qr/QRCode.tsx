@@ -11,6 +11,7 @@ import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
 export interface QRCodeContent {
   text: string;
+  renderAsQuine: boolean;
   shouldOptimiseUrl: boolean;
   dotStyle: 'square' | 'dot' | 'text' | 'cutout';
   dotRadius: number;
@@ -26,6 +27,14 @@ export const BUTTON_TEXT = {
 } as const;
 export type ButtonText = (typeof BUTTON_TEXT)[keyof typeof BUTTON_TEXT];
 
+export const SVG_BUTTON_TEXT = {
+  INITIAL: 'Copy as SVG',
+  SUCCESS: 'Copied as SVG!',
+  FAILED: 'Failed to copy SVG',
+} as const;
+export type SvgButtonText =
+  (typeof SVG_BUTTON_TEXT)[keyof typeof SVG_BUTTON_TEXT];
+
 export const URL_SPLITTER: RegExp =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
 
@@ -40,15 +49,15 @@ function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
   return text;
 }
 
-function useOptimisedQr(state: QRCodeContent) {
+function useOptimisedQr(state: QRCodeContent, href: URL) {
   'use memo';
-  const optimisedValue: string = useQrValue(
-    state.text,
-    state.shouldOptimiseUrl,
-  );
+
+  const finalText = (state.renderAsQuine && href.href) || state.text;
+
+  const optimisedValue: string = useQrValue(finalText, state.shouldOptimiseUrl);
 
   const nonOptimisedQr = useQRCode({
-    value: state.text,
+    value: finalText,
     level: state.minErrorCorrectionLevel,
     minVersion: 1,
   });
@@ -103,15 +112,20 @@ function useOptimisedQr(state: QRCodeContent) {
 
 export function QRCode({
   content,
+  quineValue,
   ref,
   showDebug = false,
   children,
 }: PropsWithChildren<{
   content: QRCodeContent;
+  quineValue: URL;
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }>): JSX.Element {
-  const { actualValue, qrDetails, debugMessage } = useOptimisedQr(content);
+  const { actualValue, qrDetails, debugMessage } = useOptimisedQr(
+    content,
+    quineValue,
+  );
   // The cutout style re-encodes independently (always High error correction,
   // whatever version that needs) — when it's active, the debug panel should
   // describe that actual encoding, not the plain one computed above, or it
@@ -136,7 +150,7 @@ export function QRCode({
           data-testid="qr-code"
           data-text-content={content.text}
           data-dot-style={content.dotStyle}
-          className="transition-[height,width] duration-300 ease even:transition-all even:duration-300 even:ease max-w-screen max-h-[100vw]"
+          className="transition-[height,width] duration-300 ease max-w-screen max-h-[100vw]"
           aria-description={`A QR code that contains the text: ${content.text}`}
         />
       </div>

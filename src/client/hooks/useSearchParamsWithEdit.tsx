@@ -37,9 +37,14 @@ import { type ReadonlyURLSearchParams, useSearchParams } from 'next/navigation';
  * avoid, not the fix.
  */
 export function useSearchParamsWithEdit(): [
+  URL,
   ReadonlyURLSearchParams,
   (newParams?: SetStateAction<URLSearchParams>, isEdit?: boolean) => void,
 ] {
+  const [currentURL, setCurrentUrl] = useState<URL>(
+    () => new URL('https://www.aylett.co.uk/qr'),
+  );
+
   const params = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
@@ -75,6 +80,8 @@ export function useSearchParamsWithEdit(): [
       const newUrl = new URL(globalThis.location.href);
       newUrl.search = newParamsString;
 
+      setCurrentUrl(newUrl);
+
       // `isEditing` here is intentionally the *previous* call's `isEdit`,
       // not this call's — see the hook's doc comment above for why that lag
       // is required.
@@ -87,5 +94,5 @@ export function useSearchParamsWithEdit(): [
     [isEditing],
   );
 
-  return [params, setSearchParams];
+  return [currentURL, params, setSearchParams];
 }
