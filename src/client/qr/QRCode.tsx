@@ -10,11 +10,8 @@ import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
 export interface QRCodeState {
   text: string;
-  buttonText: ButtonText;
-  svgButtonText: SvgButtonText;
   shouldOptimiseUrl: boolean;
   isQuine: boolean;
-  generation: number;
   dotStyle: 'square' | 'dot' | 'text';
   dotRadius: number;
   rasterText: string;
@@ -114,11 +111,13 @@ function useOptimisedQr(state: QRCodeState) {
 
 export function QRCode({
   state,
+  generation,
   ref,
   showDebug = false,
   children,
 }: PropsWithChildren<{
   state: QRCodeState;
+  generation?: number;
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }>): JSX.Element {
@@ -145,7 +144,7 @@ export function QRCode({
         <QRDebugPanel
           qrDebugDetails={qrDebugDetails}
           qrValue={actualValue}
-          state={state}
+          generation={generation}
           debugMessage={debugMessage}
         />
       )}

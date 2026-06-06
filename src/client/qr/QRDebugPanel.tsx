@@ -1,17 +1,16 @@
 import { Activity, useState } from 'react';
 
-import type { QRCodeState } from '@/client/qr/QRCode';
 import type { DebugDetails } from '@/client/qr/thirdparty/qrcode.react';
 
 export function QRDebugPanel({
   qrDebugDetails,
   qrValue,
-  state,
+  generation,
   debugMessage,
 }: {
   qrDebugDetails: DebugDetails;
   qrValue: string;
-  state: QRCodeState;
+  generation?: number;
   debugMessage: () => string;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
@@ -34,7 +33,7 @@ export function QRDebugPanel({
           <dt>Rendered value</dt>
           <dd>{'"' + qrValue + '"'}</dd>
           <dt>Render Generation</dt>
-          <dd>{state.generation}</dd>
+          <dd>{generation}</dd>
           <dt>Optimisation</dt>
           <dd>{debugMessage()}</dd>
           <dt>Segments</dt>
