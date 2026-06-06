@@ -5,6 +5,7 @@ import {
   useEffectEvent,
   useReducer,
   useRef,
+  useState,
   useTransition,
   type ChangeEvent,
   type JSX,
@@ -23,7 +24,9 @@ import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react';
 import {
   type ButtonText,
   type QRCodeState,
+  type SvgButtonText,
   BUTTON_TEXT,
+  SVG_BUTTON_TEXT,
   QRCode,
   URL_SPLITTER,
 } from '@/client/qr/QRCode';
@@ -31,6 +34,7 @@ import { encodeQueryComponent, nullToError } from '@/utilities';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
+  isQuine: false,
   dotStyle: 'square' as const,
   dotRadius: 0.25,
   minErrorCorrectionLevel: 'L' as ErrorCorrectionLevel,
@@ -38,9 +42,12 @@ const DEFAULTS = {
   rasterFont: 'Impact',
 };
 
+const QUINE_BASE = 'https://www.aylett.co.uk/qr/';
+
 function buildQrUrl(qrState: QRCodeState): string {
   const parts: string[] = [];
   if (qrState.text) parts.push(`text=${encodeQueryComponent(qrState.text)}`);
+  if (qrState.isQuine) parts.push('quine=true');
   if (!qrState.shouldOptimiseUrl) parts.push('optimise=false');
   if (qrState.dotStyle === 'dot') {
     parts.push('dotStyle=dot');
@@ -58,6 +65,11 @@ function buildQrUrl(qrState: QRCodeState): string {
   return parts.length > 0 ? `?${parts.join('&')}` : './qr';
 }
 
+function buildQuineText(qrState: QRCodeState): string {
+  const rel = buildQrUrl(qrState);
+  return QUINE_BASE + (rel.startsWith('?') ? rel : '');
+}
+
 export interface QRCodeFormState {
   nextPushStateText?: string;
   previousPushStateText?: string;
@@ -67,6 +79,11 @@ export interface QRCodeFormState {
 interface QRCodeStateSetShouldOptimiseUrl {
   type: 'setShouldOptimiseUrl';
   shouldOptimiseUrl: boolean;
+}
+
+interface QRCodeStateSetIsQuine {
+  type: 'setIsQuine';
+  isQuine: boolean;
 }
 
 interface QRCodeStateSetText {
@@ -85,6 +102,11 @@ interface QRCodeResetNextPushStateText {
 interface QRCodeStateSetButtonText {
   type: 'setButtonText';
   buttonText: ButtonText;
+}
+
+interface QRCodeStateSetSvgButtonText {
+  type: 'setSvgButtonText';
+  svgButtonText: SvgButtonText;
 }
 
 interface QRCodeStateUpdateGeneration {
@@ -123,10 +145,12 @@ interface QRCodeStateSetMinErrorCorrectionLevel {
 
 type QRCodeStateUpdate =
   | QRCodeStateSetShouldOptimiseUrl
+  | QRCodeStateSetIsQuine
   | QRCodeStateSetText
   | QRCodeStatePushState
   | QRCodeResetNextPushStateText
   | QRCodeStateSetButtonText
+  | QRCodeStateSetSvgButtonText
   | QRCodeStateUpdateGeneration
   | QRCodeStatePopState
   | QRCodeStateSetDotStyle
@@ -135,10 +159,16 @@ type QRCodeStateUpdate =
   | QRCodeStateSetRasterText
   | QRCodeStateSetRasterFont;
 
+function resetCopyState(draft: QRCodeFormState) {
+  draft.qrState.buttonText = BUTTON_TEXT.INITIAL_TEXT;
+  draft.qrState.svgButtonText = SVG_BUTTON_TEXT.INITIAL;
+}
+
 function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
   switch (instructions.type) {
     case 'setText': {
       draft.qrState.text = instructions.text;
+      resetCopyState(draft);
       break;
     }
     case 'pushState': {
@@ -161,31 +191,46 @@ function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
     }
     case 'setShouldOptimiseUrl': {
       draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
+      resetCopyState(draft);
+      break;
+    }
+    case 'setIsQuine': {
+      draft.qrState.isQuine = instructions.isQuine;
+      resetCopyState(draft);
       break;
     }
     case 'setDotStyle': {
       draft.qrState.dotStyle = instructions.dotStyle;
+      resetCopyState(draft);
       break;
     }
     case 'setDotRadius': {
       draft.qrState.dotRadius = instructions.dotRadius;
+      resetCopyState(draft);
       break;
     }
     case 'setMinErrorCorrectionLevel': {
       draft.qrState.minErrorCorrectionLevel =
         instructions.minErrorCorrectionLevel;
+      resetCopyState(draft);
       break;
     }
     case 'setRasterText': {
       draft.qrState.rasterText = instructions.rasterText;
+      resetCopyState(draft);
       break;
     }
     case 'setRasterFont': {
       draft.qrState.rasterFont = instructions.rasterFont;
+      resetCopyState(draft);
       break;
     }
     case 'setButtonText': {
       draft.qrState.buttonText = instructions.buttonText;
+      break;
+    }
+    case 'setSvgButtonText': {
+      draft.qrState.svgButtonText = instructions.svgButtonText;
       break;
     }
     case 'updateGeneration': {
@@ -201,10 +246,7 @@ const producer = produce<QRCodeFormState, [QRCodeStateUpdate]>(recipe);
 
 function initState(searchParams: URLSearchParams): QRCodeFormState {
   const isQuine = searchParams.get('quine') === 'true';
-  const paramText = searchParams.get('text') ?? '';
-  const text = isQuine
-    ? `https://www.aylett.co.uk/qr/?text=${paramText}`
-    : paramText;
+  const text = searchParams.get('text') ?? '';
 
   const dotStyleParam = searchParams.get('dotStyle');
   const dotStyle: 'square' | 'dot' | 'text' =
@@ -232,7 +274,9 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
     qrState: {
       text,
       buttonText: BUTTON_TEXT.INITIAL_TEXT,
+      svgButtonText: SVG_BUTTON_TEXT.INITIAL,
       generation: 0,
+      isQuine,
       shouldOptimiseUrl,
       dotStyle,
       dotRadius,
@@ -250,6 +294,7 @@ export function QRCodeForm(): JSX.Element {
   const searchParams = useSearchParams();
   const [state, dispatch] = useReducer(producer, searchParams, initState);
   const [_inTransition, startTransition] = useTransition();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   function copyToClipboard() {
     startTransition(async () => {
@@ -291,6 +336,20 @@ export function QRCodeForm(): JSX.Element {
 
   const alphanumericValue = state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
 
+  function copyPngText(buttonText: ButtonText): string {
+    switch (buttonText) {
+      case BUTTON_TEXT.INITIAL_TEXT: {
+        return 'Copy as PNG';
+      }
+      case BUTTON_TEXT.SUCCESS_TEXT: {
+        return 'Copied as PNG!';
+      }
+      case BUTTON_TEXT.FAILED_TEXT: {
+        return 'Failed to copy PNG';
+      }
+    }
+  }
+
   function download() {
     startTransition(async () => {
       if (!ref.current) {
@@ -306,6 +365,44 @@ export function QRCodeForm(): JSX.Element {
       link.download = `qr-${alphanumericValue}.png`;
       link.href = dataUrl;
       link.click();
+    });
+  }
+
+  function downloadSvg() {
+    startTransition(() => {
+      const svgEl = ref.current?.querySelector('svg');
+      if (!svgEl) throw new Error('QR Code SVG is not ready');
+      const svgStr = new XMLSerializer().serializeToString(svgEl);
+      const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `qr-${alphanumericValue}.svg`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  function copyAsSvg() {
+    startTransition(async () => {
+      const svgEl = ref.current?.querySelector('svg');
+      if (!svgEl) throw new Error('QR Code SVG is not ready');
+      try {
+        const svgStr = new XMLSerializer().serializeToString(svgEl);
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/svg+xml': svgStr }),
+        ]);
+        dispatch({
+          type: 'setSvgButtonText',
+          svgButtonText: SVG_BUTTON_TEXT.SUCCESS,
+        });
+      } catch (error) {
+        console.error(error);
+        dispatch({
+          type: 'setSvgButtonText',
+          svgButtonText: SVG_BUTTON_TEXT.FAILED,
+        });
+      }
     });
   }
 
@@ -350,6 +447,10 @@ export function QRCodeForm(): JSX.Element {
       type: 'setShouldOptimiseUrl',
       shouldOptimiseUrl: searchParams.get('optimise') !== 'false',
     });
+    dispatch({
+      type: 'setIsQuine',
+      isQuine: searchParams.get('quine') === 'true',
+    });
     if (resetRef.current) {
       startTransition(resetRef.current);
     }
@@ -393,16 +494,16 @@ export function QRCodeForm(): JSX.Element {
     if (updateGeneration) {
       dispatch({ type: 'updateGeneration' });
     }
-    dispatch({
-      type: 'setButtonText',
-      buttonText: BUTTON_TEXT.INITIAL_TEXT,
-    });
     if (resetRef.current) {
       resetRef.current();
     }
   }
 
   const canOptimiseUrl = URL_SPLITTER.test(state.qrState.text);
+
+  const effectiveQrState = state.qrState.isQuine
+    ? { ...state.qrState, text: buildQuineText(state.qrState) }
+    : state.qrState;
 
   return (
     <form className="flex items-center flex-col contain-content">
@@ -426,7 +527,12 @@ export function QRCodeForm(): JSX.Element {
         data-generation={state.qrState.generation}
         aria-label="Text to render as a QR code"
       />
-      <details className="w-full mt-2">
+      <details
+        className="w-full mt-2"
+        onToggle={(e) => {
+          setAdvancedOpen(e.currentTarget.open);
+        }}
+      >
         <summary>Advanced options</summary>
         <label
           className={
@@ -449,6 +555,22 @@ export function QRCodeForm(): JSX.Element {
             }}
           />
           Optimise URL
+        </label>
+        <label className="w-full">
+          <input
+            type="checkbox"
+            className="m-1"
+            checked={state.qrState.isQuine}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setIsQuine',
+                  isQuine: event.target.checked,
+                });
+              });
+            }}
+          />
+          Quine (encode a link back to this page)
         </label>
         <label className="w-full flex flex-row items-center gap-2">
           Module style
@@ -574,7 +696,7 @@ export function QRCodeForm(): JSX.Element {
         }}
       >
         <ErrorBoundary errorComponent={QRCodeError}>
-          <QRCode state={state.qrState} ref={ref} showDebug={true}>
+          <QRCode state={effectiveQrState} ref={ref} showDebug={true}>
             <div className="mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
               <button
                 type="button"
@@ -582,7 +704,9 @@ export function QRCodeForm(): JSX.Element {
                   startTransition(copyToClipboard);
                 }}
               >
-                {state.qrState.buttonText}
+                {advancedOpen
+                  ? copyPngText(state.qrState.buttonText)
+                  : state.qrState.buttonText}
               </button>
               <button
                 type="button"
@@ -590,8 +714,29 @@ export function QRCodeForm(): JSX.Element {
                   startTransition(download);
                 }}
               >
-                Download
+                {advancedOpen ? 'Download as PNG' : 'Download'}
               </button>
+              {advancedOpen && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      copyAsSvg();
+                    }}
+                    disabled={!ClipboardItem.supports('image/svg+xml')}
+                  >
+                    {state.qrState.svgButtonText}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      downloadSvg();
+                    }}
+                  >
+                    Download as SVG
+                  </button>
+                </>
+              )}
             </div>
           </QRCode>
         </ErrorBoundary>

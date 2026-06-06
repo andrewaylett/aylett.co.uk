@@ -11,7 +11,9 @@ import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 export interface QRCodeState {
   text: string;
   buttonText: ButtonText;
+  svgButtonText: SvgButtonText;
   shouldOptimiseUrl: boolean;
+  isQuine: boolean;
   generation: number;
   dotStyle: 'square' | 'dot' | 'text';
   dotRadius: number;
@@ -26,6 +28,14 @@ export const BUTTON_TEXT = {
   SUCCESS_TEXT: 'Copied to clipboard!',
 } as const;
 export type ButtonText = (typeof BUTTON_TEXT)[keyof typeof BUTTON_TEXT];
+
+export const SVG_BUTTON_TEXT = {
+  INITIAL: 'Copy as SVG',
+  SUCCESS: 'Copied as SVG!',
+  FAILED: 'Failed to copy SVG',
+} as const;
+export type SvgButtonText =
+  (typeof SVG_BUTTON_TEXT)[keyof typeof SVG_BUTTON_TEXT];
 
 export const URL_SPLITTER: RegExp =
   /^(?<start>https?:\/\/[a-z0-9._-]+\/?)(?<rest>.*)$/i;
