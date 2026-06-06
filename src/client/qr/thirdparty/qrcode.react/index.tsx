@@ -125,6 +125,45 @@ const DEFAULT_MINVERSION = 1;
 
 const SPEC_MARGIN_SIZE = 4;
 
+// Structural zone heights: top 9 rows (TL+TR finders + format info), bottom 8 rows
+// (BL finder + format info). Interior data rows: 9 … size−9.
+const STRUCTURAL_TOP_ROWS = 9;
+const STRUCTURAL_BOTTOM_ROWS = 8;
+
+// ─── Module classifiers ────────────────────────────────────────────────────────
+
+// True for finder/format-info/version-info modules that are rendered as full squares.
+// Timing modules are excluded — they get separate narrow-rectangle rendering.
+function isStructuralSquareModule(x: number, y: number, size: number): boolean {
+  if (x <= 8 && y <= 8) return true; // TL finder + format info
+  if (x >= size - 8 && y <= 8) return true; // TR finder + format info
+  if (x <= 8 && y >= size - 8) return true; // BL finder + format info
+  // Version information blocks (only present in versions 7+, size >= 45)
+  if (size >= 45) {
+    if (x >= size - 11 && x <= size - 9 && y <= 5) return true;
+    if (y >= size - 11 && y <= size - 9 && x <= 5) return true;
+  }
+  return false;
+}
+
+// True for timing modules that lie between the finder zones (not inside them).
+// Row 6 and column 6 within a finder zone are overwritten by finder values and
+// treated as structural-square modules instead.
+function isTimingModule(x: number, y: number, size: number): boolean {
+  if (x !== 6 && y !== 6) return false;
+  if (x <= 8 && y <= 8) return false; // inside TL finder zone
+  if (x >= size - 8 && y <= 8) return false; // inside TR finder zone
+  if (x <= 8 && y >= size - 8) return false; // inside BL finder zone
+  return true;
+}
+
+// Used to exclude structural modules from dot/circle rendering.
+function isSquareModule(x: number, y: number, size: number): boolean {
+  return isStructuralSquareModule(x, y, size) || isTimingModule(x, y, size);
+}
+
+// ─── Path generators ──────────────────────────────────────────────────────────
+
 function generatePath(modules: Modules, margin = 0): string {
   const ops: string[] = [];
   for (const [y, row] of modules.entries()) {
@@ -167,36 +206,6 @@ function generatePath(modules: Modules, margin = 0): string {
     }
   }
   return ops.join('');
-}
-
-// True for finder/format-info/version-info modules that are rendered as full squares.
-// Timing modules are excluded — they get separate narrow-rectangle rendering.
-function isStructuralSquareModule(x: number, y: number, size: number): boolean {
-  if (x <= 8 && y <= 8) return true; // TL finder + format info
-  if (x >= size - 8 && y <= 8) return true; // TR finder + format info
-  if (x <= 8 && y >= size - 8) return true; // BL finder + format info
-  // Version information blocks (only present in versions 7+, size >= 45)
-  if (size >= 45) {
-    if (x >= size - 11 && x <= size - 9 && y <= 5) return true;
-    if (y >= size - 11 && y <= size - 9 && x <= 5) return true;
-  }
-  return false;
-}
-
-// True for timing modules that lie between the finder zones (not inside them).
-// Row 6 and column 6 within a finder zone are overwritten by finder values and
-// treated as structural-square modules instead.
-function isTimingModule(x: number, y: number, size: number): boolean {
-  if (x !== 6 && y !== 6) return false;
-  if (x <= 8 && y <= 8) return false; // inside TL finder zone
-  if (x >= size - 8 && y <= 8) return false; // inside TR finder zone
-  if (x <= 8 && y >= size - 8) return false; // inside BL finder zone
-  return true;
-}
-
-// Used to exclude structural modules from dot/circle rendering.
-function isSquareModule(x: number, y: number, size: number): boolean {
-  return isStructuralSquareModule(x, y, size) || isTimingModule(x, y, size);
 }
 
 // Generates SVG rect paths for timing modules, narrowed to 50% in the perpendicular
@@ -248,10 +257,163 @@ function generateDotPath(
   return ops.join('');
 }
 
-// Structural zones: top 9 rows (TL+TR finders + format info) and bottom 8 rows
-// (BL finder + format info). Interior data rows: 9 … size−9 = size−17 rows total.
-const STRUCTURAL_TOP_ROWS = 9;
-const STRUCTURAL_BOTTOM_ROWS = 8;
+// Renders data/alignment and timing modules as 3×3 sub-cell grids.
+//
+// Data/alignment modules: centre sub-cell (dx=1,dy=1) carries the QR value;
+//   the eight outer sub-cells carry text pixels for interior rows.
+//
+// Timing modules: the middle row (horizontal strip, y=6) or middle column
+//   (vertical strip, x=6) of three sub-cells carries the QR value; the other
+//   six sub-cells carry text pixels for interior rows.
+//
+// Structural square modules are excluded (handled separately).
+// pixelData is sized size*3 wide × (size−17)*3 tall; py is offset by 9 rows.
+function generateTextPath(
+  modules: Modules,
+  margin: number,
+  pixelData: Uint8ClampedArray | null,
+  size: number,
+): string {
+  const ops: string[] = [];
+  const s = 1 / 3;
+  const interiorTop = STRUCTURAL_TOP_ROWS;
+  const interiorBottom = size - STRUCTURAL_BOTTOM_ROWS - 1;
+  const canvasWidth = size * 3;
+
+  for (const [y, row] of modules.entries()) {
+    for (const [x, cell] of row.entries()) {
+      if (isStructuralSquareModule(x, y, size)) continue;
+
+      const bx = x + margin;
+      const by = y + margin;
+      const hasText =
+        pixelData !== null && y >= interiorTop && y <= interiorBottom;
+
+      if (isTimingModule(x, y, size)) {
+        // Horizontal strip (y=6): middle row of sub-cells is the timing bar.
+        // Vertical strip (x=6): middle column of sub-cells is the timing bar.
+        const horiz = y === 6;
+        if (cell) {
+          ops.push(
+            horiz
+              ? `M${bx},${by + s}h1v${s}H${bx}z`
+              : `M${bx + s},${by}h${s}v1H${bx + s}z`,
+          );
+        }
+        if (hasText) {
+          for (let dy = 0; dy < 3; dy++) {
+            for (let dx = 0; dx < 3; dx++) {
+              if (horiz ? dy === 1 : dx === 1) continue;
+              const i =
+                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
+              if ((pixelData[i] ?? 255) < 128) {
+                ops.push(
+                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
+                );
+              }
+            }
+          }
+        }
+      } else {
+        // Data/alignment module: centre sub-cell = QR value, outer 8 = text.
+        if (cell) {
+          ops.push(`M${bx + s},${by + s}h${s}v${s}H${bx + s}z`);
+        }
+        if (hasText) {
+          for (let dy = 0; dy < 3; dy++) {
+            for (let dx = 0; dx < 3; dx++) {
+              if (dx === 1 && dy === 1) continue;
+              const i =
+                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
+              if ((pixelData[i] ?? 255) < 128) {
+                ops.push(
+                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return ops.join('');
+}
+
+// ─── Per-style path computation ───────────────────────────────────────────────
+
+// Drawing strategy: the SVG has no global background — it is transparent where
+// no module requires colour. Three rendering categories:
+//   1. Quiet zone: bgColor even-odd frame around the module grid.
+//   2. bgCrisp: structural light squares + any bgColor timing/dot shapes.
+//   3. fgCrisp: structural dark squares + any fgColor data shapes.
+// Timing modules are always narrowed to 50% in the perpendicular axis.
+// Dot mode adds geometricPrecision circle paths; text mode fills the data area
+// and uses sub-cell paths.
+interface StylePaths {
+  /** bgColor paths rendered with crispEdges. */
+  bgCrisp: string;
+  /** fgColor paths rendered with crispEdges. */
+  fgCrisp: string;
+  /** bgColor paths rendered with geometricPrecision (dot mode light circles). */
+  bgPrecise: string;
+  /** fgColor paths rendered with geometricPrecision (dot mode dark circles). */
+  fgPrecise: string;
+  /** Text mode requires a solid bgColor rect behind the whole data area. */
+  needsDataBackground: boolean;
+}
+
+function computeStylePaths(
+  dotStyle: 'square' | 'dot' | 'text',
+  cells: Modules,
+  size: number,
+  margin: number,
+  dotRadius: number,
+  pixelData: Uint8ClampedArray | null,
+): StylePaths {
+  const structuralLight = generatePath(
+    cells.map((row, y) =>
+      row.map((cell, x) => !cell && isStructuralSquareModule(x, y, size)),
+    ),
+    margin,
+  );
+  const structuralDark = generatePath(
+    cells.map((row, y) =>
+      row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
+    ),
+    margin,
+  );
+
+  if (dotStyle === 'square') {
+    return {
+      bgCrisp: '',
+      fgCrisp: generatePath(cells, margin),
+      bgPrecise: '',
+      fgPrecise: '',
+      needsDataBackground: true,
+    };
+  }
+
+  if (dotStyle === 'dot') {
+    return {
+      bgCrisp: structuralLight + generateTimingPath(cells, margin, false),
+      fgCrisp: structuralDark + generateTimingPath(cells, margin),
+      bgPrecise: generateDotPath(cells, margin, dotRadius, false),
+      fgPrecise: generateDotPath(cells, margin, dotRadius),
+      needsDataBackground: false,
+    };
+  }
+
+  // text mode
+  return {
+    bgCrisp: structuralLight,
+    fgCrisp: structuralDark + generateTextPath(cells, margin, pixelData, size),
+    bgPrecise: '',
+    fgPrecise: '',
+    needsDataBackground: true,
+  };
+}
+
+// ─── Raster text hook ─────────────────────────────────────────────────────────
 
 // Renders rasterText onto an off-screen canvas covering only the interior data
 // region (between the locator squares): width size*3, height (size−17)*3.
@@ -329,87 +491,7 @@ function useRasterPixels(
   return rasterText ? pixels : null;
 }
 
-// Renders data/alignment and timing modules as 3×3 sub-cell grids.
-//
-// Data/alignment modules: centre sub-cell (dx=1,dy=1) carries the QR value;
-//   the eight outer sub-cells carry text pixels for interior rows.
-//
-// Timing modules: the middle row (horizontal strip, y=6) or middle column
-//   (vertical strip, x=6) of three sub-cells carries the QR value; the other
-//   six sub-cells carry text pixels for interior rows.
-//
-// Structural square modules are excluded (handled by fgPath/whitePath).
-// pixelData is sized size*3 wide × (size−17)*3 tall; py is offset by 9 rows.
-function generateTextPath(
-  modules: Modules,
-  margin: number,
-  pixelData: Uint8ClampedArray | null,
-  size: number,
-): string {
-  const ops: string[] = [];
-  const s = 1 / 3;
-  const interiorTop = STRUCTURAL_TOP_ROWS;
-  const interiorBottom = size - STRUCTURAL_BOTTOM_ROWS - 1;
-  const canvasWidth = size * 3;
-
-  for (const [y, row] of modules.entries()) {
-    for (const [x, cell] of row.entries()) {
-      if (isStructuralSquareModule(x, y, size)) continue;
-
-      const bx = x + margin;
-      const by = y + margin;
-      const hasText =
-        pixelData !== null && y >= interiorTop && y <= interiorBottom;
-
-      if (isTimingModule(x, y, size)) {
-        // Horizontal strip (y=6): middle row of sub-cells is the timing bar.
-        // Vertical strip (x=6): middle column of sub-cells is the timing bar.
-        const horiz = y === 6;
-        if (cell) {
-          ops.push(
-            horiz
-              ? `M${bx},${by + s}h1v${s}H${bx}z`
-              : `M${bx + s},${by}h${s}v1H${bx + s}z`,
-          );
-        }
-        if (hasText) {
-          for (let dy = 0; dy < 3; dy++) {
-            for (let dx = 0; dx < 3; dx++) {
-              if (horiz ? dy === 1 : dx === 1) continue;
-              const i =
-                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
-              if ((pixelData[i] ?? 255) < 128) {
-                ops.push(
-                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
-                );
-              }
-            }
-          }
-        }
-      } else {
-        // Data/alignment module: centre sub-cell = QR value, outer 8 = text.
-        if (cell) {
-          ops.push(`M${bx + s},${by + s}h${s}v${s}H${bx + s}z`);
-        }
-        if (hasText) {
-          for (let dy = 0; dy < 3; dy++) {
-            for (let dx = 0; dx < 3; dx++) {
-              if (dx === 1 && dy === 1) continue;
-              const i =
-                (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
-              if ((pixelData[i] ?? 255) < 128) {
-                ops.push(
-                  `M${bx + dx * s},${by + dy * s}h${s}v${s}H${bx + dx * s}z`,
-                );
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return ops.join('');
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface DebugDetails {
   qrcode: qrcodegen.QrCode;
@@ -429,6 +511,8 @@ interface QrCodeDetails {
   qrcode: QrCode;
   segments: readonly QrSegment[];
 }
+
+// ─── Hooks ────────────────────────────────────────────────────────────────────
 
 // Returns which character-count-bits group the version belongs to (0, 1, or 2).
 // Segments should be re-optimised whenever the actual version lands in a different
@@ -499,6 +583,22 @@ export function useQRCode({
   }
 }
 
+export function useDebugDetails(details: QrCodeDetails): DebugDetails {
+  'use memo';
+  const moduleCount = details.numCells - details.margin * 2;
+  const qrVersion = (moduleCount - 17) / 4;
+  const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
+  return {
+    ...details,
+    moduleCount,
+    qrVersion,
+    level,
+    segments: details.segments,
+  };
+}
+
+// ─── Components ───────────────────────────────────────────────────────────────
+
 export const QRCodeSVG: ForwardRefExoticComponent<
   PropsWithoutRef<QRPropsSVG> & RefAttributes<SVGSVGElement>
 > = forwardRef<SVGSVGElement, QRPropsSVG>(
@@ -520,20 +620,6 @@ export const QRCodeSVG: ForwardRefExoticComponent<
     return <QRCodeSVGDetails details={details} {...props} ref={forwardedRef} />;
   },
 );
-
-export function useDebugDetails(details: QrCodeDetails): DebugDetails {
-  'use memo';
-  const moduleCount = details.numCells - details.margin * 2;
-  const qrVersion = (moduleCount - 17) / 4;
-  const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
-  return {
-    ...details,
-    moduleCount,
-    qrVersion,
-    level,
-    segments: details.segments,
-  };
-}
 
 export const QRCodeSVGDetails: ForwardRefExoticComponent<
   Omit<QRPropsSVG, 'value'> & {
@@ -561,54 +647,13 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
   const pixelData = useRasterPixels(rasterText, rasterFont, size);
 
   const finalSize = numCells * cellSize;
-
-  // Drawing strategy: no solid background rect — the SVG is transparent where no
-  // colour is required. Rendering categories:
-  //   1. Border frame (quiet zone): bgColor even-odd frame.
-  //   2. bgColor path: structural light squares + light timing narrow rects (dot mode).
-  //   3. fgColor path: varies by dotStyle — see below.
-  // Timing modules are always rendered as 50%-width rectangles centred on the cell,
-  // full-length in the timing direction, half-width in the perpendicular direction.
-
-  // 1. Quiet-zone frame: fills the margin band around the modules grid.
   const innerWidth = numCells - 2 * margin;
+
+  // Quiet-zone frame: fills the margin band around the module grid.
   const borderPath = `M0,0 h${numCells}v${numCells}H0zM${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`;
 
-  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light
-  //    timing narrow rects (text mode renders timing inside generateTextPath).
-  const whitePath =
-    generatePath(
-      cells.map((row, y) =>
-        row.map((cell, x) => !cell && isStructuralSquareModule(x, y, size)),
-      ),
-      margin,
-    ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin, false) : '');
-
-  // 3. fgColor paths differ by style:
-  //   square — all dark cells as full squares
-  //   dot    — structural squares + timing narrow rects + per-cell circles
-  //   text   — structural squares only; timing and data modules handled by
-  //            generateTextPath (middle row/col for timing, centre sub-cell
-  //            for data, outer sub-cells for text overlay)
-  const fgPath =
-    dotStyle === 'square'
-      ? generatePath(cells, margin)
-      : generatePath(
-          cells.map((row, y) =>
-            row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
-          ),
-          margin,
-        ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin) : '');
-  const dotPath =
-    dotStyle === 'dot' ? generateDotPath(cells, margin, dotRadius) : null;
-  const lightDotPath =
-    dotStyle === 'dot'
-      ? generateDotPath(cells, margin, dotRadius, false)
-      : null;
-  const textPath =
-    dotStyle === 'text'
-      ? generateTextPath(cells, margin, pixelData, size)
-      : null;
+  const { bgCrisp, fgCrisp, bgPrecise, fgPrecise, needsDataBackground } =
+    computeStylePaths(dotStyle, cells, size, margin, dotRadius, pixelData);
 
   return (
     <svg
@@ -631,27 +676,28 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
         d={borderPath}
         shapeRendering="crispEdges"
       />
-      {dotStyle === 'text' && (
+      {needsDataBackground && (
         <path
           fill={bgColor}
           d={`M${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`}
           shapeRendering="crispEdges"
         />
       )}
-      <path fill={bgColor} d={whitePath} shapeRendering="crispEdges" />
-      <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
-      {lightDotPath && (
+      <path fill={bgColor} d={bgCrisp} shapeRendering="crispEdges" />
+      <path fill={fgColor} d={fgCrisp} shapeRendering="crispEdges" />
+      {bgPrecise && (
         <path
           fill={bgColor}
-          d={lightDotPath}
+          d={bgPrecise}
           shapeRendering="geometricPrecision"
         />
       )}
-      {dotPath && (
-        <path fill={fgColor} d={dotPath} shapeRendering="geometricPrecision" />
-      )}
-      {textPath && (
-        <path fill={fgColor} d={textPath} shapeRendering="crispEdges" />
+      {fgPrecise && (
+        <path
+          fill={fgColor}
+          d={fgPrecise}
+          shapeRendering="geometricPrecision"
+        />
       )}
     </svg>
   );
