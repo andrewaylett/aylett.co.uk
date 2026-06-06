@@ -25,7 +25,7 @@ describe('useSearchParamsWithEdit', () => {
       await import('@/client/hooks/useSearchParamsWithEdit');
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
-    expect(result.current[0]).toBe(mockSearchParams);
+    expect(result.current[1]).toBe(mockSearchParams);
   });
 
   it('pushes state on the first call, with no isEdit argument', async () => {
@@ -36,7 +36,7 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1](new URLSearchParams('a=1'));
+      result.current[2](new URLSearchParams('a=1'));
     });
 
     expect(pushSpy).toHaveBeenCalledTimes(1);
@@ -56,7 +56,7 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1](new URLSearchParams('a=1'), true);
+      result.current[2](new URLSearchParams('a=1'), true);
     });
 
     expect(pushSpy).toHaveBeenCalledTimes(1);
@@ -71,10 +71,10 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1](new URLSearchParams('a=1'), true);
+      result.current[2](new URLSearchParams('a=1'), true);
     });
     act(() => {
-      result.current[1](new URLSearchParams('a=2'), false);
+      result.current[2](new URLSearchParams('a=2'), false);
     });
 
     expect(pushSpy).toHaveBeenCalledTimes(1);
@@ -90,13 +90,13 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1](new URLSearchParams('a=1'), true);
+      result.current[2](new URLSearchParams('a=1'), true);
     });
     act(() => {
       globalThis.dispatchEvent(new PopStateEvent('popstate'));
     });
     act(() => {
-      result.current[1](new URLSearchParams('a=2'));
+      result.current[2](new URLSearchParams('a=2'));
     });
 
     expect(pushSpy).toHaveBeenCalledTimes(2);
@@ -111,7 +111,7 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1]();
+      result.current[2]();
     });
 
     expect(pushSpy).not.toHaveBeenCalled();
@@ -126,7 +126,7 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1]((old) => old);
+      result.current[2]((old) => old);
     });
 
     expect(pushSpy).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe('useSearchParamsWithEdit', () => {
     const { result } = renderHook(() => useSearchParamsWithEdit());
 
     act(() => {
-      result.current[1](new URLSearchParams('a=1'));
+      result.current[2](new URLSearchParams('a=1'));
     });
 
     expect(globalThis.location.search).toBe('?a=1');
