@@ -13,8 +13,10 @@ export interface QRCodeState {
   buttonText: ButtonText;
   shouldOptimiseUrl: boolean;
   generation: number;
-  dotStyle: 'square' | 'dot';
+  dotStyle: 'square' | 'dot' | 'text';
   dotRadius: number;
+  rasterText: string;
+  rasterFont: string;
   minErrorCorrectionLevel: ErrorCorrectionLevel;
 }
 
@@ -118,9 +120,11 @@ export function QRCode({
       <div className="w-min h-min border-2 border-slate-800" ref={ref}>
         <QRCodeSVGDetails
           details={qrDetails}
-          cellSize={4}
+          cellSize={9}
           dotStyle={state.dotStyle}
           dotRadius={state.dotRadius}
+          rasterText={state.rasterText}
+          rasterFont={state.rasterFont}
           data-testid="qr-code"
           className="transition-[height,width] duration-300 ease even:transition-all even:duration-300 even:ease max-w-screen max-h-[100vw]"
           aria-description={`A QR code that contains the text: ${state.text}`}

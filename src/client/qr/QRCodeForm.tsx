@@ -34,6 +34,8 @@ const DEFAULTS = {
   dotStyle: 'square' as const,
   dotRadius: 0.25,
   minErrorCorrectionLevel: 'L' as ErrorCorrectionLevel,
+  rasterText: '',
+  rasterFont: 'Impact',
 };
 
 function buildQrUrl(qrState: QRCodeState): string {
@@ -44,6 +46,12 @@ function buildQrUrl(qrState: QRCodeState): string {
     parts.push('dotStyle=dot');
     if (qrState.dotRadius !== DEFAULTS.dotRadius)
       parts.push(`dotRadius=${Math.round(qrState.dotRadius * 200)}`);
+  } else if (qrState.dotStyle === 'text') {
+    parts.push('dotStyle=text');
+    if (qrState.rasterText)
+      parts.push(`rasterText=${encodeQueryComponent(qrState.rasterText)}`);
+    if (qrState.rasterFont && qrState.rasterFont !== DEFAULTS.rasterFont)
+      parts.push(`rasterFont=${encodeQueryComponent(qrState.rasterFont)}`);
   }
   if (qrState.minErrorCorrectionLevel !== 'L')
     parts.push(`ecl=${qrState.minErrorCorrectionLevel}`);
@@ -90,7 +98,17 @@ interface QRCodeStatePopState {
 
 interface QRCodeStateSetDotStyle {
   type: 'setDotStyle';
-  dotStyle: 'square' | 'dot';
+  dotStyle: 'square' | 'dot' | 'text';
+}
+
+interface QRCodeStateSetRasterText {
+  type: 'setRasterText';
+  rasterText: string;
+}
+
+interface QRCodeStateSetRasterFont {
+  type: 'setRasterFont';
+  rasterFont: string;
 }
 
 interface QRCodeStateSetDotRadius {
@@ -113,7 +131,9 @@ type QRCodeStateUpdate =
   | QRCodeStatePopState
   | QRCodeStateSetDotStyle
   | QRCodeStateSetDotRadius
-  | QRCodeStateSetMinErrorCorrectionLevel;
+  | QRCodeStateSetMinErrorCorrectionLevel
+  | QRCodeStateSetRasterText
+  | QRCodeStateSetRasterFont;
 
 function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
   switch (instructions.type) {
@@ -156,6 +176,14 @@ function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
         instructions.minErrorCorrectionLevel;
       break;
     }
+    case 'setRasterText': {
+      draft.qrState.rasterText = instructions.rasterText;
+      break;
+    }
+    case 'setRasterFont': {
+      draft.qrState.rasterFont = instructions.rasterFont;
+      break;
+    }
     case 'setButtonText': {
       draft.qrState.buttonText = instructions.buttonText;
       break;
@@ -178,8 +206,13 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
     ? `https://www.aylett.co.uk/qr/?text=${paramText}`
     : paramText;
 
-  const dotStyle =
-    searchParams.get('dotStyle') === 'dot' ? 'dot' : DEFAULTS.dotStyle;
+  const dotStyleParam = searchParams.get('dotStyle');
+  const dotStyle: 'square' | 'dot' | 'text' =
+    dotStyleParam === 'dot'
+      ? 'dot'
+      : dotStyleParam === 'text'
+        ? 'text'
+        : DEFAULTS.dotStyle;
   const rawRadius = searchParams.get('dotRadius');
   const dotRadius =
     rawRadius !== null && !Number.isNaN(Number(rawRadius))
@@ -192,6 +225,8 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
     ? (eclParam as ErrorCorrectionLevel)
     : DEFAULTS.minErrorCorrectionLevel;
   const shouldOptimiseUrl = searchParams.get('optimise') !== 'false';
+  const rasterText = searchParams.get('rasterText') ?? DEFAULTS.rasterText;
+  const rasterFont = searchParams.get('rasterFont') ?? DEFAULTS.rasterFont;
 
   return {
     qrState: {
@@ -201,6 +236,8 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
       shouldOptimiseUrl,
       dotStyle,
       dotRadius,
+      rasterText,
+      rasterFont,
       minErrorCorrectionLevel,
     },
   };
@@ -274,10 +311,15 @@ export function QRCodeForm(): JSX.Element {
 
   const onPopState = useEffectEvent(() => {
     dispatch({ type: 'popState', text: searchParams.get('text') ?? '' });
+    const popDotStyleParam = searchParams.get('dotStyle');
     dispatch({
       type: 'setDotStyle',
       dotStyle:
-        searchParams.get('dotStyle') === 'dot' ? 'dot' : DEFAULTS.dotStyle,
+        popDotStyleParam === 'dot'
+          ? 'dot'
+          : popDotStyleParam === 'text'
+            ? 'text'
+            : DEFAULTS.dotStyle,
     });
     const rawRadius = searchParams.get('dotRadius');
     dispatch({
@@ -286,6 +328,14 @@ export function QRCodeForm(): JSX.Element {
         rawRadius !== null && !Number.isNaN(Number(rawRadius))
           ? Number(rawRadius) / 200
           : DEFAULTS.dotRadius,
+    });
+    dispatch({
+      type: 'setRasterText',
+      rasterText: searchParams.get('rasterText') ?? DEFAULTS.rasterText,
+    });
+    dispatch({
+      type: 'setRasterFont',
+      rasterFont: searchParams.get('rasterFont') ?? DEFAULTS.rasterFont,
     });
     const eclParam = searchParams.get('ecl') ?? 'L';
     dispatch({
@@ -400,21 +450,23 @@ export function QRCodeForm(): JSX.Element {
           />
           Optimise URL
         </label>
-        <label className="w-full">
-          <input
-            type="checkbox"
-            className="m-1"
-            checked={state.qrState.dotStyle === 'dot'}
+        <label className="w-full flex flex-row items-center gap-2">
+          Module style
+          <select
+            value={state.qrState.dotStyle}
             onChange={(event) => {
               startTransition(() => {
                 dispatch({
                   type: 'setDotStyle',
-                  dotStyle: event.target.checked ? 'dot' : 'square',
+                  dotStyle: event.target.value as 'square' | 'dot' | 'text',
                 });
               });
             }}
-          />
-          Dot modules
+          >
+            <option value="square">Square</option>
+            <option value="dot">Dot</option>
+            <option value="text">Text raster</option>
+          </select>
         </label>
         <label
           className={
@@ -442,6 +494,53 @@ export function QRCodeForm(): JSX.Element {
           <output className="w-[3ch] text-right">
             {Math.round(state.qrState.dotRadius * 200)}%
           </output>
+        </label>
+        <label
+          className={
+            'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+            (state.qrState.dotStyle === 'text' ? ' h-lh' : ' h-0')
+          }
+        >
+          Raster text
+          <input
+            type="text"
+            className="border border-gray-300 rounded p-1 ml-2"
+            value={state.qrState.rasterText}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setRasterText',
+                  rasterText: event.target.value,
+                });
+              });
+            }}
+          />
+        </label>
+        <label
+          className={
+            'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+            (state.qrState.dotStyle === 'text' ? ' h-lh' : ' h-0')
+          }
+        >
+          Font
+          <select
+            value={state.qrState.rasterFont}
+            onChange={(event) => {
+              startTransition(() => {
+                dispatch({
+                  type: 'setRasterFont',
+                  rasterFont: event.target.value,
+                });
+              });
+            }}
+          >
+            <option value="Impact">Impact</option>
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+          </select>
         </label>
         <label className="w-full flex flex-row items-center gap-2">
           Min error correction
