@@ -4,56 +4,22 @@
  * SPDX-License-Identifier: ISC
  */
 
+import React, { type PropsWithoutRef, type RefAttributes } from 'react';
+
+import type { QrCode } from '../qrcodegen';
+import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react/errorCorrectionLevel';
+
 import {
-  useDebugValue,
-  useEffect,
-  useState,
-  type ForwardRefExoticComponent,
-  type PropsWithoutRef,
-  type RefAttributes,
-  forwardRef,
-} from 'react';
+  STRUCTURAL_BOTTOM_ROWS,
+  STRUCTURAL_TOP_ROWS,
+  useRasterPixels,
+} from '@/client/qr/thirdparty/qrcode.react/useRasterPixels';
+import {
+  type QrCodeDetails,
+  useQRCode,
+} from '@/client/qr/thirdparty/qrcode.react/useQRCode';
 
-import * as qrcodegen from '../qrcodegen';
-
-import type { QrCode, QrSegment } from '../qrcodegen';
-
-type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
-export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
-
-type ERROR_LEVEL_MAPPED_TYPE = Record<
-  ErrorCorrectionLevel,
-  typeof qrcodegen.QrCode.Ecc.LOW
->;
-
-const ERROR_LEVEL_MAP: ERROR_LEVEL_MAPPED_TYPE = {
-  L: qrcodegen.QrCode.Ecc.LOW,
-  M: qrcodegen.QrCode.Ecc.MEDIUM,
-  Q: qrcodegen.QrCode.Ecc.QUARTILE,
-  H: qrcodegen.QrCode.Ecc.HIGH,
-} as const;
-
-function errorLevelToString(
-  level: typeof qrcodegen.QrCode.Ecc.LOW,
-): ErrorCorrectionLevel {
-  switch (level.ordinal) {
-    case 0: {
-      return 'L';
-    }
-    case 1: {
-      return 'M';
-    }
-    case 2: {
-      return 'Q';
-    }
-    case 3: {
-      return 'H';
-    }
-    default: {
-      throw new Error('Invalid error correction level');
-    }
-  }
-}
+export type Modules = ReturnType<QrCode['getModules']>;
 
 interface QRProps {
   /**
@@ -122,13 +88,6 @@ const DEFAULT_LEVEL: ErrorCorrectionLevel = 'L';
 const DEFAULT_BGCOLOR = '#FFFFFF';
 const DEFAULT_FGCOLOR = '#000000';
 const DEFAULT_MINVERSION = 1;
-
-const SPEC_MARGIN_SIZE = 4;
-
-// Structural zone heights: top 9 rows (TL+TR finders + format info), bottom 8 rows
-// (BL finder + format info). Interior data rows: 9 … size−9.
-const STRUCTURAL_TOP_ROWS = 9;
-const STRUCTURAL_BOTTOM_ROWS = 8;
 
 // ─── Module classifiers ────────────────────────────────────────────────────────
 
@@ -413,222 +372,38 @@ function computeStylePaths(
   };
 }
 
-// ─── Raster text hook ─────────────────────────────────────────────────────────
-
-// Renders rasterText onto an off-screen canvas covering only the interior data
-// region (between the locator squares): width size*3, height (size−17)*3.
-// Returns null while loading or when rasterText is empty.
-// Stale cached pixels are suppressed by gating the return on rasterText.
-function useRasterPixels(
-  rasterText: string,
-  rasterFont: string,
-  size: number,
-): Uint8ClampedArray | null {
-  const [pixels, setPixels] = useState<Uint8ClampedArray | null>(null);
-
-  useEffect(() => {
-    if (!rasterText) return;
-    let cancelled = false;
-
-    async function render() {
-      const cw = size * 3;
-      const ch = Math.max(
-        3,
-        (size - STRUCTURAL_TOP_ROWS - STRUCTURAL_BOTTOM_ROWS) * 3,
-      );
-      await document.fonts.load(`bold 72px "${rasterFont}"`);
-      if (cancelled) return;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = cw;
-      canvas.height = ch;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, cw, ch);
-      ctx.fillStyle = '#000000';
-      ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = 'center';
-
-      // Largest font where the actual ink bounds fit — not the nominal em size,
-      // so text without descenders (e.g. "QR") can use a larger font.
-      let lo = 1,
-        hi = Math.max(cw, ch) * 2;
-      while (lo < hi - 1) {
-        const mid = (lo + hi) >> 1;
-        ctx.font = `bold ${mid}px "${rasterFont}"`;
-        const m = ctx.measureText(rasterText);
-        const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
-        // Fall back to font size when actual bounds are unavailable (e.g. jsdom)
-        if (m.width <= cw && (inkH > 0 ? inkH : mid) <= ch) lo = mid;
-        else hi = mid;
-      }
-
-      // Center by ink bounds rather than the em box so the visual weight sits
-      // in the middle of the data region regardless of descenders.
-      ctx.font = `bold ${lo}px "${rasterFont}"`;
-      const fm = ctx.measureText(rasterText);
-      const inkCy =
-        fm.actualBoundingBoxAscent > 0
-          ? ch / 2 +
-            (fm.actualBoundingBoxAscent - fm.actualBoundingBoxDescent) / 2
-          : ch / 2;
-      ctx.fillText(rasterText, cw / 2, inkCy);
-
-      // After the final await + cancellation check, cancelled is always false here.
-      setPixels(ctx.getImageData(0, 0, cw, ch).data);
-    }
-
-    render().catch(console.error);
-    return () => {
-      cancelled = true;
-    };
-  }, [rasterText, rasterFont, size]);
-
-  // When rasterText is empty, suppress any stale cached pixels immediately
-  // without needing an extra state update from inside the effect.
-  return rasterText ? pixels : null;
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface DebugDetails {
-  qrcode: qrcodegen.QrCode;
-  margin: number;
-  cells: Modules;
-  numCells: number;
-  moduleCount: number;
-  qrVersion: number;
-  level: ErrorCorrectionLevel;
-  segments: readonly QrSegment[];
-}
-
-interface QrCodeDetails {
-  cells: boolean[][];
-  margin: number;
-  numCells: number;
-  qrcode: QrCode;
-  segments: readonly QrSegment[];
-}
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
-// Returns which character-count-bits group the version belongs to (0, 1, or 2).
-// Segments should be re-optimised whenever the actual version lands in a different
-// group from the one used to compute them.
-function versionGroup(version: number): number {
-  return Math.floor((version + 7) / 17);
-}
-
-export function useQRCode({
-  value,
-  level,
-  minVersion,
-}: {
-  value: string;
-  level: ErrorCorrectionLevel;
-  minVersion: number;
-}): QrCodeDetails | Error {
-  useDebugValue(value, (v) => `QR: "${v}"`);
-
-  try {
-    // Optimise segments for the minimum version, then encode to find the actual version.
-    // If the actual version lands in a different ccbits group (1–9, 10–26, 27–40),
-    // re-optimise for that version and re-encode — a single retry is sufficient since
-    // re-optimised segments can only use fewer bits, never more.
-    let segments = qrcodegen.QrSegment.makeSegments(value, minVersion);
-    let qrcode = qrcodegen.QrCode.encodeSegments(
-      segments,
-      ERROR_LEVEL_MAP[level],
-      minVersion,
-      undefined,
-      undefined,
-      true,
-    );
-
-    if (versionGroup(qrcode.version) !== versionGroup(minVersion)) {
-      const reoptimised = qrcodegen.QrSegment.makeSegments(
-        value,
-        qrcode.version,
-      );
-      qrcode = qrcodegen.QrCode.encodeSegments(
-        reoptimised,
-        ERROR_LEVEL_MAP[level],
-        minVersion,
-        undefined,
-        undefined,
-        true,
-      );
-      segments = reoptimised;
-    }
-
-    const cells = qrcode.getModules();
-    const margin = SPEC_MARGIN_SIZE;
-    const numCells = cells.length + margin * 2;
-    return {
-      qrcode,
-      cells,
-      margin,
-      numCells,
-      segments,
-    };
-  } catch (error) {
-    if (error instanceof Error) {
-      return error;
-    }
-    return new Error(
-      `Unknown error when encoding QR Code: ${JSON.stringify(error)}`,
-    );
-  }
-}
-
-export function useDebugDetails(details: QrCodeDetails): DebugDetails {
-  'use memo';
-  const moduleCount = details.numCells - details.margin * 2;
-  const qrVersion = (moduleCount - 17) / 4;
-  const level = errorLevelToString(details.qrcode.errorCorrectionLevel);
-  return {
-    ...details,
-    moduleCount,
-    qrVersion,
-    level,
-    segments: details.segments,
-  };
-}
-
 // ─── Components ───────────────────────────────────────────────────────────────
 
-export const QRCodeSVG: ForwardRefExoticComponent<
-  PropsWithoutRef<QRPropsSVG> & RefAttributes<SVGSVGElement>
-> = forwardRef<SVGSVGElement, QRPropsSVG>(
-  function QRCodeSVG(props, forwardedRef) {
-    const {
-      value,
-      level = DEFAULT_LEVEL,
-      minVersion = DEFAULT_MINVERSION,
-    } = props;
+export function QRCodeSVG(
+  props: PropsWithoutRef<QRPropsSVG> & RefAttributes<SVGSVGElement>,
+): JSX.Element {
+  const {
+    value,
+    level = DEFAULT_LEVEL,
+    minVersion = DEFAULT_MINVERSION,
+    ref,
+  } = props;
 
-    const details = useQRCode({
-      value,
-      level,
-      minVersion,
-    });
-    if (details instanceof Error) {
-      throw details;
-    }
-    return <QRCodeSVGDetails details={details} {...props} ref={forwardedRef} />;
-  },
-);
+  const details = useQRCode({
+    value,
+    level,
+    minVersion,
+  });
+  if (details instanceof Error) {
+    throw details;
+  }
+  return <QRCodeSVGDetails details={details} {...props} ref={ref} />;
+}
 
-export const QRCodeSVGDetails: ForwardRefExoticComponent<
-  Omit<QRPropsSVG, 'value'> & {
+export function QRCodeSVGDetails(
+  props: Omit<QRPropsSVG, 'value'> & {
     details: QrCodeDetails;
-  } & React.RefAttributes<SVGSVGElement>
-> = forwardRef<
-  SVGSVGElement,
-  Omit<QRPropsSVG, 'value'> & { details: QrCodeDetails }
->(function QRCodeSVGDetails(props, forwardedRef) {
+  } & RefAttributes<SVGSVGElement>,
+): JSX.Element {
   const {
     details,
     bgColor = DEFAULT_BGCOLOR,
@@ -639,6 +414,7 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
     dotRadius = 0.25,
     rasterText = '',
     rasterFont = 'Impact',
+    ref,
     ...otherProps
   } = props;
 
@@ -665,7 +441,7 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
         contain: 'strict',
       }}
       viewBox={`0 0 ${numCells} ${numCells}`}
-      ref={forwardedRef}
+      ref={ref}
       role="img"
       {...otherProps}
     >
@@ -701,6 +477,4 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
       )}
     </svg>
   );
-});
-
-QRCodeSVG.displayName = 'QRCodeSVG';
+}

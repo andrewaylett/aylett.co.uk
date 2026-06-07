@@ -1,12 +1,11 @@
 import type { JSX, PropsWithChildren, RefObject } from 'react';
 
-import {
-  QRCodeSVGDetails,
-  useDebugDetails,
-  useQRCode,
-  type ErrorCorrectionLevel,
-} from '@/client/qr/thirdparty/qrcode.react';
+import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react/errorCorrectionLevel';
+
+import { QRCodeSVGDetails } from '@/client/qr/thirdparty/qrcode.react';
 import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
+import { useDebugDetails } from '@/client/qr/thirdparty/qrcode.react/useDebugDetails';
+import { useQRCode } from '@/client/qr/thirdparty/qrcode.react/useQRCode';
 
 export interface QRCodeState {
   text: string;

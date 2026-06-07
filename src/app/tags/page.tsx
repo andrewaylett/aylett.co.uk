@@ -8,6 +8,8 @@ import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export default async function TagsPage(): Promise<JSX.Element> {
+  'use cache';
+
   const tags = await allTags();
 
   const sortedTags = [...tags].sort();

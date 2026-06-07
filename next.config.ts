@@ -119,6 +119,7 @@ export default function nextConfig(
   })({
     ...defaultConfig,
     ...({
+      cacheComponents: true,
       typedRoutes: true,
       reactCompiler: {
         compilationMode: 'infer',

@@ -22,6 +22,8 @@ export const metadata: Metadata = {
 };
 
 export default async function articles(): Promise<JSX.Element> {
+  'use cache';
+
   const files = await allArticles();
   return (
     <PageStructure

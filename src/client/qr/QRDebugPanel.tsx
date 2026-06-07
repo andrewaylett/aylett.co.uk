@@ -1,6 +1,6 @@
 import { Activity, useState } from 'react';
 
-import type { DebugDetails } from '@/client/qr/thirdparty/qrcode.react';
+import type { DebugDetails } from '@/client/qr/thirdparty/qrcode.react/useDebugDetails';
 
 export function QRDebugPanel({
   qrDebugDetails,

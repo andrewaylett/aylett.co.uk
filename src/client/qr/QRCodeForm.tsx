@@ -19,7 +19,7 @@ import { toBlob, toPng } from 'html-to-image';
 import { QRCodeError } from './QRCodeError';
 import { QRCodeErrorContext } from './QRCodeErrorContext';
 
-import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react';
+import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react/errorCorrectionLevel';
 
 import {
   type ButtonText,

@@ -17,9 +17,6 @@ import { PageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { gitHubUrl } from '@/utilities';
 
-export const dynamicParams = false;
-export const dynamic = 'error';
-
 interface ThoughtProps {
   params: Promise<{ id: string }>;
 }
