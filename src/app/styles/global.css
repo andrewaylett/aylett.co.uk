@@ -15,6 +15,9 @@
     --grid-template-columns-centre: 1fr var(--column-width) 1fr;
 
     --grid-column-2: 2;
+
+    --animate-pop: pop 0.5s ease-out;
+    --animate-fade-in: fade-in 0.3s ease-out;
 }
 
 /*
@@ -142,6 +145,17 @@
     100% {
         opacity: 1;
     }
+}
+
+@keyframes pop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    70%  { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @layer base {
