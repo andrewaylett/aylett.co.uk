@@ -2,15 +2,12 @@ import { useContext, useEffect } from 'react';
 
 import { QRCodeErrorContext } from './QRCodeErrorContext';
 
-import type { ErrorComponent } from 'next/dist/client/components/error-boundary';
+import type {
+  ErrorComponent,
+  ErrorInfo,
+} from 'next/dist/client/components/error-boundary';
 
-export const QRCodeError: ErrorComponent = ({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset?: () => void;
-}) => {
+export const QRCodeError: ErrorComponent = ({ error, reset }: ErrorInfo) => {
   const context = useContext(QRCodeErrorContext);
   if (!context) {
     throw new Error(
@@ -22,10 +19,15 @@ export const QRCodeError: ErrorComponent = ({
     updateResetRef(reset);
   }, [reset, updateResetRef]);
 
+  const message =
+    typeof error === 'object' && error && 'message' in error
+      ? String(error.message)
+      : 'An unknown error occurred';
+
   return (
     <div className="w-full">
       <h2 className="text-red-500">Error generating QR code</h2>
-      <p>{error.message}</p>
+      <p>{message}</p>
       <button
         type="button"
         onClick={resetText}
