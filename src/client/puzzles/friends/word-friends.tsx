@@ -9,12 +9,40 @@ import React, {
   useSyncExternalStore,
 } from 'react';
 
+import { z } from 'zod/v4';
+
 import { PuzzleView } from './Puzzle';
+
+import type { static_assert } from '@/types';
 
 import {
   buildPuzzle,
   type Puzzle,
 } from '@/client/puzzles/friends/gen/build-puzzle';
+
+// ---------------- Schemas ----------------
+
+const WordsValueSchema = z.object({
+  cells: z.array(z.number()),
+  edges: z.array(z.string()),
+});
+
+const PuzzleSchema = z.object({
+  letters: z.array(z.string()),
+  edges: z.array(z.string()),
+  words: z.record(z.string(), WordsValueSchema.optional()),
+  seed: z.string(),
+  critters: z.array(z.string()),
+});
+
+const FoundStateSchema = z.array(z.string());
+
+type _checkPuzzleSchema = static_assert<
+  Puzzle extends z.output<typeof PuzzleSchema> ? true : false
+>;
+type _checkPuzzle = static_assert<
+  z.output<typeof PuzzleSchema> extends Puzzle ? true : false
+>;
 
 // ---------------- Component ----------------
 
@@ -22,6 +50,7 @@ const GAME_STATE_KEY = 'game-state-v2';
 const FOUND_STATE_KEY = 'found-state-v1';
 
 const SERVER_RENDER = Symbol('SERVER_RENDER');
+const NO_SAVED_VALUE = Symbol('NO_SAVED_VALUE');
 const EMPTY_ARRAY: string[] = [];
 
 export default function LineTraceWordGame(): React.JSX.Element {
@@ -35,11 +64,13 @@ export default function LineTraceWordGame(): React.JSX.Element {
     },
     () => {
       if (stateRef.current === undefined) {
-        const raw = JSON.parse(
-          localStorage.getItem(GAME_STATE_KEY) ?? 'undefined',
-        ) as Puzzle | undefined;
-        if (raw !== undefined) {
-          stateRef.current = Promise.resolve(raw);
+        stateRef.current = NO_SAVED_VALUE;
+        const stateValue = localStorage.getItem(GAME_STATE_KEY);
+        if (stateValue) {
+          const parsed = PuzzleSchema.safeParse(JSON.parse(stateValue));
+          if (parsed.success) {
+            stateRef.current = Promise.resolve(parsed.data);
+          }
         }
       }
       return stateRef.current;
@@ -52,11 +83,14 @@ export default function LineTraceWordGame(): React.JSX.Element {
       /* empty */
     },
     () => {
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      if (!foundRef.current) {
-        foundRef.current = JSON.parse(
-          localStorage.getItem(FOUND_STATE_KEY) ?? '[]',
-        ) as string[];
+      if (foundRef.current === undefined) {
+        const stateValue = localStorage.getItem(FOUND_STATE_KEY);
+        if (stateValue) {
+          const parsed = FoundStateSchema.safeParse(JSON.parse(stateValue));
+          foundRef.current = parsed.success ? parsed.data : [];
+        } else {
+          foundRef.current = [];
+        }
       }
       return foundRef.current;
     },

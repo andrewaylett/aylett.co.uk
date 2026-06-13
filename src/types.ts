@@ -1,5 +1,7 @@
 import { z, type ZodDiscriminatedUnion, type ZodObject } from 'zod';
 
+export type static_assert<_T extends true> = never;
+
 const ArticleSchemaShape: {
   title: z.ZodString;
   revision: z.ZodOptional<z.ZodString>;
