@@ -24,7 +24,7 @@ export interface MDFile {
   id: string;
 }
 
-async function findProjectDirectory(): Promise<string> {
+export async function findProjectDirectory(): Promise<string> {
   let wd = process.cwd();
   do {
     if (
