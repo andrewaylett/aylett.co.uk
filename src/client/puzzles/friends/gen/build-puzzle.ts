@@ -28,7 +28,7 @@ export async function buildPuzzle(): Promise<Puzzle> {
   let fallback: BuildResult | null = null;
   for (let attempt = 0; attempt < 60; attempt++) {
     const seed = SEEDS[Math.floor(Math.random() * SEEDS.length)];
-    const res = tryBuild(seed);
+    const res = await tryBuild(seed);
     if (!res) continue;
     const clean = res.avoidCount === 0;
     if (clean && res.accepted.size >= 14) return pack(res);
@@ -53,6 +53,6 @@ function pack(res: BuildResult): Puzzle {
     edges: [...res.edges],
     words,
     seed: res.seed,
-    critters: [...shuffle(CRITTERS), ...shuffle(CRITTERS).slice(0, 16)],
+    critters: shuffle(CRITTERS).slice(0, 16),
   };
 }

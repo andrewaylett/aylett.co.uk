@@ -22,7 +22,7 @@ export interface BuildResult {
   avoidCount: number;
 }
 
-export function tryBuild(seed: string): BuildResult | null {
+export async function tryBuild(seed: string): Promise<BuildResult | null> {
   const grid: (string | null)[] = Array.from({ length: 16 }).fill(null) as (
     | string
     | null
@@ -49,7 +49,7 @@ export function tryBuild(seed: string): BuildResult | null {
   if (grid.includes(null)) return null;
 
   const filledGrid = grid as string[];
-  const ctx = boardContext(filledGrid);
+  const ctx = await boardContext(filledGrid);
   const avoidCount = scanAvoid(filledGrid, edges).size;
   if (avoidCount === 0) enrich(filledGrid, edges, ctx);
 
