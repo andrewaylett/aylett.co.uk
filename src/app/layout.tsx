@@ -1,5 +1,3 @@
-import 'server-only';
-
 import type { PropsWithChildren, JSX } from 'react';
 
 import localFont from 'next/font/local';
