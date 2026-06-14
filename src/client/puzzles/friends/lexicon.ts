@@ -1,12 +1,12 @@
-import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import 'server-only';
+
+import { cache } from 'react';
 
 import {
   AVOID,
   buildPrefixes,
   DEFAULT_WORDS,
 } from '@/client/puzzles/friends/words';
-import { findProjectDirectory } from '@/remark/traverse';
 
 export interface Lexicon {
   words: string[];
@@ -25,12 +25,15 @@ export interface BoardCtx {
  * word, so each board can quickly extract only the words its letters allow.
  */
 async function makeLexicon(): Promise<Lexicon> {
-  const projectDirectory = await findProjectDirectory();
-  const wordsFile = path.join(
-    projectDirectory,
-    'src/client/puzzles/friends/words/words.txt',
+  const wordsResponse = await fetch(
+    'https://atlas.aylett.co.uk/puzzles/words.txt',
   );
-  const text = await fs.readFile(wordsFile, 'utf8');
+  if (!wordsResponse.ok) {
+    throw new Error(
+      `Failed to load words: error ${wordsResponse.status}, ${wordsResponse.statusText}`,
+    );
+  }
+  const text = await wordsResponse.text();
 
   const set = new Set(DEFAULT_WORDS);
   for (const line of text.split(/\r?\n/)) {
@@ -52,16 +55,16 @@ async function makeLexicon(): Promise<Lexicon> {
   return { words, masks, size: words.length };
 }
 
-export const DEFAULT_LEXICON: Lexicon = await makeLexicon();
+const cachedLexicon = cache(makeLexicon);
 
 /** Per-board dictionary: only lexicon words whose letters all appear on the board.
  */
-export function boardContext(grid: string[]): BoardCtx {
+export async function boardContext(grid: string[]): Promise<BoardCtx> {
   let bm = 0;
   for (const L of grid) bm |= 1 << ((L.codePointAt(0) ?? 65) - 65);
   const dict = new Set<string>();
   let maxLen = 4;
-  const { words, masks } = DEFAULT_LEXICON;
+  const { words, masks } = await cachedLexicon();
   for (const [i, word] of words.entries()) {
     if ((masks[i] & ~bm) === 0 && word.length <= 16) {
       dict.add(word);

@@ -2,11 +2,11 @@
 
 import React, {
   type SetStateAction,
-  startTransition,
   useEffect,
   useRef,
   useState,
   useSyncExternalStore,
+  useTransition,
 } from 'react';
 
 import { z } from 'zod/v4';
@@ -54,6 +54,7 @@ const NO_SAVED_VALUE = Symbol('NO_SAVED_VALUE');
 const EMPTY_ARRAY: string[] = [];
 
 export default function LineTraceWordGame(): React.JSX.Element {
+  const [isTransition, startTransition] = useTransition();
   const stateRef = useRef<Promise<Puzzle> | symbol>(undefined);
   const foundRef = useRef<string[] | symbol>(undefined);
   const savedGameState = useSyncExternalStore<
@@ -145,34 +146,33 @@ export default function LineTraceWordGame(): React.JSX.Element {
   }, [found]);
 
   return (
-    <>
-      <div className="max-w-200 mx-auto">
-        <div className="flex justify-between flex-wrap gap-2 mb-3">
-          <p className="text-slate-500 dark:text-slate-400 text-sm my-0 mb-4">
-            Trace along the lines to find words of 4+ letters. Letters that are
-            no longer needed turn into friends; lines fade away when
-            they&apos;re spent.
-          </p>
-          <button onClick={newPuzzle}>New puzzle</button>
-        </div>
-
-        <PuzzleView
-          key={generation}
-          puzzle={puzzleState}
-          found={found}
-          setFound={(f: SetStateAction<string[]>) => {
-            setFound((prev) => {
-              if (typeof f === 'function') {
-                if (savedFoundState !== SERVER_RENDER) {
-                  return f(prev ?? (savedFoundState as string[]));
-                }
-                return f(prev ?? []);
-              }
-              return f;
-            });
-          }}
-        />
+    <div className={'max-w-200 mx-auto' + (isTransition ? ' cursor-wait' : '')}>
+      <div className="flex justify-between flex-wrap gap-2 mb-3">
+        <p className="text-slate-500 dark:text-slate-400 text-sm my-0 mb-4">
+          Trace along the lines to find words of 4+ letters. Letters that are no
+          longer needed turn into friends; lines fade away when they&apos;re
+          spent.
+        </p>
+        <button onClick={newPuzzle}>New puzzle</button>
       </div>
-    </>
+
+      <PuzzleView
+        key={generation}
+        puzzle={puzzleState}
+        found={found}
+        startNewPuzzle={newPuzzle}
+        setFound={(f: SetStateAction<string[]>) => {
+          setFound((prev) => {
+            if (typeof f === 'function') {
+              if (savedFoundState !== SERVER_RENDER) {
+                return f(prev ?? (savedFoundState as string[]));
+              }
+              return f(prev ?? []);
+            }
+            return f;
+          });
+        }}
+      />
+    </div>
   );
 }

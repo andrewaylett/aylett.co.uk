@@ -18,6 +18,7 @@ export interface PuzzleProps {
   puzzle?: Promise<Puzzle>;
   found: string[];
   setFound: Dispatch<SetStateAction<string[]>>;
+  startNewPuzzle: () => void;
 }
 
 const cx = (i: number): number => 50 + (i & 3) * 93;
@@ -27,6 +28,7 @@ export function PuzzleView({
   puzzle: puzzleState,
   found,
   setFound,
+  startNewPuzzle,
 }: PuzzleProps): JSX.Element {
   const [input, setInput] = useState('');
   const [flash, setFlash] = useState(false);
@@ -37,9 +39,22 @@ export function PuzzleView({
 
   const isLoadingPuzzle = deferredPuzzleState !== puzzleState;
 
+  const allWords: (keyof WordsRecord)[] = useMemo(
+    () => (puzzle ? Object.keys(puzzle.words) : []),
+    [puzzle],
+  );
+  const total = allWords.length;
+  const done = total > 0 && found.length === total;
+
   const submit = useCallback(() => {
     const w = input.trim().toUpperCase();
-    if (!w || !puzzle) return;
+    if (!w) {
+      if (done) {
+        startNewPuzzle();
+      }
+      return;
+    }
+    if (!puzzle) return;
     if (puzzle.words[w] && !found.includes(w)) {
       setFound((f) => [...f, w]);
       setInput('');
@@ -51,13 +66,8 @@ export function PuzzleView({
         inputRef.current.focus();
       }
     }
-  }, [input, puzzle, found, setFound]);
+  }, [input, puzzle, found, setFound, done, startNewPuzzle]);
 
-  const allWords: (keyof WordsRecord)[] = useMemo(
-    () => (puzzle ? Object.keys(puzzle.words) : []),
-    [puzzle],
-  );
-  const total = allWords.length;
   const maxLen = useMemo(
     () =>
       allWords.length > 0 ? Math.max(...allWords.map((w) => w.length)) : 0,
@@ -79,14 +89,41 @@ export function PuzzleView({
     return { letterCount: lc, edgeCount: ec };
   }, [puzzle, allWords, found]);
 
-  const matchesFound = found.includes(input.trim().toUpperCase());
-  const prefixCanMatch =
-    !puzzle ||
-    input.length === 0 ||
-    Object.entries(puzzle.words).some((w) =>
-      w[0].startsWith(input.trim().toUpperCase()),
-    );
-  const done = found.length === total;
+  const prefix = input.trim().toUpperCase();
+  const matchesFound = found.includes(prefix);
+  const prefixCanMatch = (() => {
+    if (!puzzle || prefix.length === 0) return true;
+    const adj: number[][] = Array.from({ length: 16 }, () => []);
+    for (const k of puzzle.edges) {
+      if (edgeCount[k] > 0) {
+        const [a, b] = k.split('-').map(Number);
+        adj[a].push(b);
+        adj[b].push(a);
+      }
+    }
+    const dfs = (
+      cell: number,
+      depth: number,
+      visited: Set<number>,
+    ): boolean => {
+      if (depth === prefix.length) return true;
+      for (const nb of adj[cell]) {
+        if (!visited.has(nb) && puzzle.letters[nb] === prefix[depth]) {
+          visited.add(nb);
+          if (dfs(nb, depth + 1, visited)) return true;
+          visited.delete(nb);
+        }
+      }
+      return false;
+    };
+    for (let i = 0; i < 16; i++) {
+      if (letterCount[i] > 0 && puzzle.letters[i] === prefix[0]) {
+        if (prefix.length === 1) return true;
+        if (dfs(i, 1, new Set([i]))) return true;
+      }
+    }
+    return false;
+  })();
 
   return (
     <div className="flex gap-5 flex-wrap items-start mb-2">
@@ -182,11 +219,11 @@ export function PuzzleView({
               flash
                 ? 'border border-green-400 shadow-[0_0_12px_rgba(74,222,128,0.4)]'
                 : 'border border-slate-300 dark:border-slate-600',
-              matchesFound
-                ? 'bg-green-100 dark:bg-green-800'
-                : prefixCanMatch
-                  ? 'bg-white dark:bg-slate-800'
-                  : 'bg-red-200 dark:bg-red-700',
+              prefixCanMatch
+                ? matchesFound
+                  ? 'bg-green-100 dark:bg-green-800'
+                  : 'bg-white dark:bg-slate-800'
+                : 'bg-red-200 dark:bg-red-700',
             ].join(' ')}
           />
           <button onClick={submit}>Enter</button>
