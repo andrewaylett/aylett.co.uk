@@ -146,7 +146,11 @@ export default function LineTraceWordGame(): React.JSX.Element {
   }, [found]);
 
   return (
-    <div className={'max-w-200 mx-auto' + (isTransition ? ' cursor-wait' : '')}>
+    <div
+      className={
+        'w-full max-w-200 mx-auto' + (isTransition ? ' cursor-wait' : '')
+      }
+    >
       <div className="flex justify-between flex-wrap gap-2 mb-3">
         <p className="text-slate-500 dark:text-slate-400 text-sm my-0 mb-4">
           Trace along the lines to find words of 4+ letters. Letters that are no
