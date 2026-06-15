@@ -28,7 +28,9 @@ export const SunContext: Context<SunState | undefined> = createContext<
 
 export function useSun(): SunState {
   const ctx = useContext(SunContext);
-  if (!ctx) throw new Error('useSun must be used within SunProvider');
+  if (!ctx) {
+    throw new Error('useSun must be used within SunProvider');
+  }
   return ctx;
 }
 

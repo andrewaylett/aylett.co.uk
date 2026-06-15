@@ -1,5 +1,7 @@
 export function minutesToHHMM(mins?: number | null): string {
-  if (mins === null || mins === undefined) return '—';
+  if (mins === null || mins === undefined) {
+    return '—';
+  }
   const sign = mins < 0 ? '−' : '+';
   const abs = Math.abs(Math.round(mins));
   const h = Math.floor(abs / 60),

@@ -40,7 +40,9 @@ async function makeLexicon(): Promise<Lexicon> {
     const w = line.trim();
     if (/^[a-z]{4,16}$/.test(w)) {
       const U = w.toUpperCase();
-      if (!AVOID.has(U)) set.add(U);
+      if (!AVOID.has(U)) {
+        set.add(U);
+      }
     }
   }
 
@@ -48,8 +50,9 @@ async function makeLexicon(): Promise<Lexicon> {
   const masks = new Uint32Array(words.length);
   for (const [i, w] of words.entries()) {
     let m = 0;
-    for (let j = 0; j < w.length; j++)
+    for (let j = 0; j < w.length; j++) {
       m |= 1 << ((w.codePointAt(j) ?? 65) - 65);
+    }
     masks[i] = m;
   }
   return { words, masks, size: words.length };
@@ -61,14 +64,18 @@ const cachedLexicon = cache(makeLexicon);
  */
 export async function boardContext(grid: string[]): Promise<BoardCtx> {
   let bm = 0;
-  for (const L of grid) bm |= 1 << ((L.codePointAt(0) ?? 65) - 65);
+  for (const L of grid) {
+    bm |= 1 << ((L.codePointAt(0) ?? 65) - 65);
+  }
   const dict = new Set<string>();
   let maxLen = 4;
   const { words, masks } = await cachedLexicon();
   for (const [i, word] of words.entries()) {
     if ((masks[i] & ~bm) === 0 && word.length <= 16) {
       dict.add(word);
-      if (word.length > maxLen) maxLen = word.length;
+      if (word.length > maxLen) {
+        maxLen = word.length;
+      }
     }
   }
   return { dict, prefixes: buildPrefixes(dict), maxLen };

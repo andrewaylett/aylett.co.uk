@@ -24,7 +24,9 @@ const PRECOMPUTED_DECLINATIONS = {
 };
 
 function computeDeclinationsInternal(year: number): Declination[] {
-  if (!Number.isFinite(year)) return [];
+  if (!Number.isFinite(year)) {
+    return [];
+  }
   const days: Declination[] = [];
   let d = new Temporal.PlainDate(year, 1, 1);
   while (d.year === year) {

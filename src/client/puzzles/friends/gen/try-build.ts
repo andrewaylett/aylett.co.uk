@@ -29,7 +29,9 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
   )[];
   const edges = new Set<string>();
   const seedPath = placeSeedPath(seed.length);
-  if (!seedPath) return null;
+  if (!seedPath) {
+    return null;
+  }
   applyWord(seed, seedPath, grid, edges);
 
   let guard = 0;
@@ -38,22 +40,36 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
     let best: (Placement & { word: string }) | null = null;
     let tested = 0;
     for (const w of sample) {
-      if (tested++ > 260) break;
+      if (tested++ > 260) {
+        break;
+      }
       const p = searchPlacement(w, grid, edges);
-      if (p && (!best || p.score > best.score)) best = { ...p, word: w };
-      if (best && best.fills >= 2 && tested > 80) break;
+      if (p && (!best || p.score > best.score)) {
+        best = { ...p, word: w };
+      }
+      if (best && best.fills >= 2 && tested > 80) {
+        break;
+      }
     }
-    if (!best) return null;
+    if (!best) {
+      return null;
+    }
     applyWord(best.word, best.path, grid, edges);
   }
-  if (grid.includes(null)) return null;
+  if (grid.includes(null)) {
+    return null;
+  }
 
   const filledGrid = grid as string[];
   const ctx = await boardContext(filledGrid);
   const avoidCount = scanAvoid(filledGrid, edges).size;
-  if (avoidCount === 0) enrich(filledGrid, edges, ctx);
+  if (avoidCount === 0) {
+    enrich(filledGrid, edges, ctx);
+  }
 
   const accepted = scanWords(filledGrid, edges, ctx);
-  if (!accepted.has(seed)) return null;
+  if (!accepted.has(seed)) {
+    return null;
+  }
   return { grid: filledGrid, edges, accepted, seed, avoidCount };
 }

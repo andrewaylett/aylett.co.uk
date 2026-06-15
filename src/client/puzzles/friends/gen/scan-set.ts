@@ -11,17 +11,29 @@ export function scanSet(
   const found = new Set<string>();
   const dfs = (cell: number, used: Set<number>, prefix: string): void => {
     const p = prefix + grid[cell];
-    if (!prefixes.has(p)) return;
-    if (p.length >= 4 && dict.has(p)) found.add(p);
-    if (p.length >= maxLen) return;
+    if (!prefixes.has(p)) {
+      return;
+    }
+    if (p.length >= 4 && dict.has(p)) {
+      found.add(p);
+    }
+    if (p.length >= maxLen) {
+      return;
+    }
     for (const nb of NEIGH[cell]) {
-      if (used.has(nb)) continue;
-      if (!edges.has(ekey(cell.toString(), nb.toString()))) continue;
+      if (used.has(nb)) {
+        continue;
+      }
+      if (!edges.has(ekey(cell.toString(), nb.toString()))) {
+        continue;
+      }
       used.add(nb);
       dfs(nb, used, p);
       used.delete(nb);
     }
   };
-  for (let s = 0; s < 16; s++) dfs(s, new Set([s]), '');
+  for (let s = 0; s < 16; s++) {
+    dfs(s, new Set([s]), '');
+  }
   return found;
 }

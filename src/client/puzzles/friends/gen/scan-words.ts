@@ -24,8 +24,12 @@ export function scanWords(
       e = { cells: new Set<number>(), edges: new Set<string>() };
       found.set(word, e);
     }
-    for (const c of cells) e.cells.add(c);
-    for (const k of pathEdges) e.edges.add(k);
+    for (const c of cells) {
+      e.cells.add(c);
+    }
+    for (const k of pathEdges) {
+      e.edges.add(k);
+    }
   };
   const dfs = (
     cell: number,
@@ -34,13 +38,23 @@ export function scanWords(
     pathEdges: string[],
   ): void => {
     const p = prefix + grid[cell];
-    if (!ctx.prefixes.has(p)) return;
-    if (p.length >= 4 && ctx.dict.has(p)) record(p, used, pathEdges);
-    if (p.length >= ctx.maxLen) return;
+    if (!ctx.prefixes.has(p)) {
+      return;
+    }
+    if (p.length >= 4 && ctx.dict.has(p)) {
+      record(p, used, pathEdges);
+    }
+    if (p.length >= ctx.maxLen) {
+      return;
+    }
     for (const nb of NEIGH[cell]) {
-      if (used.has(nb)) continue;
+      if (used.has(nb)) {
+        continue;
+      }
       const ek = ekey(cell.toString(), nb.toString());
-      if (!edges.has(ek)) continue;
+      if (!edges.has(ek)) {
+        continue;
+      }
       used.add(nb);
       pathEdges.push(ek);
       dfs(nb, used, p, pathEdges);
@@ -48,6 +62,8 @@ export function scanWords(
       pathEdges.pop();
     }
   };
-  for (let s = 0; s < 16; s++) dfs(s, new Set([s]), '', []);
+  for (let s = 0; s < 16; s++) {
+    dfs(s, new Set([s]), '', []);
+  }
   return found;
 }

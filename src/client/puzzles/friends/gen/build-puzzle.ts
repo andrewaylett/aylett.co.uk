@@ -29,25 +29,33 @@ export async function buildPuzzle(): Promise<Puzzle> {
   for (let attempt = 0; attempt < 60; attempt++) {
     const seed = SEEDS[Math.floor(Math.random() * SEEDS.length)];
     const res = await tryBuild(seed);
-    if (!res) continue;
+    if (!res) {
+      continue;
+    }
     const clean = res.avoidCount === 0;
-    if (clean && res.accepted.size >= 14) return pack(res);
+    if (clean && res.accepted.size >= 14) {
+      return pack(res);
+    }
     if (
       !fallback ||
       (clean && fallback.avoidCount > 0) ||
       (clean === (fallback.avoidCount === 0) &&
         res.accepted.size > fallback.accepted.size)
-    )
+    ) {
       fallback = res;
+    }
   }
-  if (fallback) return pack(fallback);
+  if (fallback) {
+    return pack(fallback);
+  }
   return buildPuzzle();
 }
 
 function pack(res: BuildResult): Puzzle {
   const words: Record<string, { cells: number[]; edges: string[] }> = {};
-  for (const [w, sets] of res.accepted)
+  for (const [w, sets] of res.accepted) {
     words[w] = { cells: [...sets.cells], edges: [...sets.edges] };
+  }
   return {
     letters: res.grid,
     edges: [...res.edges],

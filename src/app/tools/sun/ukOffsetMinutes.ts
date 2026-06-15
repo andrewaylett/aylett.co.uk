@@ -9,8 +9,14 @@ export function ukOffsetMinutes(date: Temporal.PlainDate): number {
   }
   const bstStart = lastSunday(y, 3);
   const bstEnd = lastSunday(y, 10);
-  if (m > 3 && m < 10) return 60;
-  if (m === 3 && d >= bstStart) return 60;
-  if (m === 10 && d < bstEnd) return 60;
+  if (m > 3 && m < 10) {
+    return 60;
+  }
+  if (m === 3 && d >= bstStart) {
+    return 60;
+  }
+  if (m === 10 && d < bstEnd) {
+    return 60;
+  }
   return 0;
 }

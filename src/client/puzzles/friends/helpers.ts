@@ -5,13 +5,18 @@ function genNeigh() {
     const r = i >> 2,
       c = i & 3;
     const a: number[] = [];
-    for (let dr = -1; dr <= 1; dr++)
+    for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
-        if (!dr && !dc) continue;
+        if (!dr && !dc) {
+          continue;
+        }
         const nr = r + dr,
           nc = c + dc;
-        if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4) a.push(nr * 4 + nc);
+        if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4) {
+          a.push(nr * 4 + nc);
+        }
       }
+    }
     result.push(a);
   }
   return result;
@@ -20,8 +25,13 @@ export const NEIGH: number[][] = genNeigh();
 
 function genAllPairs() {
   const result: [number, number][] = [];
-  for (let i = 0; i < 16; i++)
-    for (const nb of NEIGH[i]) if (i < nb) result.push([i, nb]);
+  for (let i = 0; i < 16; i++) {
+    for (const nb of NEIGH[i]) {
+      if (i < nb) {
+        result.push([i, nb]);
+      }
+    }
+  }
   return result;
 }
 export const ALL_PAIRS: [number, number][] = genAllPairs();

@@ -49,6 +49,7 @@ export default tseslint.config(
       },
     },
     rules: {
+      curly: ['error', 'all'],
       'unicorn/filename-case': ['off'],
       'unicorn/no-null': ['off'],
       'unicorn/no-await-expression-member': ['off'],
