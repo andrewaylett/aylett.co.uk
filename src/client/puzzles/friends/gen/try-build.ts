@@ -1,3 +1,5 @@
+import { produce } from 'immer';
+
 import {
   scanWords,
   type WordInfo,
@@ -22,54 +24,159 @@ export interface BuildResult {
   avoidCount: number;
 }
 
+interface DfsState {
+  grid: (string | null)[];
+  edges: Set<string>;
+  maxWordLen: number;
+}
+
+// Must exceed any realistic countPotentialFit value so a clean result always
+// beats a dirty one in score comparisons.
+const BIG_PENALTY = 100_000;
+
+function countPotentialFit(grid: (string | null)[], words: string[]): number {
+  const placed: Record<string, number> = {};
+  let emptyCount = 0;
+  for (const cell of grid) {
+    if (cell === null) {
+      emptyCount++;
+    } else {
+      placed[cell] = (placed[cell] ?? 0) + 1;
+    }
+  }
+  let count = 0;
+  for (const word of words) {
+    const needed: Record<string, number> = {};
+    for (const ch of word) {
+      needed[ch] = (needed[ch] ?? 0) + 1;
+    }
+    let extraNeeded = 0;
+    for (const [ch, cnt] of Object.entries(needed)) {
+      extraNeeded += Math.max(0, cnt - (placed[ch] ?? 0));
+    }
+    if (extraNeeded <= emptyCount) {
+      count++;
+    }
+  }
+  return count;
+}
+
 export async function tryBuild(seed: string): Promise<BuildResult | null> {
-  const grid: (string | null)[] = Array.from({ length: 16 }).fill(null) as (
-    | string
-    | null
-  )[];
-  const edges = new Set<string>();
+  const initialGrid: (string | null)[] = Array.from({ length: 16 }, () => null);
+  const initialEdges = new Set<string>();
   const seedPath = placeSeedPath(seed.length);
   if (!seedPath) {
     return null;
   }
-  applyWord(seed, seedPath, grid, edges);
+  applyWord(seed, seedPath, initialGrid, initialEdges);
 
-  let guard = 0;
-  while (grid.includes(null) && guard++ < 25) {
-    const sample = shuffle(FILLWORDS).sort((a, b) => b.length - a.length);
-    let best: (Placement & { word: string }) | null = null;
-    let tested = 0;
-    for (const w of sample) {
-      if (tested++ > 260) {
-        break;
+  const shuffled = shuffle(FILLWORDS);
+  const allLens = [9, 8, 7, 6, 5, 4] as const;
+  const wordsByLen = new Map<number, string[]>();
+  for (const len of allLens) {
+    const ws = shuffled.filter((w) => w.length === len);
+    if (ws.length > 0) {
+      wordsByLen.set(len, ws);
+    }
+  }
+  const sortedLens = allLens.filter((l) => wordsByLen.has(l));
+
+  let bestResult: BuildResult | null = null;
+  let bestScore = -Infinity;
+  const usedWords = new Set<string>();
+
+  const dfs = async (state: DfsState, wordsPlaced: number): Promise<void> => {
+    const remaining = FILLWORDS.filter((w) => !usedWords.has(w));
+    const emptyCount = state.grid.filter((c) => c === null).length;
+
+    // upperBound is valid for both pruning and leaf scoring: placing a word
+    // increments wordsPlaced by 1 but removes the word from remaining and
+    // tightens empty-slot budget, so the bound is non-increasing along any path.
+    const upperBound = wordsPlaced + countPotentialFit(state.grid, remaining);
+    if (upperBound <= bestScore) {
+      return;
+    }
+
+    if (emptyCount === 0) {
+      const filledGrid = state.grid as string[];
+      // Copy edges: enrich mutates them; state.edges may be frozen by immer.
+      const edges = new Set(state.edges);
+      const ctx = await boardContext(filledGrid);
+      const avoidCount = scanAvoid(filledGrid, edges).size;
+      if (avoidCount === 0) {
+        enrich(filledGrid, edges, ctx);
       }
-      const p = searchPlacement(w, grid, edges);
-      if (p && (!best || p.score > best.score)) {
-        best = { ...p, word: w };
+      const accepted = scanWords(filledGrid, edges, ctx);
+      if (!accepted.has(seed)) {
+        return;
       }
-      if (best && best.fills >= 2 && tested > 80) {
+      const finalScore = upperBound - avoidCount * BIG_PENALTY;
+      if (finalScore > bestScore) {
+        bestScore = finalScore;
+        bestResult = { grid: filledGrid, edges, accepted, seed, avoidCount };
+      }
+      return;
+    }
+
+    let targetLen: number | null = null;
+    const candidates: {
+      word: string;
+      placement: Placement;
+      candidateScore: number;
+    }[] = [];
+
+    for (const len of sortedLens) {
+      if (len > state.maxWordLen) {
+        continue;
+      }
+      const wordsOfLen = wordsByLen.get(len);
+      if (!wordsOfLen) {
+        continue;
+      }
+      for (const word of wordsOfLen) {
+        if (usedWords.has(word)) {
+          continue;
+        }
+        const placement = searchPlacement(word, state.grid, state.edges);
+        if (!placement) {
+          continue;
+        }
+        targetLen = len;
+        // Temp copy for scoring; produce would be wasteful here.
+        const tempGrid = [...state.grid];
+        const tempEdges = new Set(state.edges);
+        applyWord(word, placement.path, tempGrid, tempEdges);
+        const nextRemaining = remaining.filter((w) => w !== word);
+        const candidateScore =
+          wordsPlaced + 1 + countPotentialFit(tempGrid, nextRemaining);
+        candidates.push({ word, placement, candidateScore });
+      }
+      if (targetLen !== null) {
         break;
       }
     }
-    if (!best) {
-      return null;
+
+    if (candidates.length === 0 || targetLen === null) {
+      return;
     }
-    applyWord(best.word, best.path, grid, edges);
-  }
-  if (grid.includes(null)) {
-    return null;
-  }
+    candidates.sort((a, b) => b.candidateScore - a.candidateScore);
+    const capturedLen = targetLen;
 
-  const filledGrid = grid as string[];
-  const ctx = await boardContext(filledGrid);
-  const avoidCount = scanAvoid(filledGrid, edges).size;
-  if (avoidCount === 0) {
-    enrich(filledGrid, edges, ctx);
-  }
+    for (const { word, placement } of candidates) {
+      usedWords.add(word);
+      const nextState = produce(state, (draft) => {
+        applyWord(word, placement.path, draft.grid, draft.edges);
+        draft.maxWordLen = capturedLen;
+      });
+      await dfs(nextState, wordsPlaced + 1);
+      usedWords.delete(word);
+    }
+  };
 
-  const accepted = scanWords(filledGrid, edges, ctx);
-  if (!accepted.has(seed)) {
-    return null;
-  }
-  return { grid: filledGrid, edges, accepted, seed, avoidCount };
+  const initialMaxWordLen = sortedLens[0] ?? 9;
+  await dfs(
+    { grid: initialGrid, edges: initialEdges, maxWordLen: initialMaxWordLen },
+    0,
+  );
+  return bestResult;
 }
