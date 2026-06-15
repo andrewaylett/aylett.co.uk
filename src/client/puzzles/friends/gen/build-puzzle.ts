@@ -2,6 +2,8 @@
 
 import 'server-only';
 
+import type { WordInfo } from '@/client/puzzles/friends/gen/scan-words';
+
 import {
   type BuildResult,
   tryBuild,
@@ -24,6 +26,24 @@ export interface Puzzle {
   critters: string[];
 }
 
+// A is implied by B if you'd necessarily find A when B is traceable on the board.
+// Since edges are undirected, any subpath can be traversed in reverse, so A is
+// implied if A (or A reversed) is a contiguous substring of B.
+function isImplied(a: string, b: string): boolean {
+  if (a.length >= b.length) {
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-misused-spread
+  const rev = [...a].reverse().join('');
+  return b.includes(a) || b.includes(rev);
+}
+
+function effectiveSize(accepted: Map<string, WordInfo>): number {
+  const words = [...accepted.keys()];
+  return words.filter((w) => !words.some((other) => isImplied(w, other)))
+    .length;
+}
+
 export async function buildPuzzle(): Promise<Puzzle> {
   let fallback: BuildResult | null = null;
   for (let attempt = 0; attempt < 60; attempt++) {
@@ -33,14 +53,15 @@ export async function buildPuzzle(): Promise<Puzzle> {
       continue;
     }
     const clean = res.avoidCount === 0;
-    if (clean && res.accepted.size >= 14) {
+    const size = effectiveSize(res.accepted);
+    if (clean && size >= 14) {
       return pack(res);
     }
     if (
       !fallback ||
       (clean && fallback.avoidCount > 0) ||
       (clean === (fallback.avoidCount === 0) &&
-        res.accepted.size > fallback.accepted.size)
+        size > effectiveSize(fallback.accepted))
     ) {
       fallback = res;
     }

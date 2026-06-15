@@ -1,4 +1,6 @@
-import { produce } from 'immer';
+import { enableMapSet, produce } from 'immer';
+
+enableMapSet();
 
 import {
   scanWords,
