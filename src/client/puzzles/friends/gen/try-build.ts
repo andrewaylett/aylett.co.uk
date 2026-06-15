@@ -36,7 +36,10 @@ interface DfsState {
 // beats a dirty one in score comparisons.
 const BIG_PENALTY = 100_000;
 
-function countPotentialFit(grid: (string | null)[], words: string[]): number {
+export function countPotentialFit(
+  grid: (string | null)[],
+  words: string[],
+): number {
   const placed: Record<string, number> = {};
   let emptyCount = 0;
   for (const cell of grid) {
@@ -88,7 +91,9 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
   const usedWords = new Set<string>();
 
   const dfs = async (state: DfsState, wordsPlaced: number): Promise<void> => {
-    const remaining = FILLWORDS.filter((w) => !usedWords.has(w));
+    const remaining = FILLWORDS.filter(
+      (w) => !usedWords.has(w) && w.length <= state.maxWordLen,
+    );
     const emptyCount = state.grid.filter((c) => c === null).length;
 
     // upperBound is valid for both pruning and leaf scoring: placing a word
