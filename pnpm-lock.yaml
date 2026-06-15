@@ -4,6 +4,237 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@eslint/js':
+      specifier: 9.39.4
+      version: 9.39.4
+    '@jest/globals':
+      specifier: 30.3.0
+      version: 30.3.0
+    '@next/eslint-plugin-next':
+      specifier: 16.2.5
+      version: 16.2.5
+    '@prettier/plugin-xml':
+      specifier: 3.4.2
+      version: 3.4.2
+    '@swc/jest':
+      specifier: 0.2.39
+      version: 0.2.39
+    '@tailwindcss/postcss':
+      specifier: 4.2.4
+      version: 4.2.4
+    '@testing-library/dom':
+      specifier: 10.4.1
+      version: 10.4.1
+    '@testing-library/jest-dom':
+      specifier: 6.9.1
+      version: 6.9.1
+    '@testing-library/react':
+      specifier: 16.3.2
+      version: 16.3.2
+    '@testing-library/user-event':
+      specifier: 14.6.1
+      version: 14.6.1
+    '@types/hast':
+      specifier: 3.0.4
+      version: 3.0.4
+    '@types/jest':
+      specifier: 30.0.0
+      version: 30.0.0
+    '@types/mdast':
+      specifier: 4.0.4
+      version: 4.0.4
+    '@types/nlcst':
+      specifier: 2.0.3
+      version: 2.0.3
+    '@types/node':
+      specifier: 24.12.2
+      version: 24.12.2
+    '@types/react':
+      specifier: 19.2.14
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: 19.2.3
+      version: 19.2.3
+    '@types/rss':
+      specifier: 0.0.32
+      version: 0.0.32
+    babel-plugin-react-compiler:
+      specifier: 1.0.0
+      version: 1.0.0
+    baseline-browser-mapping:
+      specifier: 2.10.27
+      version: 2.10.27
+    browserslist:
+      specifier: 4.28.2
+      version: 4.28.2
+    caniuse-lite:
+      specifier: 1.0.30001792
+      version: 1.0.30001792
+    client-only:
+      specifier: 0.0.1
+      version: 0.0.1
+    date-fns:
+      specifier: 4.1.0
+      version: 4.1.0
+    encoding:
+      specifier: 0.1.13
+      version: 0.1.13
+    eslint:
+      specifier: 9.39.4
+      version: 9.39.4
+    eslint-config-andrewaylett:
+      specifier: 7.0.0
+      version: 7.0.0
+    eslint-config-next:
+      specifier: 16.2.5
+      version: 16.2.5
+    eslint-plugin-import:
+      specifier: 2.32.0
+      version: 2.32.0
+    eslint-plugin-jest:
+      specifier: 29.15.2
+      version: 29.15.2
+    eslint-plugin-react:
+      specifier: 7.37.5
+      version: 7.37.5
+    eslint-plugin-react-hooks:
+      specifier: 7.0.1
+      version: 7.0.1
+    expect:
+      specifier: 30.3.0
+      version: 30.3.0
+    globals:
+      specifier: 17.6.0
+      version: 17.6.0
+    html-to-image:
+      specifier: 1.11.13
+      version: 1.11.13
+    identity-obj-proxy:
+      specifier: 3.0.0
+      version: 3.0.0
+    immer:
+      specifier: 11.1.7
+      version: 11.1.7
+    jest:
+      specifier: 30.3.0
+      version: 30.3.0
+    jest-environment-jsdom:
+      specifier: 30.3.0
+      version: 30.3.0
+    jiti:
+      specifier: 2.7.0
+      version: 2.7.0
+    mdast-util-from-markdown:
+      specifier: 2.0.3
+      version: 2.0.3
+    mdast-util-to-markdown:
+      specifier: 2.1.2
+      version: 2.1.2
+    mermaid:
+      specifier: 11.15.0
+      version: 11.15.0
+    micromark-util-types:
+      specifier: 2.0.2
+      version: 2.0.2
+    next:
+      specifier: 16.3.0-preview.3
+      version: 16.3.0-preview.3
+    next-plausible:
+      specifier: 4.0.0
+      version: 4.0.0
+    nlcst-to-string:
+      specifier: 4.0.0
+      version: 4.0.0
+    parse-english:
+      specifier: 7.0.0
+      version: 7.0.0
+    postcss:
+      specifier: 8.5.14
+      version: 8.5.14
+    prettier:
+      specifier: 3.8.3
+      version: 3.8.3
+    react-compiler-marker:
+      specifier: 0.1.0
+      version: 0.1.0
+    recharts:
+      specifier: 3.8.1
+      version: 3.8.1
+    rehype-format:
+      specifier: 5.0.1
+      version: 5.0.1
+    rehype-react:
+      specifier: 8.0.0
+      version: 8.0.0
+    rehype-slug:
+      specifier: 6.0.0
+      version: 6.0.0
+    remark-frontmatter:
+      specifier: 5.0.0
+      version: 5.0.0
+    remark-gfm:
+      specifier: 4.0.1
+      version: 4.0.1
+    remark-parse:
+      specifier: 11.0.0
+      version: 11.0.0
+    remark-rehype:
+      specifier: 11.1.2
+      version: 11.1.2
+    remark-stringify:
+      specifier: 11.0.0
+      version: 11.0.0
+    retext-smartypants:
+      specifier: 6.2.0
+      version: 6.2.0
+    rss:
+      specifier: 1.2.2
+      version: 1.2.2
+    server-only:
+      specifier: 0.0.1
+      version: 0.0.1
+    tailwindcss:
+      specifier: 4.2.4
+      version: 4.2.4
+    temporal-polyfill:
+      specifier: 0.3.2
+      version: 0.3.2
+    to-vfile:
+      specifier: 8.0.0
+      version: 8.0.0
+    ts-jest:
+      specifier: 29.4.9
+      version: 29.4.9
+    typescript:
+      specifier: 6.0.3
+      version: 6.0.3
+    typescript-eslint:
+      specifier: 8.59.2
+      version: 8.59.2
+    unified:
+      specifier: 11.0.5
+      version: 11.0.5
+    unist-util-is:
+      specifier: 6.0.1
+      version: 6.0.1
+    unist-util-visit:
+      specifier: 5.1.0
+      version: 5.1.0
+    unist-util-visit-parents:
+      specifier: 6.0.2
+      version: 6.0.2
+    vfile:
+      specifier: 6.0.3
+      version: 6.0.3
+    yaml:
+      specifier: 2.8.4
+      version: 2.8.4
+    zod:
+      specifier: 4.4.3
+      version: 4.4.3
+
 overrides:
   jsdom: 29.1.1
   react: 19.2.4
@@ -18,40 +249,40 @@ importers:
   .:
     dependencies:
       client-only:
-        specifier: 0.0.1
+        specifier: 'catalog:'
         version: 0.0.1
       date-fns:
-        specifier: 4.1.0
+        specifier: 'catalog:'
         version: 4.1.0
       html-to-image:
-        specifier: 1.11.13
+        specifier: 'catalog:'
         version: 1.11.13
       immer:
-        specifier: 11.1.7
+        specifier: 'catalog:'
         version: 11.1.7
       mdast-util-from-markdown:
-        specifier: 2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       mdast-util-to-markdown:
-        specifier: 2.1.2
+        specifier: 'catalog:'
         version: 2.1.2
       mermaid:
-        specifier: 11.15.0
+        specifier: 'catalog:'
         version: 11.15.0
       micromark-util-types:
-        specifier: 2.0.2
+        specifier: 'catalog:'
         version: 2.0.2
       next:
-        specifier: 16.3.0-preview.3
+        specifier: 'catalog:'
         version: 16.3.0-preview.3(@babel/core@7.29.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-plausible:
-        specifier: 4.0.0
+        specifier: 'catalog:'
         version: 4.0.0(next@16.3.0-preview.3(@babel/core@7.29.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       nlcst-to-string:
-        specifier: 4.0.0
+        specifier: 'catalog:'
         version: 4.0.0
       parse-english:
-        specifier: 7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       react:
         specifier: 19.2.4
@@ -60,206 +291,206 @@ importers:
         specifier: 19.2.4
         version: 19.2.4
       recharts:
-        specifier: 3.8.1
+        specifier: 'catalog:'
         version: 3.8.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@19.2.4)(react@19.2.4)(redux@5.0.1)
       rehype-format:
-        specifier: 5.0.1
+        specifier: 'catalog:'
         version: 5.0.1
       rehype-react:
-        specifier: 8.0.0
+        specifier: 'catalog:'
         version: 8.0.0
       rehype-slug:
-        specifier: 6.0.0
+        specifier: 'catalog:'
         version: 6.0.0
       remark-frontmatter:
-        specifier: 5.0.0
+        specifier: 'catalog:'
         version: 5.0.0
       remark-gfm:
-        specifier: 4.0.1
+        specifier: 'catalog:'
         version: 4.0.1
       remark-parse:
-        specifier: 11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       remark-rehype:
-        specifier: 11.1.2
+        specifier: 'catalog:'
         version: 11.1.2
       remark-stringify:
-        specifier: 11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       retext-smartypants:
-        specifier: 6.2.0
+        specifier: 'catalog:'
         version: 6.2.0
       rss:
-        specifier: 1.2.2
+        specifier: 'catalog:'
         version: 1.2.2
       server-only:
-        specifier: 0.0.1
+        specifier: 'catalog:'
         version: 0.0.1
       temporal-polyfill:
-        specifier: 0.3.2
+        specifier: 'catalog:'
         version: 0.3.2
       to-vfile:
-        specifier: 8.0.0
+        specifier: 'catalog:'
         version: 8.0.0
       unified:
-        specifier: 11.0.5
+        specifier: 'catalog:'
         version: 11.0.5
       unist-util-is:
-        specifier: 6.0.1
+        specifier: 'catalog:'
         version: 6.0.1
       unist-util-visit:
-        specifier: 5.1.0
+        specifier: 'catalog:'
         version: 5.1.0
       unist-util-visit-parents:
-        specifier: 6.0.2
+        specifier: 'catalog:'
         version: 6.0.2
       vfile:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       yaml:
-        specifier: 2.8.4
+        specifier: 'catalog:'
         version: 2.8.4
       zod:
-        specifier: 4.4.3
+        specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
       '@eslint/js':
-        specifier: 9.39.4
+        specifier: 'catalog:'
         version: 9.39.4
       '@jest/globals':
-        specifier: 30.3.0
+        specifier: 'catalog:'
         version: 30.3.0
       '@next/eslint-plugin-next':
-        specifier: 16.2.5
+        specifier: 'catalog:'
         version: 16.2.5
       '@prettier/plugin-xml':
-        specifier: 3.4.2
+        specifier: 'catalog:'
         version: 3.4.2(prettier@3.8.3)
       '@swc/jest':
-        specifier: 0.2.39
+        specifier: 'catalog:'
         version: 0.2.39(@swc/core@1.15.33)
       '@tailwindcss/postcss':
-        specifier: 4.2.4
+        specifier: 'catalog:'
         version: 4.2.4
       '@testing-library/dom':
-        specifier: 10.4.1
+        specifier: 'catalog:'
         version: 10.4.1
       '@testing-library/jest-dom':
-        specifier: 6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       '@testing-library/react':
-        specifier: 16.3.2
+        specifier: 'catalog:'
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@testing-library/user-event':
-        specifier: 14.6.1
+        specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.1)
       '@types/hast':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4
       '@types/jest':
-        specifier: 30.0.0
+        specifier: 'catalog:'
         version: 30.0.0
       '@types/mdast':
-        specifier: 4.0.4
+        specifier: 'catalog:'
         version: 4.0.4
       '@types/nlcst':
-        specifier: 2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       '@types/node':
-        specifier: 24.12.2
+        specifier: 'catalog:'
         version: 24.12.2
       '@types/react':
-        specifier: 19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: 19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@types/rss':
-        specifier: 0.0.32
+        specifier: 'catalog:'
         version: 0.0.32
       babel-plugin-react-compiler:
-        specifier: 1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       baseline-browser-mapping:
-        specifier: 2.10.27
+        specifier: 'catalog:'
         version: 2.10.27
       browserslist:
-        specifier: 4.28.2
+        specifier: 'catalog:'
         version: 4.28.2
       caniuse-lite:
-        specifier: 1.0.30001792
+        specifier: 'catalog:'
         version: 1.0.30001792
       encoding:
-        specifier: 0.1.13
+        specifier: 'catalog:'
         version: 0.1.13
       eslint:
-        specifier: 9.39.4
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       eslint-config-andrewaylett:
-        specifier: 7.0.0
+        specifier: 'catalog:'
         version: 7.0.0(52126bdd19fbb2e84d2e453bcec24231)
       eslint-config-next:
-        specifier: 16.2.5
+        specifier: 'catalog:'
         version: 16.2.5(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       eslint-import-resolver-typescript:
         specifier: 4.4.4
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-import:
-        specifier: 2.32.0
+        specifier: 'catalog:'
         version: 2.32.0(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-jest:
-        specifier: 29.15.2
+        specifier: 'catalog:'
         version: 29.15.2(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(jest@30.3.0(@types/node@24.12.2))(typescript@6.0.3)
       eslint-plugin-react:
-        specifier: 7.37.5
+        specifier: 'catalog:'
         version: 7.37.5(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-react-hooks:
-        specifier: 7.0.1
+        specifier: 'catalog:'
         version: 7.0.1(eslint@9.39.4(jiti@2.7.0))
       expect:
-        specifier: 30.3.0
+        specifier: 'catalog:'
         version: 30.3.0
       glob:
         specifier: 13.0.6
         version: 13.0.6
       globals:
-        specifier: 17.6.0
+        specifier: 'catalog:'
         version: 17.6.0
       identity-obj-proxy:
-        specifier: 3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       jest:
-        specifier: 30.3.0
+        specifier: 'catalog:'
         version: 30.3.0(@types/node@24.12.2)
       jest-environment-jsdom:
-        specifier: 30.3.0
+        specifier: 'catalog:'
         version: 30.3.0
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
       jsdom:
         specifier: 29.1.1
         version: 29.1.1
       postcss:
-        specifier: 8.5.14
+        specifier: 'catalog:'
         version: 8.5.14
       prettier:
-        specifier: 3.8.3
+        specifier: 'catalog:'
         version: 3.8.3
       react-compiler-marker:
-        specifier: 0.1.0
+        specifier: 'catalog:'
         version: 0.1.0
       tailwindcss:
-        specifier: 4.2.4
+        specifier: 'catalog:'
         version: 4.2.4
       ts-jest:
-        specifier: 29.4.9
+        specifier: 'catalog:'
         version: 29.4.9(@babel/core@7.29.0)(@jest/transform@30.3.0)(@jest/types@30.3.0)(babel-jest@30.3.0(@babel/core@7.29.0))(jest-util@30.3.0)(jest@30.3.0(@types/node@24.12.2))(typescript@6.0.3)
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-eslint:
-        specifier: 8.59.2
+        specifier: 'catalog:'
         version: 8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
 
 packages:
@@ -1411,31 +1642,15 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/project-service@8.59.1':
-    resolution: {integrity: sha512-+MuHQlHiEr00Of/IQbE/MmEoi44znZHbR/Pz7Opq4HryUOlRi+/44dro9Ycy8Fyo+/024IWtw8m4JUMCGTYxDg==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
   '@typescript-eslint/project-service@8.59.2':
     resolution: {integrity: sha512-+2hqvEkeyf/0FBor67duF0Ll7Ot8jyKzDQOSrxazF/danillRq2DwR9dLptsXpoZQqxE1UisSmoZewrlPas9Vw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/scope-manager@8.59.1':
-    resolution: {integrity: sha512-LwuHQI4pDOYVKvmH2dkaJo6YZCSgouVgnS/z7yBPKBMvgtBvyLqiLy9Z6b7+m/TRcX1NFYUqZetI5Y+aT4GEfg==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/scope-manager@8.59.2':
     resolution: {integrity: sha512-JzfyEpEtOU89CcFSwyNS3mu4MLvLSXqnmX05+aKBDM+TdR5jzcGOEBwxwGNxrEQ7p/z6kK2WyioCGBf2zZBnvg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/tsconfig-utils@8.59.1':
-    resolution: {integrity: sha512-/0nEyPbX7gRsk0Uwfe4ALwwgxuA66d/l2mhRDNlAvaj4U3juhUtJNq0DsY8M2AYwwb9rEq2hrC3IcIcEt++iJA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
 
   '@typescript-eslint/tsconfig-utils@8.59.2':
     resolution: {integrity: sha512-BKK4alN7oi4C/zv4VqHQ+uRU+lTa6JGIZ7s1juw7b3RHo9OfKB+bKX3u0iVZetdsUCBBkSbdWbarJbmN0fTeSw==}
@@ -1450,31 +1665,14 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/types@8.59.1':
-    resolution: {integrity: sha512-ZDCjgccSdYPw5Bxh+my4Z0lJU96ZDN7jbBzvmEn0FZx3RtU1C7VWl6NbDx94bwY3V5YsgwRzJPOgeY2Q/nLG8A==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/types@8.59.2':
     resolution: {integrity: sha512-e82GVOE8Ps3E++Egvb6Y3Dw0S10u8NkQ9KXmtRhCWJJ8kDhOJTvtMAWnFL16kB1583goCWXsr0NieKCZMs2/0Q==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/typescript-estree@8.59.1':
-    resolution: {integrity: sha512-OUd+vJS05sSkOip+BkZ/2NS8RMxrAAJemsC6vU3kmfLyeaJT0TftHkV9mcx2107MmsBVXXexhVu4F0TZXyMl4g==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
 
   '@typescript-eslint/typescript-estree@8.59.2':
     resolution: {integrity: sha512-o0XPGNwcWw+FIwStOWn+BwBuEmL6QXP0rsvAFg7ET1dey1Nr6Wb1ac8p5HEsK0ygO/6mUxlk+YWQD9xcb/nnXg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
-  '@typescript-eslint/utils@8.59.1':
-    resolution: {integrity: sha512-3pIeoXhCeYH9FSCBI8P3iNwJlGuzPlYKkTlen2O9T1DSeeg8UG8jstq6BLk+Mda0qup7mgk4z4XL4OzRaxZ8LA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
   '@typescript-eslint/utils@8.59.2':
@@ -1483,10 +1681,6 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
-
-  '@typescript-eslint/visitor-keys@8.59.1':
-    resolution: {integrity: sha512-LdDNl6C5iJExcM0Yh0PwAIBb9PrSiCsWamF/JyEZawm3kFDnRoaq3LGE4bpyRao/fWeGKKyw7icx0YxrLFC5Cg==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript-eslint/visitor-keys@8.59.2':
     resolution: {integrity: sha512-NwjLUnGy8/Zfx23fl50tRC8rYaYnM52xNRYFAXvmiil9yh1+K6aRVQMnzW6gQB/1DLgWt977lYQn7C+wtgXZiA==}
@@ -5654,15 +5848,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.59.1(typescript@6.0.3)':
-    dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.59.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.59.1
-      debug: 4.4.3
-      typescript: 6.0.3
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/project-service@8.59.2(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.59.2(typescript@6.0.3)
@@ -5672,19 +5857,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@8.59.1':
-    dependencies:
-      '@typescript-eslint/types': 8.59.1
-      '@typescript-eslint/visitor-keys': 8.59.1
-
   '@typescript-eslint/scope-manager@8.59.2':
     dependencies:
       '@typescript-eslint/types': 8.59.2
       '@typescript-eslint/visitor-keys': 8.59.2
-
-  '@typescript-eslint/tsconfig-utils@8.59.1(typescript@6.0.3)':
-    dependencies:
-      typescript: 6.0.3
 
   '@typescript-eslint/tsconfig-utils@8.59.2(typescript@6.0.3)':
     dependencies:
@@ -5702,24 +5878,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/types@8.59.1': {}
-
   '@typescript-eslint/types@8.59.2': {}
-
-  '@typescript-eslint/typescript-estree@8.59.1(typescript@6.0.3)':
-    dependencies:
-      '@typescript-eslint/project-service': 8.59.1(typescript@6.0.3)
-      '@typescript-eslint/tsconfig-utils': 8.59.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.59.1
-      '@typescript-eslint/visitor-keys': 8.59.1
-      debug: 4.4.3
-      minimatch: 10.2.5
-      semver: 7.7.4
-      tinyglobby: 0.2.16
-      ts-api-utils: 2.5.0(typescript@6.0.3)
-      typescript: 6.0.3
-    transitivePeerDependencies:
-      - supports-color
 
   '@typescript-eslint/typescript-estree@8.59.2(typescript@6.0.3)':
     dependencies:
@@ -5736,17 +5895,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.59.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
-    dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.7.0))
-      '@typescript-eslint/scope-manager': 8.59.1
-      '@typescript-eslint/types': 8.59.1
-      '@typescript-eslint/typescript-estree': 8.59.1(typescript@6.0.3)
-      eslint: 9.39.4(jiti@2.7.0)
-      typescript: 6.0.3
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/utils@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.7.0))
@@ -5757,11 +5905,6 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  '@typescript-eslint/visitor-keys@8.59.1':
-    dependencies:
-      '@typescript-eslint/types': 8.59.1
-      eslint-visitor-keys: 5.0.1
 
   '@typescript-eslint/visitor-keys@8.59.2':
     dependencies:
@@ -6711,7 +6854,7 @@ snapshots:
 
   eslint-plugin-jest@29.15.2(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(jest@30.3.0(@types/node@24.12.2))(typescript@6.0.3):
     dependencies:
-      '@typescript-eslint/utils': 8.59.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       eslint: 9.39.4(jiti@2.7.0)
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.59.2(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
