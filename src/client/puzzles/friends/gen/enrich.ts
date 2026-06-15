@@ -18,7 +18,9 @@ export function enrich(
     let best: { k: string; gain: number } | null = null;
     for (const [a, b] of ALL_PAIRS) {
       const k = ekey(a.toString(), b.toString());
-      if (edges.has(k)) continue;
+      if (edges.has(k)) {
+        continue;
+      }
       edges.add(k);
       let gain = 0;
       let longGain = 0;
@@ -27,14 +29,20 @@ export function enrich(
         for (const w of ws) {
           if (!current.has(w)) {
             gain++;
-            if (w.length >= 6) longGain++;
+            if (w.length >= 6) {
+              longGain++;
+            }
           }
         }
       }
       edges.delete(k);
-      if (longGain > 0 && (!best || gain > best.gain)) best = { k, gain };
+      if (longGain > 0 && (!best || gain > best.gain)) {
+        best = { k, gain };
+      }
     }
-    if (!best) break;
+    if (!best) {
+      break;
+    }
     edges.add(best.k);
     current = scanSet(grid, edges, ctx.dict, ctx.prefixes, ctx.maxLen);
   }

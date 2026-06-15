@@ -172,13 +172,23 @@ function generatePath(modules: Modules, margin = 0): string {
 // True for finder/format-info/version-info modules that are rendered as full squares.
 // Timing modules are excluded — they get separate narrow-rectangle rendering.
 function isStructuralSquareModule(x: number, y: number, size: number): boolean {
-  if (x <= 8 && y <= 8) return true; // TL finder + format info
-  if (x >= size - 8 && y <= 8) return true; // TR finder + format info
-  if (x <= 8 && y >= size - 8) return true; // BL finder + format info
+  if (x <= 8 && y <= 8) {
+    return true;
+  } // TL finder + format info
+  if (x >= size - 8 && y <= 8) {
+    return true;
+  } // TR finder + format info
+  if (x <= 8 && y >= size - 8) {
+    return true;
+  } // BL finder + format info
   // Version information blocks (only present in versions 7+, size >= 45)
   if (size >= 45) {
-    if (x >= size - 11 && x <= size - 9 && y <= 5) return true;
-    if (y >= size - 11 && y <= size - 9 && x <= 5) return true;
+    if (x >= size - 11 && x <= size - 9 && y <= 5) {
+      return true;
+    }
+    if (y >= size - 11 && y <= size - 9 && x <= 5) {
+      return true;
+    }
   }
   return false;
 }
@@ -187,10 +197,18 @@ function isStructuralSquareModule(x: number, y: number, size: number): boolean {
 // Row 6 and column 6 within a finder zone are overwritten by finder values and
 // treated as structural-square modules instead.
 function isTimingModule(x: number, y: number, size: number): boolean {
-  if (x !== 6 && y !== 6) return false;
-  if (x <= 8 && y <= 8) return false; // inside TL finder zone
-  if (x >= size - 8 && y <= 8) return false; // inside TR finder zone
-  if (x <= 8 && y >= size - 8) return false; // inside BL finder zone
+  if (x !== 6 && y !== 6) {
+    return false;
+  }
+  if (x <= 8 && y <= 8) {
+    return false;
+  } // inside TL finder zone
+  if (x >= size - 8 && y <= 8) {
+    return false;
+  } // inside TR finder zone
+  if (x <= 8 && y >= size - 8) {
+    return false;
+  } // inside BL finder zone
   return true;
 }
 
@@ -211,7 +229,9 @@ function generateTimingPath(
   const ops: string[] = [];
   for (const [y, row] of modules.entries()) {
     for (const [x, cell] of row.entries()) {
-      if (cell !== isDark || !isTimingModule(x, y, size)) continue;
+      if (cell !== isDark || !isTimingModule(x, y, size)) {
+        continue;
+      }
       if (y === 6) {
         ops.push(`M${x + margin},${y + margin + 0.25}h1v.5H${x + margin}z`);
       } else {
@@ -265,7 +285,9 @@ function useRasterPixels(
   const [pixels, setPixels] = useState<Uint8ClampedArray | null>(null);
 
   useEffect(() => {
-    if (!rasterText) return;
+    if (!rasterText) {
+      return;
+    }
     let cancelled = false;
 
     async function render() {
@@ -275,13 +297,17 @@ function useRasterPixels(
         (size - STRUCTURAL_TOP_ROWS - STRUCTURAL_BOTTOM_ROWS) * 3,
       );
       await document.fonts.load(`bold 72px "${rasterFont}"`);
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
       const canvas = document.createElement('canvas');
       canvas.width = cw;
       canvas.height = ch;
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) {
+        return;
+      }
 
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, cw, ch);
@@ -299,8 +325,11 @@ function useRasterPixels(
         const m = ctx.measureText(rasterText);
         const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
         // Fall back to font size when actual bounds are unavailable (e.g. jsdom)
-        if (m.width <= cw && (inkH > 0 ? inkH : mid) <= ch) lo = mid;
-        else hi = mid;
+        if (m.width <= cw && (inkH > 0 ? inkH : mid) <= ch) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
       }
 
       // Center by ink bounds rather than the em box so the visual weight sits
@@ -354,7 +383,9 @@ function generateTextPath(
 
   for (const [y, row] of modules.entries()) {
     for (const [x, cell] of row.entries()) {
-      if (isStructuralSquareModule(x, y, size)) continue;
+      if (isStructuralSquareModule(x, y, size)) {
+        continue;
+      }
 
       const bx = x + margin;
       const by = y + margin;
@@ -375,7 +406,9 @@ function generateTextPath(
         if (hasText) {
           for (let dy = 0; dy < 3; dy++) {
             for (let dx = 0; dx < 3; dx++) {
-              if (horiz ? dy === 1 : dx === 1) continue;
+              if (horiz ? dy === 1 : dx === 1) {
+                continue;
+              }
               const i =
                 (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
               if ((pixelData[i] ?? 255) < 128) {
@@ -394,7 +427,9 @@ function generateTextPath(
         if (hasText) {
           for (let dy = 0; dy < 3; dy++) {
             for (let dx = 0; dx < 3; dx++) {
-              if (dx === 1 && dy === 1) continue;
+              if (dx === 1 && dy === 1) {
+                continue;
+              }
               const i =
                 (((y - interiorTop) * 3 + dy) * canvasWidth + x * 3 + dx) * 4;
               if ((pixelData[i] ?? 255) < 128) {

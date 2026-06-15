@@ -21,7 +21,9 @@ export async function allTags(): Promise<Set<string>> {
     ...thoughts.map((t) => new Metadata<Thought>(t, ThoughtSchema).data),
   ]);
   for await (const metadata of allMetadata) {
-    for (const tag of metadata.tags) tags.add(tag);
+    for (const tag of metadata.tags) {
+      tags.add(tag);
+    }
   }
   return tags;
 }

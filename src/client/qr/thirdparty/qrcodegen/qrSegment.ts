@@ -27,14 +27,17 @@ export class QrSegment {
   // can be converted to UTF-8 bytes and encoded as a byte mode segment.
   public static makeBytes(data: readonly byte[]): QrSegment {
     const bb: bit[] = [];
-    for (const b of data) appendBits(b, 8, bb);
+    for (const b of data) {
+      appendBits(b, 8, bb);
+    }
     return new QrSegment(Mode.BYTE, data.length, bb);
   }
 
   // Returns a segment representing the given string of decimal digits encoded in numeric mode.
   public static makeNumeric(digits: string): QrSegment {
-    if (!QrSegment.isNumeric(digits))
+    if (!QrSegment.isNumeric(digits)) {
       throw new RangeError('String contains non-numeric characters');
+    }
     const bb: bit[] = [];
     for (let i = 0; i < digits.length; ) {
       // Consume up to 3 digits per iteration
@@ -53,10 +56,11 @@ export class QrSegment {
   // The characters allowed are: 0 to 9, A to Z (uppercase only), space,
   // dollar, percent, asterisk, plus, hyphen, period, slash, colon.
   public static makeAlphanumeric(text: string): QrSegment {
-    if (!QrSegment.isAlphanumeric(text))
+    if (!QrSegment.isAlphanumeric(text)) {
       throw new RangeError(
         'String contains unencodable characters in alphanumeric mode',
       );
+    }
     const bb: bit[] = [];
     let i: int;
     for (i = 0; i + 2 <= text.length; i += 2) {
@@ -66,9 +70,10 @@ export class QrSegment {
       temp += QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i + 1));
       appendBits(temp, 11, bb);
     }
-    if (i < text.length)
-      // 1 character remaining
+    if (i < text.length) // 1 character remaining
+    {
       appendBits(QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i)), 6, bb);
+    }
     return new QrSegment(Mode.ALPHANUMERIC, text.length, bb);
   }
 
@@ -78,11 +83,15 @@ export class QrSegment {
   // to be considered as segment boundaries — extending a byte segment through the middle of a
   // run is never better than starting it at the run boundary.
   public static makeSegments(text: string, version: int = 1): QrSegment[] {
-    if (text == '') return [];
+    if (text == '') {
+      return [];
+    }
     // Fast path for all-numeric strings: numeric mode is always optimal here.
     // (No fast path for all-alphanumeric: a long numeric suffix is better in
     // numeric mode, so we let the DP decide.)
-    if (QrSegment.isNumeric(text)) return [QrSegment.makeNumeric(text)];
+    if (QrSegment.isNumeric(text)) {
+      return [QrSegment.makeNumeric(text)];
+    }
 
     const n: int = text.length;
 
@@ -103,13 +112,19 @@ export class QrSegment {
     // Collect boundary positions: positions where character type changes, plus 0 and n.
     // charType: 0 = numeric, 1 = alphanumeric (non-numeric), 2 = byte-only.
     function charType(i: int): int {
-      if (numericEnd[i] > i) return 0;
-      if (alphaEnd[i] > i) return 1;
+      if (numericEnd[i] > i) {
+        return 0;
+      }
+      if (alphaEnd[i] > i) {
+        return 1;
+      }
       return 2;
     }
     const bounds: int[] = [0];
     for (let i = 1; i < n; i++) {
-      if (charType(i) !== charType(i - 1)) bounds.push(i);
+      if (charType(i) !== charType(i - 1)) {
+        bounds.push(i);
+      }
     }
     bounds.push(n);
     const m: int = bounds.length; // m - 1 runs
@@ -143,7 +158,9 @@ export class QrSegment {
 
     for (let i = 1; i < m; i++) {
       for (let j = 0; j < i; j++) {
-        if (dp[j] === Number.POSITIVE_INFINITY) continue;
+        if (dp[j] === Number.POSITIVE_INFINITY) {
+          continue;
+        }
         const s: int = bounds[j];
         const e: int = bounds[i];
         const len: int = e - s;
@@ -204,16 +221,19 @@ export class QrSegment {
   // (ECI) designator with the given assignment value.
   public static makeEci(assignVal: int): QrSegment {
     const bb: bit[] = [];
-    if (assignVal < 0)
+    if (assignVal < 0) {
       throw new RangeError('ECI assignment value out of range');
-    else if (assignVal < 1 << 7) appendBits(assignVal, 8, bb);
-    else if (assignVal < 1 << 14) {
+    } else if (assignVal < 1 << 7) {
+      appendBits(assignVal, 8, bb);
+    } else if (assignVal < 1 << 14) {
       appendBits(0b10, 2, bb);
       appendBits(assignVal, 14, bb);
     } else if (assignVal < 1_000_000) {
       appendBits(0b110, 3, bb);
       appendBits(assignVal, 21, bb);
-    } else throw new RangeError('ECI assignment value out of range');
+    } else {
+      throw new RangeError('ECI assignment value out of range');
+    }
     return new QrSegment(Mode.ECI, 0, bb);
   }
 
@@ -247,7 +267,9 @@ export class QrSegment {
     // The original source text for this segment, if known.
     public readonly text?: string,
   ) {
-    if (numChars < 0) throw new RangeError('Invalid argument');
+    if (numChars < 0) {
+      throw new RangeError('Invalid argument');
+    }
     this.bitData = [...bitData]; // Make defensive copy
   }
 
@@ -269,7 +291,9 @@ export class QrSegment {
     let result = 0;
     for (const seg of segs) {
       const ccbits: int = seg.mode.numCharCountBits(version);
-      if (seg.numChars >= 1 << ccbits) return Infinity; // The segment's length doesn't fit the field's bit width
+      if (seg.numChars >= 1 << ccbits) {
+        return Infinity;
+      } // The segment's length doesn't fit the field's bit width
       result += 4 + ccbits + seg.bitData.length;
     }
     return result;

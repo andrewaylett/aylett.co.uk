@@ -54,7 +54,9 @@ export function PuzzleView({
       }
       return;
     }
-    if (!puzzle) return;
+    if (!puzzle) {
+      return;
+    }
     if (puzzle.words[w] && !found.includes(w)) {
       setFound((f) => [...f, w]);
       setInput('');
@@ -75,16 +77,28 @@ export function PuzzleView({
   );
 
   const { letterCount, edgeCount } = useMemo(() => {
-    if (!puzzle) return { letterCount: [], edgeCount: {} };
+    if (!puzzle) {
+      return { letterCount: [], edgeCount: {} };
+    }
     const lc = Array.from({ length: 16 }).fill(0) as number[];
     const ec: Record<string, number> = {};
-    for (const k of puzzle.edges) ec[k] = 0;
+    for (const k of puzzle.edges) {
+      ec[k] = 0;
+    }
     for (const w of allWords) {
-      if (found.includes(w)) continue;
+      if (found.includes(w)) {
+        continue;
+      }
       const entry = puzzle.words[w];
-      if (!entry) continue;
-      for (const c of entry.cells) lc[c]++;
-      for (const k of entry.edges) ec[k]++;
+      if (!entry) {
+        continue;
+      }
+      for (const c of entry.cells) {
+        lc[c]++;
+      }
+      for (const k of entry.edges) {
+        ec[k]++;
+      }
     }
     return { letterCount: lc, edgeCount: ec };
   }, [puzzle, allWords, found]);
@@ -92,7 +106,9 @@ export function PuzzleView({
   const prefix = input.trim().toUpperCase();
   const matchesFound = found.includes(prefix);
   const prefixCanMatch = (() => {
-    if (!puzzle || prefix.length === 0) return true;
+    if (!puzzle || prefix.length === 0) {
+      return true;
+    }
     const adj: number[][] = Array.from({ length: 16 }, () => []);
     for (const k of puzzle.edges) {
       if (edgeCount[k] > 0) {
@@ -106,11 +122,15 @@ export function PuzzleView({
       depth: number,
       visited: Set<number>,
     ): boolean => {
-      if (depth === prefix.length) return true;
+      if (depth === prefix.length) {
+        return true;
+      }
       for (const nb of adj[cell]) {
         if (!visited.has(nb) && puzzle.letters[nb] === prefix[depth]) {
           visited.add(nb);
-          if (dfs(nb, depth + 1, visited)) return true;
+          if (dfs(nb, depth + 1, visited)) {
+            return true;
+          }
           visited.delete(nb);
         }
       }
@@ -118,8 +138,12 @@ export function PuzzleView({
     };
     for (let i = 0; i < 16; i++) {
       if (letterCount[i] > 0 && puzzle.letters[i] === prefix[0]) {
-        if (prefix.length === 1) return true;
-        if (dfs(i, 1, new Set([i]))) return true;
+        if (prefix.length === 1) {
+          return true;
+        }
+        if (dfs(i, 1, new Set([i]))) {
+          return true;
+        }
       }
     }
     return false;
@@ -208,7 +232,9 @@ export function PuzzleView({
                 setInput(e.target.value.replaceAll(/[^a-zA-Z]/g, ''));
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') submit();
+                if (e.key === 'Enter') {
+                  submit();
+                }
               }}
               placeholder="Type a word…"
               autoFocus

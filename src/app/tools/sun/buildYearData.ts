@@ -12,7 +12,9 @@ export function buildYearData(
   lng: number,
   year: number,
 ): DayTimes[] {
-  if (!Number.isFinite(year)) return [];
+  if (!Number.isFinite(year)) {
+    return [];
+  }
   const results: DayTimes[] = [];
   let d = new Temporal.PlainDate(year, 1, 1);
   while (d.year === year) {

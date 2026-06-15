@@ -77,8 +77,12 @@ export function solarTimes(
   const cosHA =
     (cos(SUNRISE_ZENITH) - sin(latR) * sinDec) / (cos(latR) * cos(dec));
 
-  if (cosHA < -1) return { polar: 'midnight sun', dayLength: 24 * 60 };
-  if (cosHA > 1) return { polar: 'polar night', dayLength: 0 };
+  if (cosHA < -1) {
+    return { polar: 'midnight sun', dayLength: 24 * 60 };
+  }
+  if (cosHA > 1) {
+    return { polar: 'polar night', dayLength: 0 };
+  }
 
   const ha = acos(cosHA) / RAD;
   const solarNoon = SOLAR_NOON_BASE - MIN_PER_DEG_LNG * lng - eot; // UTC minutes from midnight

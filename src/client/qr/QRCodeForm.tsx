@@ -40,21 +40,29 @@ const DEFAULTS = {
 
 function buildQrUrl(qrState: QRCodeState): string {
   const parts: string[] = [];
-  if (qrState.text) parts.push(`text=${encodeQueryComponent(qrState.text)}`);
-  if (!qrState.shouldOptimiseUrl) parts.push('optimise=false');
+  if (qrState.text) {
+    parts.push(`text=${encodeQueryComponent(qrState.text)}`);
+  }
+  if (!qrState.shouldOptimiseUrl) {
+    parts.push('optimise=false');
+  }
   if (qrState.dotStyle === 'dot') {
     parts.push('dotStyle=dot');
-    if (qrState.dotRadius !== DEFAULTS.dotRadius)
+    if (qrState.dotRadius !== DEFAULTS.dotRadius) {
       parts.push(`dotRadius=${Math.round(qrState.dotRadius * 200)}`);
+    }
   } else if (qrState.dotStyle === 'text') {
     parts.push('dotStyle=text');
-    if (qrState.rasterText)
+    if (qrState.rasterText) {
       parts.push(`rasterText=${encodeQueryComponent(qrState.rasterText)}`);
-    if (qrState.rasterFont && qrState.rasterFont !== DEFAULTS.rasterFont)
+    }
+    if (qrState.rasterFont && qrState.rasterFont !== DEFAULTS.rasterFont) {
       parts.push(`rasterFont=${encodeQueryComponent(qrState.rasterFont)}`);
+    }
   }
-  if (qrState.minErrorCorrectionLevel !== 'L')
+  if (qrState.minErrorCorrectionLevel !== 'L') {
     parts.push(`ecl=${qrState.minErrorCorrectionLevel}`);
+  }
   return parts.length > 0 ? `?${parts.join('&')}` : './qr';
 }
 

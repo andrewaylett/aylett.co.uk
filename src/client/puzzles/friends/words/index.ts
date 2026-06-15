@@ -14,23 +14,35 @@ function inflect(base: string, flags: string | string[]) {
   const prev = base.slice(-2, -1);
   const vowels = 'aeiou';
   if (flags.includes('S')) {
-    if (/(s|x|z|ch|sh)$/.test(base)) out.push(base + 'es');
-    else if (last === 'y' && !vowels.includes(prev))
+    if (/(s|x|z|ch|sh)$/.test(base)) {
+      out.push(base + 'es');
+    } else if (last === 'y' && !vowels.includes(prev)) {
       out.push(base.slice(0, -1) + 'ies');
-    else out.push(base + 's');
+    } else {
+      out.push(base + 's');
+    }
   }
   if (flags.includes('D')) {
-    if (last === 'e') out.push(base + 'd');
-    else if (last === 'y' && !vowels.includes(prev))
+    if (last === 'e') {
+      out.push(base + 'd');
+    } else if (last === 'y' && !vowels.includes(prev)) {
       out.push(base.slice(0, -1) + 'ied');
-    else if (flags.includes('B')) out.push(base + last + 'ed');
-    else out.push(base + 'ed');
+    } else if (flags.includes('B')) {
+      out.push(base + last + 'ed');
+    } else {
+      out.push(base + 'ed');
+    }
   }
   if (flags.includes('G')) {
-    if (base.endsWith('ee')) out.push(base + 'ing');
-    else if (last === 'e') out.push(base.slice(0, -1) + 'ing');
-    else if (flags.includes('B')) out.push(base + last + 'ing');
-    else out.push(base + 'ing');
+    if (base.endsWith('ee')) {
+      out.push(base + 'ing');
+    } else if (last === 'e') {
+      out.push(base.slice(0, -1) + 'ing');
+    } else if (flags.includes('B')) {
+      out.push(base + last + 'ing');
+    } else {
+      out.push(base + 'ing');
+    }
   }
   return out;
 }
@@ -38,11 +50,17 @@ function inflect(base: string, flags: string | string[]) {
 function expandList(raw: string): Set<string> {
   const out = new Set<string>();
   for (const token of raw.split(/\s+/)) {
-    if (!token) continue;
+    if (!token) {
+      continue;
+    }
     const [base, flags = ''] = token.split('/');
-    if (!/^[a-z]+$/.test(base)) continue;
+    if (!/^[a-z]+$/.test(base)) {
+      continue;
+    }
     for (const w of inflect(base, flags)) {
-      if (w.length >= 4) out.add(w.toUpperCase());
+      if (w.length >= 4) {
+        out.add(w.toUpperCase());
+      }
     }
   }
   return out;
@@ -65,8 +83,11 @@ export const FILLWORDS: string[] = [...COMMON].filter(
 );
 export const buildPrefixes = (dict: Set<string>): Set<string> => {
   const p = new Set<string>();
-  for (const w of dict)
-    for (let i = 1; i <= w.length; i++) p.add(w.slice(0, i));
+  for (const w of dict) {
+    for (let i = 1; i <= w.length; i++) {
+      p.add(w.slice(0, i));
+    }
+  }
   return p;
 };
 export const AVOID_PREFIXES: Set<string> = buildPrefixes(AVOID);
