@@ -52,17 +52,11 @@ export async function buildPuzzle(): Promise<Puzzle> {
     if (!res) {
       continue;
     }
-    const clean = res.avoidCount === 0;
     const size = effectiveSize(res.accepted);
-    if (clean && size >= 14) {
+    if (size >= 14) {
       return pack(res);
     }
-    if (
-      !fallback ||
-      (clean && fallback.avoidCount > 0) ||
-      (clean === (fallback.avoidCount === 0) &&
-        size > effectiveSize(fallback.accepted))
-    ) {
+    if (!fallback || size > effectiveSize(fallback.accepted)) {
       fallback = res;
     }
   }

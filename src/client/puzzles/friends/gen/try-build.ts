@@ -23,7 +23,6 @@ export interface BuildResult {
   edges: Set<string>;
   accepted: Map<string, WordInfo>;
   seed: string;
-  avoidCount: number;
 }
 
 interface DfsState {
@@ -31,10 +30,6 @@ interface DfsState {
   edges: Set<string>;
   maxWordLen: number;
 }
-
-// Must exceed any realistic countPotentialFit value so a clean result always
-// beats a dirty one in score comparisons.
-const BIG_PENALTY = 100_000;
 
 export function countPotentialFit(
   grid: (string | null)[],
@@ -108,19 +103,18 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
       const filledGrid = state.grid as string[];
       // Copy edges: enrich mutates them; state.edges may be frozen by immer.
       const edges = new Set(state.edges);
-      const ctx = await boardContext(filledGrid);
-      const avoidCount = scanAvoid(filledGrid, edges).size;
-      if (avoidCount === 0) {
-        enrich(filledGrid, edges, ctx);
+      if (scanAvoid(filledGrid, edges).size > 0) {
+        return;
       }
+      const ctx = await boardContext(filledGrid);
+      enrich(filledGrid, edges, ctx);
       const accepted = scanWords(filledGrid, edges, ctx);
       if (!accepted.has(seed)) {
         return;
       }
-      const finalScore = upperBound - avoidCount * BIG_PENALTY;
-      if (finalScore > bestScore) {
-        bestScore = finalScore;
-        bestResult = { grid: filledGrid, edges, accepted, seed, avoidCount };
+      if (upperBound > bestScore) {
+        bestScore = upperBound;
+        bestResult = { grid: filledGrid, edges, accepted, seed };
       }
       return;
     }
@@ -136,10 +130,7 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
       if (len > state.maxWordLen) {
         continue;
       }
-      const wordsOfLen = wordsByLen.get(len);
-      if (!wordsOfLen) {
-        continue;
-      }
+      const wordsOfLen = wordsByLen.get(len) ?? [];
       for (const word of wordsOfLen) {
         if (usedWords.has(word)) {
           continue;
