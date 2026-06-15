@@ -1,4 +1,10 @@
-import { ekey, NEIGH, shuffle } from '@/client/puzzles/friends/helpers';
+import {
+  cellDegree,
+  ekey,
+  maxEdgesForCell,
+  NEIGH,
+  shuffle,
+} from '@/client/puzzles/friends/helpers';
 
 export interface Placement {
   path: number[];
@@ -14,6 +20,7 @@ export function searchPlacement(
   let best: Placement | null = null;
   let nodes = 0;
   const L = word.length;
+  const degAdj = Array.from<number>({ length: 16 }).fill(0);
   const dfs = (
     i: number,
     cell: number,
@@ -43,16 +50,31 @@ export function searchPlacement(
         continue;
       }
       const ek = ekey(cell.toString(), nb.toString());
+      const isNew = !edges.has(ek);
+      if (isNew) {
+        if (
+          cellDegree(cell, edges) + degAdj[cell] >= maxEdgesForCell(cell) ||
+          cellDegree(nb, edges) + degAdj[nb] >= maxEdgesForCell(nb)
+        ) {
+          continue;
+        }
+        degAdj[cell]++;
+        degAdj[nb]++;
+      }
       path.push(nb);
       dfs(
         i + 1,
         nb,
         path,
         fills + (g === null ? 1 : 0),
-        newE + (edges.has(ek) ? 0 : 1),
-        reuse + (g === null ? 0 : 1) + (edges.has(ek) ? 1 : 0),
+        newE + (isNew ? 1 : 0),
+        reuse + (g === null ? 0 : 1) + (isNew ? 0 : 1),
       );
       path.pop();
+      if (isNew) {
+        degAdj[cell]--;
+        degAdj[nb]--;
+      }
     }
   };
   for (let s = 0; s < 16; s++) {

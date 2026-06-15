@@ -39,6 +39,22 @@ export const ALL_PAIRS: [number, number][] = genAllPairs();
 export function ekey(a: string, b: string): string {
   return a < b ? `${a}-${b}` : `${b}-${a}`;
 }
+
+export const INNER_CELLS: Set<number> = new Set<number>([5, 6, 9, 10]);
+
+export function maxEdgesForCell(cell: number): number {
+  return INNER_CELLS.has(cell) ? 4 : 3;
+}
+
+export function cellDegree(cell: number, edges: Set<string>): number {
+  let deg = 0;
+  for (const nb of NEIGH[cell]) {
+    if (edges.has(ekey(cell.toString(), nb.toString()))) {
+      deg++;
+    }
+  }
+  return deg;
+}
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
