@@ -1,7 +1,12 @@
 import type { BoardCtx } from '@/client/puzzles/friends/lexicon';
 
 import { scanSet } from '@/client/puzzles/friends/gen/scan-set';
-import { ALL_PAIRS, ekey } from '@/client/puzzles/friends/helpers';
+import {
+  ALL_PAIRS,
+  cellDegree,
+  ekey,
+  maxEdgesForCell,
+} from '@/client/puzzles/friends/helpers';
 import { scanAvoid } from '@/client/puzzles/friends/gen/scan-avoid';
 
 /** Enrichment: add extra lines wherever doing so unlocks at least one new word
@@ -19,6 +24,12 @@ export function enrich(
     for (const [a, b] of ALL_PAIRS) {
       const k = ekey(a.toString(), b.toString());
       if (edges.has(k)) {
+        continue;
+      }
+      if (
+        cellDegree(a, edges) >= maxEdgesForCell(a) ||
+        cellDegree(b, edges) >= maxEdgesForCell(b)
+      ) {
         continue;
       }
       edges.add(k);
