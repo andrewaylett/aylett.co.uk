@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "pnpm install --frozen-lockfile",
     "dev": "next dev --turbopack",
-    "build": "next build --experimental-app-only",
+    "build": "next build --experimental-app-only --webpack",
     "start": "next start",
     "postinstall": "pnpm typegen",
     "format": "pnpm run lint --fix",

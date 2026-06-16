@@ -1,4 +1,4 @@
-import { Suspense, use, type JSX } from 'react';
+import { Suspense, type JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -6,15 +6,19 @@ import { ListingEntry } from './ListingEntry';
 import { PageStructure } from './PageStructure';
 import { TitleHeader } from './TitleHeader';
 
-import { type MDFile, Metadata } from '@/remark/traverse';
+import { buildMetadata, type MDFile } from '@/remark/traverse';
 import { ThoughtSchema } from '@/types';
-import { asyncSortByKey } from '@/utilities';
+import { sortByKey } from '@/utilities';
 
-export function Thoughts({ files }: { files: MDFile[] }): JSX.Element {
-  const pages = files.map((f) => new Metadata(f, ThoughtSchema));
-  const sorted = use(
-    asyncSortByKey(pages, async (page) => (await page.data).date),
+export async function Thoughts({
+  files,
+}: {
+  files: MDFile[];
+}): Promise<JSX.Element> {
+  const pages = await Promise.all(
+    files.map((f) => buildMetadata(f, ThoughtSchema)),
   );
+  const sorted = sortByKey(pages, (page) => page.data.date);
   return (
     <PageStructure
       schemaType="ItemList"
@@ -29,7 +33,7 @@ export function Thoughts({ files }: { files: MDFile[] }): JSX.Element {
       </p>
       {sorted.reverse().map(({ id: name, data }) => (
         <Suspense key={name}>
-          <ListingEntry name={name} metadata={data} />
+          <ListingEntry name={name} data={data} />
         </Suspense>
       ))}
     </PageStructure>

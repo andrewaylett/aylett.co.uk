@@ -1,31 +1,27 @@
-import { Suspense, use, type JSX } from 'react';
+import type { JSX } from 'react';
 
 import { ArticleHeader } from './ArticleHeader';
 
-import type { Markdown } from '@/remark/traverse';
-import type { Article } from '@/types';
-
-import { useExploded } from '@/client/hooks/useExploded';
 import { PageStructure } from '@/components/PageStructure';
+import { articleForId } from '@/app/articles/articles';
 
-async function makeCopyrightString(
-  copyright: Promise<string | undefined> | undefined,
-  revised: Promise<string>,
-): Promise<string> {
-  return (
-    (copyright ? await copyright : undefined) ?? (await revised).split('/')[0]
-  );
+function makeCopyrightString(
+  copyright: string | undefined,
+  revised: string,
+): string {
+  return copyright ?? revised.split('/')[0];
 }
 
-export function ArticlePage({
+export async function ArticlePage({
   id,
-  page,
 }: {
-  page: Markdown<Article>;
   id: string;
-}): JSX.Element {
-  const { content, metadata } = page;
-  const { author, copyright, lifecycle, revised, tags } = useExploded(metadata);
+}): Promise<JSX.Element> {
+  'use cache';
+
+  const { content, metadata } = await articleForId(id);
+
+  const { author, copyright, lifecycle, revised, tags } = metadata;
 
   const copyrightString = makeCopyrightString(copyright, revised);
   return (
@@ -34,17 +30,13 @@ export function ArticlePage({
       schemaType="Article"
       resource={`/articles/${id}`}
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
-      header={
-        <Suspense>
-          <ArticleHeader id={id} page={page} />
-        </Suspense>
-      }
+      header={<ArticleHeader id={id} data={metadata} />}
       author={author}
       copyright={copyrightString}
       keywords={tags}
     >
       <div className="article-body" property="articleBody">
-        {use(content)}
+        {content}
       </div>
     </PageStructure>
   );

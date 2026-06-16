@@ -1,4 +1,4 @@
-import { Suspense, use, type PropsWithChildren, type JSX } from 'react';
+import { Suspense, type PropsWithChildren, type JSX } from 'react';
 
 import { Footer, type FooterProps } from './Footer';
 
@@ -8,7 +8,7 @@ import { BasicFallback } from '@/components/BasicFallback';
 export interface PageStructureProps extends FooterProps {
   breadcrumbs?: Breadcrumbs;
   header: JSX.Element;
-  lifecycle?: Promise<string>;
+  lifecycle?: string;
   schemaType: string;
   resource: string;
 }
@@ -26,11 +26,7 @@ export function PageStructure({
 }: PropsWithChildren<PageStructureProps>): JSX.Element {
   return (
     <>
-      {lifecycle && use(lifecycle) === 'draft' ? (
-        <div className="bg-draft" />
-      ) : (
-        ''
-      )}
+      {lifecycle === 'draft' ? <div className="bg-draft" /> : ''}
       <div
         className="flex flex-col min-h-screen grid-cols-centre"
         vocab="https://schema.org/"

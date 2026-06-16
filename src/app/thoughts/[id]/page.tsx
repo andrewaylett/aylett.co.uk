@@ -1,24 +1,15 @@
-import 'server-only';
-
-import { Suspense, use } from 'react';
-
 import Link from 'next/link';
 
 import { allThoughts, thoughtForId } from '../thoughts';
 
 import type { Metadata } from 'next';
-import type { Markdown } from '@/remark/traverse';
 import type { Thought } from '@/types';
 
-import { useExploded } from '@/client/hooks/useExploded';
 import { Description } from '@/components/Description';
 import { Optional } from '@/components/Optional';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { gitHubUrl } from '@/utilities';
-
-export const dynamicParams = false;
-export const dynamic = 'error';
 
 interface ThoughtProps {
   params: Promise<{ id: string }>;
@@ -27,9 +18,11 @@ interface ThoughtProps {
 export async function generateMetadata({
   params,
 }: ThoughtProps): Promise<Metadata> {
-  const page = await thoughtForId(params);
+  'use cache';
 
-  const metadata = await page.metadata;
+  const page = await thoughtForId((await params).id);
+
+  const metadata = page.metadata;
 
   return {
     title: metadata.title,
@@ -49,6 +42,8 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams(): Promise<{ id: string }[]> {
+  'use cache';
+
   const thoughts = await allThoughts();
   return thoughts.map((thought) => ({
     id: thought.id,
@@ -73,47 +68,40 @@ function Revisions({ date, url }: { date: string; url: string }): JSX.Element {
   );
 }
 
-function ThoughtPage({ params }: ThoughtProps): JSX.Element {
-  const page = thoughtForId(params);
-  return (
-    <Suspense>
-      <Thought page={page} />
-    </Suspense>
-  );
+export default async function ThoughtPage({
+  params,
+}: ThoughtProps): Promise<JSX.Element> {
+  'use cache';
+
+  const { id } = await params;
+  return <Thought id={id} />;
 }
 
-export default ThoughtPage;
+async function Thought({ id }: { id: string }) {
+  'use cache';
 
-function Thought({ page }: { page: Promise<Markdown<Thought>> }) {
-  const { content, id, metadata } = useExploded(page);
-  const { date, tags } = useExploded(metadata);
+  const page = thoughtForId(id);
+  const { content, metadata } = await page;
+  const { date, tags } = metadata;
 
   return (
     <PageStructure
       schemaType="Article"
-      resource={`/thoughts/${use(id)}`}
+      resource={`/thoughts/${id}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
-      header={<ThoughtHeader id={use(id)} metadata={metadata} />}
-      copyright={date.then((d) => d.split('/')[0])}
+      header={<ThoughtHeader id={id} />}
+      copyright={date.split('/')[0]}
       keywords={tags}
     >
-      <Suspense>
-        <div className="article-body" property="articleBody">
-          {use(content)}
-        </div>
-      </Suspense>
+      <div className="article-body" property="articleBody">
+        {content}
+      </div>
     </PageStructure>
   );
 }
 
-function ThoughtHeader({
-  id,
-  metadata,
-}: {
-  id: string;
-  metadata: Promise<Thought>;
-}) {
-  const data = use(metadata);
+async function ThoughtHeader({ id }: { id: string }) {
+  const data = (await thoughtForId(id)).metadata;
   return (
     <header>
       <h1 property="headline">{data.title}</h1>

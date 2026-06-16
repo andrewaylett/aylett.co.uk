@@ -3,11 +3,13 @@ import RSS from 'rss';
 
 import { allThoughts } from '../thoughts';
 
-import { asyncSortByKey } from '@/utilities';
+import { sortByKey } from '@/utilities';
 import { ThoughtSchema } from '@/types';
-import { Metadata } from '@/remark/traverse';
+import { buildMetadata } from '@/remark/traverse';
 
-export async function GET(): Promise<NextResponse> {
+async function buildRSSXML() {
+  'use cache';
+
   // Create RSS XML
   const feed = new RSS({
     title: 'Thoughts - aylett.co.uk',
@@ -16,17 +18,14 @@ export async function GET(): Promise<NextResponse> {
   });
 
   const thoughtFiles = await allThoughts();
-  const thoughts = thoughtFiles.map(
-    (file) => new Metadata(file, ThoughtSchema),
+  const thoughts = await Promise.all(
+    thoughtFiles.map((file) => buildMetadata(file, ThoughtSchema)),
   );
 
-  const sorted = await asyncSortByKey(
-    thoughts,
-    async (thought) => (await thought.data).date,
-  );
+  const sorted = sortByKey(thoughts, (thought) => thought.data.date);
 
   for (const article of sorted) {
-    const metadata = await article.data;
+    const metadata = article.data;
     feed.item({
       title: metadata.title,
       url: `https://www.aylett.co.uk/thoughts/${article.id}`,
@@ -38,8 +37,13 @@ export async function GET(): Promise<NextResponse> {
     });
   }
 
+  return feed.xml({ indent: true });
+}
+
+export async function GET(): Promise<NextResponse> {
+  const body = await buildRSSXML();
   // Return the feed
-  const response = new NextResponse(feed.xml({ indent: true }));
+  const response = new NextResponse(body);
   response.headers.set('Content-Type', 'application/rss+xml');
   return response;
 }

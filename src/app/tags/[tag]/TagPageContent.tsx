@@ -25,7 +25,7 @@ export function TagPageContent({
         <ul>
           {filteredArticles.map((article) => (
             <li key={article.id}>
-              <ListingEntry metadata={article.data} name={article.id} />
+              <ListingEntry data={article.data} name={article.id} />
             </li>
           ))}
         </ul>
@@ -40,7 +40,7 @@ export function TagPageContent({
         <ul>
           {filteredThoughts.map((thought) => (
             <li key={thought.id}>
-              <ListingEntry metadata={thought.data} name={thought.id} />
+              <ListingEntry data={thought.data} name={thought.id} />
             </li>
           ))}
         </ul>

@@ -2,8 +2,6 @@ import 'server-only';
 
 import type { JSX } from 'react';
 
-import { allArticles } from './articles';
-
 import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
@@ -21,8 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function articles(): Promise<JSX.Element> {
-  const files = await allArticles();
+export default function articles(): JSX.Element {
   return (
     <PageStructure
       schemaType="ItemList"
@@ -30,7 +27,7 @@ export default async function articles(): Promise<JSX.Element> {
       breadcrumbs={[]}
       header={<TitleHeader>Articles</TitleHeader>}
     >
-      <Articles files={files} />
+      <Articles />
     </PageStructure>
   );
 }

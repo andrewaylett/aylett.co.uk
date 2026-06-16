@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/.next/*',
       '**/*.scss',
       '**/build/*',
+      'tmp/*',
     ],
   },
   {

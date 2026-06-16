@@ -64,45 +64,56 @@ export async function traverse(dir: string): Promise<MDFile[]> {
   return [...gen()];
 }
 
-async function extractMetadata<P extends Content>(
-  vfile: Promise<VFile>,
+function extractMetadata<P extends Content>(
+  vfile: VFile,
   schema: ZodType<P>,
-): Promise<P> {
-  const node = (await vfile).data.frontMatter;
+): P {
+  const node = vfile.data.frontMatter;
 
   if (node) {
     const raw: unknown = parse(node.value);
     return schema.parse(raw);
   } else {
-    throw new Error(`No metadata found in ${(await vfile).path}`);
+    throw new Error(`No metadata found in ${vfile.path}`);
   }
 }
 
-async function extractResult(vfile: Promise<VFile>): Promise<ReactElement> {
-  return (await vfile).result as ReactElement;
+function extractResult(vfile: VFile): ReactElement {
+  return vfile.result as ReactElement;
 }
 
-/** Wraps a markdown file with lazy promises for its rendered React content and validated frontmatter metadata. */
-export class Markdown<out P extends Content> {
-  constructor(mdFile: MDFile, schema: ZodType<P>) {
-    this.id = mdFile.id;
-    const vfile = read(mdFile.path).then((v) => intoReact.process(v));
-    this.content = extractResult(vfile);
-    this.metadata = extractMetadata(vfile, schema);
-  }
-
+/** Wraps a markdown file for its rendered React content and validated frontmatter metadata. */
+export interface Markdown<out P extends Content> {
   id: string;
-  content: Promise<ReactElement>;
-  metadata: Promise<P>;
+  content: ReactElement;
+  metadata: P;
+}
+export async function buildMarkdown<P extends Content>(
+  mdFile: MDFile,
+  schema: ZodType<P>,
+): Promise<Markdown<P>> {
+  const v = await read(mdFile.path);
+  const vfile = await intoReact.process(v);
+  return {
+    id: mdFile.id,
+    content: extractResult(vfile),
+    metadata: extractMetadata(vfile, schema),
+  };
 }
 
-export class Metadata<out P extends Content> {
-  constructor(mdFile: MDFile, schema: ZodType<P>) {
-    this.id = mdFile.id;
-    const vfile = read(mdFile.path).then((v) => metadataProcessor.process(v));
-    this.data = extractMetadata(vfile, schema);
-  }
-
+export interface Metadata<out P extends Content> {
   id: string;
-  data: Promise<P>;
+  data: P;
+}
+
+export async function buildMetadata<P extends Content>(
+  mdFile: MDFile,
+  schema: ZodType<P>,
+): Promise<Metadata<P>> {
+  const v = await read(mdFile.path);
+  const vfile = await metadataProcessor.process(v);
+  return {
+    id: mdFile.id,
+    data: extractMetadata(vfile, schema),
+  };
 }

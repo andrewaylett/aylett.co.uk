@@ -13,7 +13,7 @@ import {
 import { allArticles } from '@/app/articles/articles';
 import { TagPageContent } from '@/app/tags/[tag]/TagPageContent';
 import { allThoughts } from '@/app/thoughts/thoughts';
-import { Metadata } from '@/remark/traverse';
+import { buildMetadata, type Metadata } from '@/remark/traverse';
 
 export async function generateStaticParams(): Promise<{ tag: string }[]> {
   const tags = await allTags();
@@ -22,13 +22,9 @@ export async function generateStaticParams(): Promise<{ tag: string }[]> {
   }));
 }
 
-export default async function TagPage({
-  params,
-}: {
-  params: Promise<{ tag: string }>;
-}): Promise<JSX.Element> {
-  const { tag: encodedTag } = await params;
-  const tag = decodeURIComponent(encodedTag);
+async function TagPage({ tag }: { tag: string }) {
+  'use cache';
+
   const articles = await allArticles();
   const thoughts = await allThoughts();
   let originalTag;
@@ -36,8 +32,8 @@ export default async function TagPage({
 
   const filteredArticles: Metadata<Article>[] = [];
   for (const article of articles) {
-    const metadata = new Metadata(article, ArticleSchema);
-    const data = await metadata.data;
+    const metadata = await buildMetadata(article, ArticleSchema);
+    const data = metadata.data;
     if ((recalledTag = data.tags.find((s) => s.toLowerCase() === tag))) {
       originalTag = recalledTag;
       filteredArticles.push(metadata);
@@ -46,8 +42,8 @@ export default async function TagPage({
 
   const filteredThoughts: Metadata<Thought>[] = [];
   for (const thought of thoughts) {
-    const metadata = new Metadata(thought, ThoughtSchema);
-    const data = await metadata.data;
+    const metadata = await buildMetadata(thought, ThoughtSchema);
+    const data = metadata.data;
     if ((recalledTag = data.tags.find((s) => s.toLowerCase() === tag))) {
       originalTag = recalledTag;
       filteredThoughts.push(metadata);
@@ -67,4 +63,13 @@ export default async function TagPage({
       unmangledTag={originalTag}
     />
   );
+}
+
+export default async function TagPageBase({
+  params,
+}: {
+  params: Promise<{ tag: string }>;
+}): Promise<JSX.Element> {
+  const { tag: encodedTag } = await params;
+  return <TagPage tag={decodeURIComponent(encodedTag)} />;
 }

@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page(): Promise<JSX.Element> {
+  'use cache';
   const files = await allThoughts();
   return <Thoughts files={files} />;
 }

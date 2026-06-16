@@ -1,23 +1,22 @@
-import { Suspense, use } from 'react';
+import { Suspense } from 'react';
 
-import { type MDFile, Metadata } from '@/remark/traverse';
+import { buildMetadata } from '@/remark/traverse';
 import { ArticleSchema } from '@/types';
-import { asyncSortByKey } from '@/utilities';
 import { ListingEntry } from '@/components/ListingEntry';
+import { allArticles } from '@/app/articles/articles';
+import { sortByKey } from '@/utilities';
 
-export function Articles({ files }: { files: MDFile[] }): JSX.Element {
-  const pages = files.map((f) => new Metadata(f, ArticleSchema));
-  const sorted = use(
-    asyncSortByKey(pages, async (page) => {
-      const { title } = await page.data;
-      return title;
-    }),
+export async function Articles(): Promise<JSX.Element> {
+  const files = await allArticles();
+  const pages = await Promise.all(
+    files.map((f) => buildMetadata(f, ArticleSchema)),
   );
+  const sorted = sortByKey(pages, (page) => page.data.title);
   return (
     <>
       {sorted.map(({ id: name, data }) => (
         <Suspense key={name}>
-          <ListingEntry name={name} metadata={data} />
+          <ListingEntry name={name} data={data} />
         </Suspense>
       ))}
     </>

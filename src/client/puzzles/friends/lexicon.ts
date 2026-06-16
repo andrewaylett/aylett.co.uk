@@ -2,8 +2,6 @@ import 'server-only';
 
 import { readFile } from 'node:fs/promises';
 
-import { cache } from 'react';
-
 import {
   AVOID,
   buildPrefixes,
@@ -47,6 +45,8 @@ async function local() {
  * word, so each board can quickly extract only the words its letters allow.
  */
 async function makeLexicon(): Promise<Lexicon> {
+  'use cache';
+
   const text = await (useLocal ? local() : remote());
 
   const set = new Set(DEFAULT_WORDS);
@@ -72,8 +72,6 @@ async function makeLexicon(): Promise<Lexicon> {
   return { words, masks, size: words.length };
 }
 
-const cachedLexicon = cache(makeLexicon);
-
 /** Per-board dictionary: only lexicon words whose letters all appear on the board.
  */
 export async function boardContext(grid: string[]): Promise<BoardCtx> {
@@ -83,7 +81,7 @@ export async function boardContext(grid: string[]): Promise<BoardCtx> {
   }
   const dict = new Set<string>();
   let maxLen = 4;
-  const { words, masks } = await cachedLexicon();
+  const { words, masks } = await makeLexicon();
   for (const [i, word] of words.entries()) {
     if ((masks[i] & ~bm) === 0 && word.length <= 16) {
       dict.add(word);

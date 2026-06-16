@@ -8,9 +8,6 @@ import { ArticlePage } from './ArticlePage';
 
 import type { Metadata } from 'next';
 
-export const dynamicParams = false;
-export const dynamic = 'error';
-
 interface ArticleProps {
   params: Promise<{ id: string }>;
 }
@@ -18,9 +15,11 @@ interface ArticleProps {
 export async function generateMetadata({
   params,
 }: ArticleProps): Promise<Metadata> {
-  const page = await articleForId(await params);
+  'use cache';
 
-  const metadata = await page.metadata;
+  const page = await articleForId((await params).id);
+
+  const metadata = page.metadata;
 
   const robots =
     metadata.lifecycle === 'draft'
@@ -49,6 +48,8 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams(): Promise<{ id: string }[]> {
+  'use cache';
+
   const pages = await allArticles();
   return pages.map((page) => ({
     id: page.id,
@@ -58,7 +59,8 @@ export async function generateStaticParams(): Promise<{ id: string }[]> {
 export default async function Page({
   params,
 }: ArticleProps): Promise<JSX.Element> {
+  'use cache';
+
   const { id } = await params;
-  const page = await articleForId({ id });
-  return <ArticlePage page={page} id={id} />;
+  return <ArticlePage id={id} />;
 }

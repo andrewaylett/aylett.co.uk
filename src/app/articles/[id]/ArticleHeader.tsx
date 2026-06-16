@@ -1,8 +1,7 @@
-import { use, type JSX } from 'react';
+import type { JSX } from 'react';
 
 import { Revisions } from './Revisions';
 
-import type { Markdown } from '@/remark/traverse';
 import type { Article } from '@/types';
 
 import { Description } from '@/components/Description';
@@ -10,14 +9,11 @@ import { TitleSeparator } from '@/components/TitleSeparator';
 
 export function ArticleHeader({
   id,
-  page,
+  data,
 }: {
   id: string;
-  page: Markdown<Article>;
+  data: Article;
 }): JSX.Element {
-  const { metadata } = page;
-  const data = use(metadata);
-
   return (
     <header className="contain-content">
       <h1 property="headline">{data.title}</h1>
