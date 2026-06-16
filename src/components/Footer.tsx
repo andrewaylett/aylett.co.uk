@@ -1,11 +1,11 @@
-import { Fragment, use, type JSX } from 'react';
+import { Fragment, type JSX } from 'react';
 
 import Link from 'next/link';
 
 export interface FooterProps {
-  author?: Promise<string | undefined>;
-  copyright?: Promise<string | undefined>;
-  keywords?: Promise<string[]>;
+  author?: string;
+  copyright?: string;
+  keywords?: string[];
 }
 
 export function Footer({
@@ -13,9 +13,9 @@ export function Footer({
   copyright,
   keywords,
 }: FooterProps): JSX.Element {
-  const resolvedKeywords = keywords ? use(keywords) : [];
-  const resolvedAuthor = (author && use(author)) ?? 'Andrew Aylett';
-  const resolvedCopyright = copyright && use(copyright);
+  const resolvedKeywords = keywords ?? [];
+  const resolvedAuthor = author ?? 'Andrew Aylett';
+  const resolvedCopyright = copyright;
 
   return (
     <footer className="sticky bottom-0 mt-4 pt-1 w-full *:text-smaller flex flex-row flex-wrap justify-between pb-1 intrinsic-h-[1lh]">

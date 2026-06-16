@@ -128,6 +128,7 @@ export default function nextConfig(
       reactStrictMode: true,
       pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
       productionBrowserSourceMaps: true,
+      cacheComponents: true,
       headers: () => headerSets,
     } satisfies NextConfig),
   });

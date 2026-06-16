@@ -31,21 +31,26 @@ export const gitHubUrl = (pageName: string): string =>
     '',
   )}.md`;
 
-/** Sorts an array by an async-derived key, resolving all keys in parallel before sorting. */
-export async function asyncSortByKey<T, K>(
-  input: T[],
-  keyExtractor: (v: T) => PromiseLike<K>,
-): Promise<T[]> {
-  const withKeys = await Promise.all(
-    input.map(
-      async (item): Promise<[Awaited<K>, T]> => [
-        await keyExtractor(item),
-        item,
-      ],
-    ),
-  );
+/** Sorts an array by a derived key, resolving all keys before sorting. */
+export function sortByKey<T>(input: T[], keyExtractor: (v: T) => unknown): T[] {
+  const withKeys = input.map((item): [unknown, T] => [
+    keyExtractor(item),
+    item,
+  ]);
 
-  withKeys.sort();
+  withKeys.sort((a, b) => {
+    const [keyA] = a;
+    const [keyB] = b;
+    // @ts-expect-error - we want to use JS's native comparison, which doesn't depend on TS types
+    if (keyA < keyB) {
+      return -1;
+    }
+    // @ts-expect-error - we want to use JS's native comparison, which doesn't depend on TS types
+    if (keyA > keyB) {
+      return 1;
+    }
+    return 0;
+  });
 
   return withKeys.map(([_, value]) => value);
 }

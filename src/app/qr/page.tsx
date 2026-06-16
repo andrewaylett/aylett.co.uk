@@ -8,8 +8,6 @@ import { QRCodeForm } from '@/client/qr/QRCodeForm';
 import { PageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
-export const dynamic = 'error';
-
 const TITLE = 'QR Code Generator';
 
 export const metadata: Metadata = {

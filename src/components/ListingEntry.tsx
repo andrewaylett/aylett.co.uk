@@ -1,4 +1,4 @@
-import { use, type JSX } from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
@@ -7,13 +7,12 @@ import type { Content } from '@/types';
 import { Description } from '@/components/Description';
 
 export function ListingEntry({
-  metadata,
+  data,
   name,
 }: {
-  metadata: Promise<Content>;
+  data: Content;
   name: string;
 }): JSX.Element {
-  const data = use(metadata);
   const isArticle = data.tag === 'article';
 
   const path = isArticle ? 'articles' : 'thoughts';
