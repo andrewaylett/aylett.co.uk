@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { readFile } from 'node:fs/promises';
+
 import { cache } from 'react';
 
 import {
@@ -20,20 +22,32 @@ export interface BoardCtx {
   maxLen: number;
 }
 
-/** ---------------- Lexicon (built-in or imported) ----------------
- * A lexicon is the full acceptance vocabulary plus a 26-bit letter mask per
- * word, so each board can quickly extract only the words its letters allow.
- */
-async function makeLexicon(): Promise<Lexicon> {
+const useLocal = process.env.NODE_ENV !== 'production';
+
+async function remote() {
   const wordsResponse = await fetch(
     'https://atlas.aylett.co.uk/puzzles/words.txt',
   );
+
   if (!wordsResponse.ok) {
     throw new Error(
       `Failed to load words: error ${wordsResponse.status}, ${wordsResponse.statusText}`,
     );
   }
-  const text = await wordsResponse.text();
+  return await wordsResponse.text();
+}
+
+async function local() {
+  return await readFile('./words.txt', { encoding: 'utf8' });
+}
+
+/**
+ * Lexicon (built-in or imported).
+ * A lexicon is the full acceptance vocabulary plus a 26-bit letter mask per
+ * word, so each board can quickly extract only the words its letters allow.
+ */
+async function makeLexicon(): Promise<Lexicon> {
+  const text = await (useLocal ? local() : remote());
 
   const set = new Set(DEFAULT_WORDS);
   for (const line of text.split(/\r?\n/)) {
