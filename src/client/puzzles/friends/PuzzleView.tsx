@@ -50,7 +50,7 @@ export function PuzzleView({
   const submit = useCallback(() => {
     const w = input.trim().toUpperCase();
     if (!w) {
-      if (found.length === total) {
+      if (total > 0 && found.length === total) {
         newPuzzleAction();
       }
       return;
@@ -132,7 +132,6 @@ export function PuzzleView({
         >
           <div
             className={[
-              'mt-3.5',
               'bg-green-100',
               'dark:bg-green-900/40',
               'border',
