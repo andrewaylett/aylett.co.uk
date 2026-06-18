@@ -11,7 +11,7 @@ export function FoundWords({
 }): JSX.Element {
   return (
     <div
-      className={`min-w-[18ch] h-full flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4`}
+      className={`min-w-[20ch] h-full flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4`}
     >
       <div className="flex justify-between items-baseline mb-2.5">
         <strong className="text-[0.95rem] text-blue-700 dark:text-blue-300">
