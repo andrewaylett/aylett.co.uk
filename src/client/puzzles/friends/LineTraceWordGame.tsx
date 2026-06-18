@@ -11,7 +11,7 @@ import React, {
 
 import { z } from 'zod/v4';
 
-import { PuzzleView } from './Puzzle';
+import { PuzzleView } from './PuzzleView';
 
 import type { static_assert } from '@/types';
 
@@ -53,13 +53,11 @@ const SERVER_RENDER = Symbol('SERVER_RENDER');
 const NO_SAVED_VALUE = Symbol('NO_SAVED_VALUE');
 const EMPTY_ARRAY: string[] = [];
 
-export default function LineTraceWordGame(): React.JSX.Element {
-  const [isTransition, startTransition] = useTransition();
-  const stateRef = useRef<Promise<Puzzle> | symbol>(undefined);
+export function LineTraceWordGame(): React.JSX.Element {
+  const [isPending, startTransition] = useTransition();
+  const stateRef = useRef<Puzzle | symbol>(undefined);
   const foundRef = useRef<string[] | symbol>(undefined);
-  const savedGameState = useSyncExternalStore<
-    Promise<Puzzle> | symbol | undefined
-  >(
+  const savedGameState = useSyncExternalStore<Puzzle | symbol | undefined>(
     () => () => {
       /* empty */
     },
@@ -70,7 +68,7 @@ export default function LineTraceWordGame(): React.JSX.Element {
         if (stateValue) {
           const parsed = PuzzleSchema.safeParse(JSON.parse(stateValue));
           if (parsed.success) {
-            stateRef.current = Promise.resolve(parsed.data);
+            stateRef.current = parsed.data;
           }
         }
       }
@@ -99,40 +97,32 @@ export default function LineTraceWordGame(): React.JSX.Element {
   );
 
   const [foundInternalState, setFound] = useState<string[] | undefined>();
-  const [puzzleInternalState, setPuzzleState] = useState<
-    Promise<Puzzle> | undefined
-  >();
-  const [generation, setGeneration] = useState(0);
+  const [puzzleInternalState, setPuzzleState] = useState<Puzzle | undefined>();
 
   const found: string[] =
     foundInternalState ??
     (typeof savedFoundState === 'symbol' ? EMPTY_ARRAY : savedFoundState);
-  const puzzleState: Promise<Puzzle> | undefined =
+  const puzzleState: Puzzle | undefined =
     puzzleInternalState ??
     (typeof savedGameState === 'symbol' ? undefined : savedGameState);
 
-  const newPuzzle = () => {
-    startTransition(() => {
-      setPuzzleState(buildPuzzle());
+  const newPuzzleAction = () => {
+    startTransition(async () => {
       setFound([]);
-      setGeneration((g) => g + 1);
+      setPuzzleState(await buildPuzzle());
     });
   };
 
   useEffect(() => {
-    async function apply() {
-      try {
-        localStorage.setItem(GAME_STATE_KEY, JSON.stringify(await puzzleState));
-      } catch {
-        // Storage failure is non-fatal.
-      }
-    }
-
     if (savedGameState !== SERVER_RENDER) {
       if (puzzleState) {
-        void apply();
+        try {
+          localStorage.setItem(GAME_STATE_KEY, JSON.stringify(puzzleState));
+        } catch {
+          // Storage failure is non-fatal.
+        }
       } else {
-        newPuzzle();
+        newPuzzleAction();
       }
     }
   }, [savedGameState, puzzleState]);
@@ -148,24 +138,27 @@ export default function LineTraceWordGame(): React.JSX.Element {
   return (
     <div
       className={
-        'w-full max-w-200 mx-auto' + (isTransition ? ' cursor-wait' : '')
+        'w-full max-w-200 mx-auto' +
+        (isPending ? ' cursor-wait opacity-70' : '')
       }
     >
       <div className="flex justify-between flex-wrap gap-2 mb-3">
-        <p className="text-slate-500 dark:text-slate-400 text-sm my-0 mb-4">
-          Trace along the lines to find words of 4+ letters. Letters that are no
-          longer needed turn into friends; lines fade away when they&apos;re
-          spent.
-        </p>
-        <button onClick={newPuzzle}>New puzzle</button>
+        <button
+          onClick={() => {
+            newPuzzleAction();
+          }}
+          disabled={isPending}
+        >
+          New puzzle
+        </button>
       </div>
 
       <PuzzleView
-        key={generation}
         puzzle={puzzleState}
         found={found}
-        startNewPuzzle={newPuzzle}
-        setFound={(f: SetStateAction<string[]>) => {
+        newPuzzleAction={newPuzzleAction}
+        isLoading={isPending}
+        setFoundAction={(f: SetStateAction<string[]>) => {
           setFound((prev) => {
             if (typeof f === 'function') {
               if (savedFoundState !== SERVER_RENDER) {
