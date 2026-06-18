@@ -1,11 +1,14 @@
 import 'server-only';
 
-import type { JSX } from 'react';
+import React, { type JSX } from 'react';
+
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 
 import type { Metadata } from 'next';
 
 import { PageStructure } from '@/components/PageStructure';
-import LineTraceWordGame from '@/client/puzzles/friends/word-friends';
+import { LineTraceWordGame } from '@/client/puzzles/friends/LineTraceWordGame';
+import { LineTraceErrorComponent } from '@/app/puzzles/word-friends/LineTraceErrorComponent';
 
 const TITLE = 'Word Friends';
 
@@ -23,7 +26,14 @@ export default function PuzzlesPage(): JSX.Element {
       resource="/puzzles"
     >
       <main className="flex flex-col justify-center items-center">
-        <LineTraceWordGame />
+        <p>
+          Trace along the lines to find words of 4+ letters. Letters that are no
+          longer needed turn into friends; lines fade away when they&apos;re
+          spent.
+        </p>
+        <ErrorBoundary errorComponent={LineTraceErrorComponent}>
+          <LineTraceWordGame />
+        </ErrorBoundary>
       </main>
     </PageStructure>
   );
