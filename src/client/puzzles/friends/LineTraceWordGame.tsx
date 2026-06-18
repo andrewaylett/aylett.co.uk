@@ -2,6 +2,7 @@
 
 import React, {
   type SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -106,12 +107,12 @@ export function LineTraceWordGame(): React.JSX.Element {
     puzzleInternalState ??
     (typeof savedGameState === 'symbol' ? undefined : savedGameState);
 
-  const newPuzzleAction = () => {
+  const newPuzzleAction = useCallback(() => {
     startTransition(async () => {
       setFound([]);
       setPuzzleState(await buildPuzzle());
     });
-  };
+  }, []);
 
   useEffect(() => {
     if (savedGameState !== SERVER_RENDER) {
@@ -125,7 +126,7 @@ export function LineTraceWordGame(): React.JSX.Element {
         newPuzzleAction();
       }
     }
-  }, [savedGameState, puzzleState]);
+  }, [savedGameState, puzzleState, newPuzzleAction]);
 
   useEffect(() => {
     try {
