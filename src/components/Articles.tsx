@@ -7,6 +7,8 @@ import { allArticles } from '@/app/articles/articles';
 import { sortByKey } from '@/utilities';
 
 export async function Articles(): Promise<JSX.Element> {
+  'use cache';
+
   const files = await allArticles();
   const pages = await Promise.all(
     files.map((f) => buildMetadata(f, ArticleSchema)),
