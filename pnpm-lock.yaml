@@ -64,8 +64,8 @@ catalogs:
       specifier: 1.0.0
       version: 1.0.0
     baseline-browser-mapping:
-      specifier: 2.10.27
-      version: 2.10.27
+      specifier: 2.10.38
+      version: 2.10.38
     browserslist:
       specifier: 4.28.2
       version: 4.28.2
@@ -413,7 +413,7 @@ importers:
         version: 1.0.0
       baseline-browser-mapping:
         specifier: 'catalog:'
-        version: 2.10.27
+        version: 2.10.38
       browserslist:
         specifier: 'catalog:'
         version: 4.28.2
@@ -1939,6 +1939,11 @@ packages:
 
   baseline-browser-mapping@2.10.27:
     resolution: {integrity: sha512-zEs/ufmZoUd7WftKpKyXaT6RFxpQ5Qm9xytKRHvJfxFV9DFJkZph9RvJ1LcOUi0Z1ZVijMte65JbILeV+8QQEA==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  baseline-browser-mapping@2.10.38:
+    resolution: {integrity: sha512-31/02mVB4yuQU6adKk5SlY6m+mxDwUq5KZkyYgnLrrKl7TEm1+3PyDtDBz2kOv/wxZz41GHsvV1A/u6RmiyBvw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -6167,6 +6172,8 @@ snapshots:
   balanced-match@4.0.4: {}
 
   baseline-browser-mapping@2.10.27: {}
+
+  baseline-browser-mapping@2.10.38: {}
 
   bidi-js@1.0.3:
     dependencies:
