@@ -19,7 +19,7 @@ onlyBuiltDependencies:
 catalog:
   "@eslint/js": 9.39.4
   "@jest/globals": 30.3.0
-  "@next/eslint-plugin-next": 16.2.5
+  "@next/eslint-plugin-next": 16.2.9
   "@prettier/plugin-xml": 3.4.2
   "@swc/jest": 0.2.39
   "@tailwindcss/postcss": 4.2.4
@@ -44,7 +44,7 @@ catalog:
   encoding: 0.1.13
   eslint: 9.39.4
   eslint-config-andrewaylett: 7.0.0
-  eslint-config-next: 16.2.5
+  eslint-config-next: 16.2.9
   eslint-import-resolver-typescript: 4.4.5
   eslint-plugin-import: 2.32.0
   eslint-plugin-jest: 29.15.2
