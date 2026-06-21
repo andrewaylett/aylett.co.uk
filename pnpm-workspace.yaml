@@ -89,7 +89,7 @@ catalog:
   tailwindcss: 4.2.4
   temporal-polyfill: 0.3.2
   to-vfile: 8.0.0
-  ts-jest: 29.4.9
+  ts-jest: 29.4.11
   typescript: 6.0.3
   typescript-eslint: 8.59.2
   unified: 11.0.5
