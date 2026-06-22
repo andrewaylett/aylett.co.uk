@@ -97,7 +97,7 @@ catalog:
   unist-util-visit: 5.1.0
   unist-util-visit-parents: 6.0.2
   vfile: 6.0.3
-  yaml: 2.8.4
+  yaml: 2.9.0
   zod: 4.4.3
 catalogMode: strict
 cleanupUnusedCatalogs: true
