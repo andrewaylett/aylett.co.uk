@@ -40,7 +40,7 @@ catalog:
   browserslist: 4.28.2
   caniuse-lite: 1.0.30001799
   client-only: 0.0.1
-  date-fns: 4.1.0
+  date-fns: 4.4.0
   encoding: 0.1.13
   eslint: 9.39.4
   eslint-config-andrewaylett: 7.0.0
