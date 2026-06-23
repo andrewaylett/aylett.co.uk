@@ -91,7 +91,7 @@ catalog:
   to-vfile: 8.0.0
   ts-jest: 29.4.11
   typescript: 6.0.3
-  typescript-eslint: 8.59.2
+  typescript-eslint: 8.61.1
   unified: 11.0.5
   unist-util-is: 6.0.1
   unist-util-visit: 5.1.0
