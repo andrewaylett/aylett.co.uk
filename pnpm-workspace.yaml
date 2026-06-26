@@ -52,7 +52,7 @@ catalog:
   eslint-plugin-react-hooks: 7.0.1
   expect: 30.4.1
   glob: 13.0.6
-  globals: 17.6.0
+  globals: 17.7.0
   html-to-image: 1.11.13
   identity-obj-proxy: 3.0.0
   immer: 11.1.8
