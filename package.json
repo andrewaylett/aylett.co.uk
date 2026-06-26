@@ -5,7 +5,7 @@
   "repository": "https://github.com/andrewaylett/aylett.co.uk",
   "version": "1.0.0",
   "type": "module",
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "predev": "pnpm install --frozen-lockfile",
     "dev": "next dev --turbopack",
