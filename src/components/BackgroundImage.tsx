@@ -127,7 +127,7 @@ export function BackgroundImage(): JSX.Element {
       <FullBackgroundImage
         src={night}
         isDark={true}
-        svgStdDeviation={3.066_669}
+        svgStdDeviation={17.122_871}
         placeholder={
           <svg
             viewBox="0 0 256 192"
@@ -136,52 +136,20 @@ export function BackgroundImage(): JSX.Element {
             height="100%"
           >
             <defs>
-              <filter id="night-blur">
-                <feGaussianBlur stdDeviation={3.066_669} />
+              <filter id="n">
+                <feGaussianBlur stdDeviation="17.122871" />
               </filter>
             </defs>
-            <g filter="url(#night-blur)">
-              <rect width="256" height="192" fill="#0a1323" />
-              <polygon
-                points="-2,123 0,195 251,195"
-                fill="#000000"
-                fillOpacity={1}
-              />
-              <polygon
-                points="259,10 -2,51 252,119"
-                fill="#2e3f5f"
-                fillOpacity={0.99}
-              />
-              <polygon
-                points="259,41 -4,68 235,114"
-                fill="#a7dfff"
-                fillOpacity={0.45}
-              />
-              <polygon
-                points="215,-4 14,15 226,147"
-                fill="#acffff"
-                fillOpacity={0.17}
-              />
-              <polygon
-                points="259,66 -4,83 258,106"
-                fill="#ffffec"
-                fillOpacity={0.64}
-              />
-              <polygon
-                points="205,94 175,106 54,112"
-                fill="#f0ffff"
-                fillOpacity={1}
-              />
-              <polygon
-                points="259,92 -4,129 259,195"
-                fill="#000000"
-                fillOpacity={0.74}
-              />
-              <polygon
-                points="213,93 224,95 134,97"
-                fill="#030300"
-                fillOpacity={0.95}
-              />
+            <g filter="url(#n)">
+              <rect width="256" height="192" fill="#a2003c" />
+              <circle cx="92" cy="234" r="259" fill="#120300" />
+              <circle cx="61" cy="-43" r="160" fill="#ff84b363" />
+              <circle cx="106" cy="155" r="248" fill="#03006c5e" />
+              <circle cx="128" cy="75" r="42" fill="#b3c0cbc2" />
+              <circle cx="56" cy="69" r="29" fill="#b0d5ff75" />
+              <circle cx="176" cy="81" r="26" fill="#f3e7d3ed" />
+              <circle cx="222" cy="67" r="41" fill="#dcfeffa8" />
+              <circle cx="140" cy="27" r="71" fill="#00e0ff1a" />
             </g>
           </svg>
         }
@@ -189,7 +157,7 @@ export function BackgroundImage(): JSX.Element {
       <FullBackgroundImage
         src={field}
         isDark={false}
-        svgStdDeviation={1.640_433}
+        svgStdDeviation={20.012_892}
         placeholder={
           <svg
             viewBox="0 0 256 192"
@@ -198,52 +166,20 @@ export function BackgroundImage(): JSX.Element {
             height="100%"
           >
             <defs>
-              <filter id="field-blur">
-                <feGaussianBlur stdDeviation={1.640_433} />
+              <filter id="f">
+                <feGaussianBlur stdDeviation="20.012892" />
               </filter>
             </defs>
-            <g filter="url(#field-blur)">
-              <rect width="256" height="192" fill="#394630" />
-              <polygon
-                points="-1,4 257,48 1,131"
-                fill="#e3f8ff"
-                fillOpacity={0.58}
-              />
-              <polygon
-                points="252,58 19,157 257,193"
-                fill="#162717"
-                fillOpacity={0.73}
-              />
-              <polygon
-                points="84,18 -2,130 245,139"
-                fill="#d9cec9"
-                fillOpacity={0.96}
-              />
-              <polygon
-                points="250,153 2,166 248,169"
-                fill="#d7eb6d"
-                fillOpacity={0.25}
-              />
-              <polygon
-                points="253,58 128,69 254,141"
-                fill="#ffbe00"
-                fillOpacity={0.96}
-              />
-              <polygon
-                points="255,-1 -2,0 257,142"
-                fill="#5494e2"
-                fillOpacity={0.81}
-              />
-              <polygon
-                points="66,37 31,91 257,147"
-                fill="#3c00b2"
-                fillOpacity={0.11}
-              />
-              <polygon
-                points="69,55 211,140 128,142"
-                fill="#aeb9cb"
-                fillOpacity={0.89}
-              />
+            <g filter="url(#f)">
+              <rect width="256" height="192" fill="#4c6891" />
+              <circle cx="216" cy="46" r="42" fill="#004ddafa" />
+              <circle cx="167" cy="196" r="166" fill="#1a14008c" />
+              <circle cx="151" cy="106" r="39" fill="#e7cdcccf" />
+              <circle cx="65" cy="61" r="80" fill="#ff7181e6" />
+              <circle cx="215" cy="78" r="64" fill="#f3edff8f" />
+              <circle cx="80" cy="52" r="88" fill="#00b7ff99" />
+              <polygon points="3,91 180,105 -30,126" fill="#f8dfbf" />
+              <circle cx="84" cy="-38" r="80" fill="#00438754" />
             </g>
           </svg>
         }
