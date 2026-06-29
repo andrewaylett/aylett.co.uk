@@ -64,7 +64,7 @@ catalog:
   mdast-util-to-markdown: 2.1.2
   mermaid: 11.15.0
   micromark-util-types: 2.0.2
-  next: 16.3.0-preview.3
+  next: 16.3.0-preview.5
   next-plausible: 4.0.0
   nlcst-to-string: 4.0.0
   parse-english: 7.0.0
