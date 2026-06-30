@@ -7,7 +7,7 @@ import {
 
 import { Temporal } from 'temporal-polyfill';
 
-import type { TooltipPayload, TooltipValueType } from 'recharts';
+import type { TooltipValueType, TooltipProps } from 'recharts';
 
 import {
   type Point,
@@ -37,7 +37,10 @@ export function PointLineChart({
     Temporal.Duration.from({ days: 1 }),
   );
 
-  function dateLabelFormatter(label: ReactNode, payload: TooltipPayload) {
+  const dateLabelFormatter: TooltipProps<
+    number,
+    keyof Point
+  >['labelFormatter'] = function dateLabelFormatter(label: ReactNode, payload) {
     if (payload.length === 0) {
       return label;
     }
@@ -52,7 +55,7 @@ export function PointLineChart({
         month: 'short',
         day: 'numeric',
       });
-  }
+  };
 
   return (
     <Typed.LineChart
