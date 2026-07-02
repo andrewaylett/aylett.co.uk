@@ -51,28 +51,33 @@ function Home(): JSX.Element {
         className="flex flex-col justify-center items-center text-center *:text-xl"
       >
         <p>
-          <Link property="item" typeof="WebPage" href="articles">
+          <Link property="item" typeof="WebPage" href="/articles">
             <span property="name">Articles</span>
           </Link>
         </p>
         <p>
-          <Link property="item" typeof="WebPage" href="thoughts">
+          <Link property="item" typeof="WebPage" href="/thoughts">
             <span property="name">Thoughts</span>
           </Link>
         </p>
         <p>
-          <Link property="item" typeof="WebPage" href="schema">
+          <Link property="item" typeof="WebPage" href="/schema">
             <span property="name">Schemas</span>
           </Link>
         </p>
         <p>
-          <Link property="item" typeof="WebPage" href="links">
+          <Link property="item" typeof="WebPage" href="/links">
             <span property="name">Links</span>
           </Link>
         </p>
         <p>
-          <Link property="item" typeof="WebPage" href="tools">
+          <Link property="item" typeof="WebPage" href="/tools">
             <span property="name">Tools</span>
+          </Link>
+        </p>
+        <p>
+          <Link property="item" typeof="WebPage" href="/puzzles">
+            <span property="name">Puzzles</span>
           </Link>
         </p>
       </main>

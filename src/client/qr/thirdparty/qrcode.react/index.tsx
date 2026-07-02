@@ -12,6 +12,8 @@ import {
   type PropsWithoutRef,
   type RefAttributes,
   forwardRef,
+  type Ref,
+  type JSX,
 } from 'react';
 
 import * as qrcodegen from '../qrcodegen';
@@ -534,6 +536,7 @@ export function useQRCode({
   }
 }
 
+// noinspection JSUnusedGlobalSymbols
 export const QRCodeSVG: ForwardRefExoticComponent<
   PropsWithoutRef<QRPropsSVG> & RefAttributes<SVGSVGElement>
 > = forwardRef<SVGSVGElement, QRPropsSVG>(
@@ -570,80 +573,48 @@ export function useDebugDetails(details: QrCodeDetails): DebugDetails {
   };
 }
 
-export const QRCodeSVGDetails: ForwardRefExoticComponent<
-  Omit<QRPropsSVG, 'value'> & {
+export function QRCodeSVGDetails({
+  dotStyle = 'square',
+  ...otherProps
+}: Omit<QRPropsSVG, 'value'> & {
+  details: QrCodeDetails;
+  ref?: Ref<SVGSVGElement> | undefined;
+}): JSX.Element {
+  return dotStyle === 'square' ? (
+    <SquareQRCodeSVGDetails dotStyle="square" {...otherProps} />
+  ) : dotStyle === 'dot' ? (
+    <DotQRCodeSVGDetails dotStyle="dot" {...otherProps} />
+  ) : (
+    <TextQRCodeSVGDetails dotStyle="text" {...otherProps} />
+  );
+}
+
+function SquareQRCodeSVGDetails(
+  props: Omit<QRPropsSVG, 'value' | 'dotStyle'> & {
     details: QrCodeDetails;
-  } & React.RefAttributes<SVGSVGElement>
-> = forwardRef<
-  SVGSVGElement,
-  Omit<QRPropsSVG, 'value'> & { details: QrCodeDetails }
->(function QRCodeSVGDetails(props, forwardedRef) {
+    ref?: Ref<SVGSVGElement> | undefined;
+    dotStyle?: 'square';
+  },
+): JSX.Element {
   const {
     details,
     bgColor = DEFAULT_BGCOLOR,
     fgColor = DEFAULT_FGCOLOR,
     title,
     cellSize = DEFAULT_CELL_SIZE,
-    dotStyle = 'square',
-    dotRadius = 0.25,
-    rasterText = '',
-    rasterFont = 'Impact',
+    ref,
     ...otherProps
   } = props;
 
   const { cells, margin, numCells } = details;
-  const size = cells.length;
-  const pixelData = useRasterPixels(rasterText, rasterFont, size);
-
   const finalSize = numCells * cellSize;
 
-  // Drawing strategy: no solid background rect — the SVG is transparent where no
-  // colour is required. Rendering categories:
-  //   1. Border frame (quiet zone): bgColor even-odd frame.
-  //   2. bgColor path: structural light squares + light timing narrow rects (dot mode).
-  //   3. fgColor path: varies by dotStyle — see below.
-  // Timing modules are always rendered as 50%-width rectangles centred on the cell,
-  // full-length in the timing direction, half-width in the perpendicular direction.
-
-  // 1. Quiet-zone frame: fills the margin band around the modules grid.
-  const innerWidth = numCells - 2 * margin;
-  const borderPath = `M0,0 h${numCells}v${numCells}H0zM${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`;
-
-  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light
-  //    timing narrow rects (text mode renders timing inside generateTextPath).
-  const whitePath =
-    generatePath(
-      cells.map((row, y) =>
-        row.map((cell, x) => !cell && isStructuralSquareModule(x, y, size)),
-      ),
-      margin,
-    ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin, false) : '');
+  // Quiet-zone frame: fills the margin band around the module grid.
+  const bgPath = `M0,0 h${numCells}v${numCells}H0z`;
 
   // 3. fgColor paths differ by style:
   //   square — all dark cells as full squares
-  //   dot    — structural squares + timing narrow rects + per-cell circles
-  //   text   — structural squares only; timing and data modules handled by
-  //            generateTextPath (middle row/col for timing, centre sub-cell
-  //            for data, outer sub-cells for text overlay)
-  const fgPath =
-    dotStyle === 'square'
-      ? generatePath(cells, margin)
-      : generatePath(
-          cells.map((row, y) =>
-            row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
-          ),
-          margin,
-        ) + (dotStyle === 'dot' ? generateTimingPath(cells, margin) : '');
-  const dotPath =
-    dotStyle === 'dot' ? generateDotPath(cells, margin, dotRadius) : null;
-  const lightDotPath =
-    dotStyle === 'dot'
-      ? generateDotPath(cells, margin, dotRadius, false)
-      : null;
-  const textPath =
-    dotStyle === 'text'
-      ? generateTextPath(cells, margin, pixelData, size)
-      : null;
+  const fgPath = generatePath(cells, margin);
 
   return (
     <svg
@@ -655,7 +626,83 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
         contain: 'strict',
       }}
       viewBox={`0 0 ${numCells} ${numCells}`}
-      ref={forwardedRef}
+      ref={ref}
+      role="img"
+      {...otherProps}
+    >
+      {!!title && <title>{title}</title>}
+      <path
+        fill={bgColor}
+        fillRule="evenodd"
+        d={bgPath}
+        shapeRendering="crispEdges"
+      />
+      <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
+      <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+    </svg>
+  );
+}
+
+function DotQRCodeSVGDetails(
+  props: Omit<QRPropsSVG, 'value' | 'dotStyle'> & {
+    details: QrCodeDetails;
+    ref?: Ref<SVGSVGElement> | undefined;
+    dotStyle?: 'dot';
+  },
+): JSX.Element {
+  const {
+    details,
+    bgColor = DEFAULT_BGCOLOR,
+    fgColor = DEFAULT_FGCOLOR,
+    title,
+    cellSize = DEFAULT_CELL_SIZE,
+    dotRadius = 0.25,
+    ref,
+    ...otherProps
+  } = props;
+
+  const { cells, margin, numCells } = details;
+  const size = cells.length;
+
+  const finalSize = numCells * cellSize;
+
+  // Quiet-zone frame: fills the margin band around the module grid.
+  const innerWidth = numCells - 2 * margin;
+  const borderPath = `M0,0 h${numCells}v${numCells}H0zM${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`;
+
+  // 2. bgColor: light structural squares (full 1×1); dot mode also adds light
+  //    timing narrow rects (text mode renders timing inside generateTextPath).
+  const whitePath =
+    generatePath(
+      cells.map((row, y) =>
+        row.map((cell, x) => !cell && isStructuralSquareModule(x, y, size)),
+      ),
+      margin,
+    ) + generateTimingPath(cells, margin, false);
+
+  // 3. fgColor paths differ by style:
+  //   dot    — structural squares + timing narrow rects + per-cell circles
+  const fgPath =
+    generatePath(
+      cells.map((row, y) =>
+        row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
+      ),
+      margin,
+    ) + generateTimingPath(cells, margin);
+  const dotPath = generateDotPath(cells, margin, dotRadius);
+  const lightDotPath = generateDotPath(cells, margin, dotRadius, false);
+
+  return (
+    <svg
+      height={finalSize}
+      width={finalSize}
+      style={{
+        containIntrinsicHeight: `${finalSize}px`,
+        containIntrinsicWidth: `${finalSize}px`,
+        contain: 'strict',
+      }}
+      viewBox={`0 0 ${numCells} ${numCells}`}
+      ref={ref}
       role="img"
       {...otherProps}
     >
@@ -666,30 +713,76 @@ export const QRCodeSVGDetails: ForwardRefExoticComponent<
         d={borderPath}
         shapeRendering="crispEdges"
       />
-      {dotStyle === 'text' && (
-        <path
-          fill={bgColor}
-          d={`M${margin},${margin}h${innerWidth}v${innerWidth}H${margin}z`}
-          shapeRendering="crispEdges"
-        />
-      )}
       <path fill={bgColor} d={whitePath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
-      {lightDotPath && (
-        <path
-          fill={bgColor}
-          d={lightDotPath}
-          shapeRendering="geometricPrecision"
-        />
-      )}
-      {dotPath && (
-        <path fill={fgColor} d={dotPath} shapeRendering="geometricPrecision" />
-      )}
-      {textPath && (
-        <path fill={fgColor} d={textPath} shapeRendering="crispEdges" />
-      )}
+      <path
+        fill={bgColor}
+        d={lightDotPath}
+        shapeRendering="geometricPrecision"
+      />
+      <path fill={fgColor} d={dotPath} shapeRendering="geometricPrecision" />
     </svg>
   );
-});
+}
 
-QRCodeSVG.displayName = 'QRCodeSVG';
+function TextQRCodeSVGDetails(
+  props: Omit<QRPropsSVG, 'value' | 'dotStyle'> & {
+    details: QrCodeDetails;
+    ref?: Ref<SVGSVGElement> | undefined;
+    dotStyle?: 'text';
+  },
+): JSX.Element {
+  const {
+    details,
+    bgColor = DEFAULT_BGCOLOR,
+    fgColor = DEFAULT_FGCOLOR,
+    title,
+    cellSize = DEFAULT_CELL_SIZE,
+    rasterText = '',
+    rasterFont = 'Impact',
+    ref,
+    ...otherProps
+  } = props;
+
+  const { cells, margin, numCells } = details;
+  const size = cells.length;
+  const pixelData = useRasterPixels(rasterText, rasterFont, size);
+
+  const finalSize = numCells * cellSize;
+
+  // Quiet-zone frame: fills the margin band around the module grid.
+  const bgPath = `M0,0 h${numCells}v${numCells}H0z`;
+
+  // 3. fgColor paths differ by style:
+  //   text   — structural squares only; timing and data modules handled by
+  //            generateTextPath (middle row/col for timing, centre sub-cell
+  //            for data, outer sub-cells for text overlay)
+  const fgPath = generatePath(
+    cells.map((row, y) =>
+      row.map((cell, x) => cell && isStructuralSquareModule(x, y, size)),
+    ),
+    margin,
+  );
+  const textPath = generateTextPath(cells, margin, pixelData, size);
+
+  return (
+    <svg
+      height={finalSize}
+      width={finalSize}
+      style={{
+        containIntrinsicHeight: `${finalSize}px`,
+        containIntrinsicWidth: `${finalSize}px`,
+        contain: 'strict',
+      }}
+      viewBox={`0 0 ${numCells} ${numCells}`}
+      ref={ref}
+      role="img"
+      {...otherProps}
+    >
+      {!!title && <title>{title}</title>}
+      <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
+      <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      <path fill={fgColor} d={textPath} shapeRendering="crispEdges" />
+    </svg>
+  );
+}

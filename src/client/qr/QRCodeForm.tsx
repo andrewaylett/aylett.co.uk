@@ -2,7 +2,6 @@
 
 import {
   useEffect,
-  useEffectEvent,
   useReducer,
   useRef,
   useTransition,
@@ -10,7 +9,7 @@ import {
   type JSX,
 } from 'react';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { produce } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { toBlob, toPng } from 'html-to-image';
@@ -27,7 +26,7 @@ import {
   QRCode,
   URL_SPLITTER,
 } from '@/client/qr/QRCode';
-import { encodeQueryComponent, nullToError } from '@/utilities';
+import { nullToError } from '@/utilities';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
@@ -39,31 +38,31 @@ const DEFAULTS = {
 };
 
 function buildQrUrl(qrState: QRCodeState): string {
-  const parts: string[] = [];
+  const params = new URLSearchParams();
   if (qrState.text) {
-    parts.push(`text=${encodeQueryComponent(qrState.text)}`);
+    params.set('text', qrState.text);
   }
   if (!qrState.shouldOptimiseUrl) {
-    parts.push('optimise=false');
+    params.set('optimise', 'false');
   }
   if (qrState.dotStyle === 'dot') {
-    parts.push('dotStyle=dot');
+    params.set('dotStyle', 'dot');
     if (qrState.dotRadius !== DEFAULTS.dotRadius) {
-      parts.push(`dotRadius=${Math.round(qrState.dotRadius * 200)}`);
+      params.set('dotRadius', Math.round(qrState.dotRadius * 200).toString());
     }
   } else if (qrState.dotStyle === 'text') {
-    parts.push('dotStyle=text');
+    params.set('dotStyle', 'text');
     if (qrState.rasterText) {
-      parts.push(`rasterText=${encodeQueryComponent(qrState.rasterText)}`);
+      params.set('rasterText', qrState.rasterText);
     }
     if (qrState.rasterFont && qrState.rasterFont !== DEFAULTS.rasterFont) {
-      parts.push(`rasterFont=${encodeQueryComponent(qrState.rasterFont)}`);
+      params.set('rasterFont', qrState.rasterFont);
     }
   }
   if (qrState.minErrorCorrectionLevel !== 'L') {
-    parts.push(`ecl=${qrState.minErrorCorrectionLevel}`);
+    params.set('ecl', qrState.minErrorCorrectionLevel);
   }
-  return parts.length > 0 ? `?${parts.join('&')}` : './qr';
+  return `?${params.toString()}`;
 }
 
 export interface QRCodeFormState {
@@ -99,11 +98,6 @@ interface QRCodeStateUpdateGeneration {
   type: 'updateGeneration';
 }
 
-interface QRCodeStatePopState {
-  type: 'popState';
-  text: string;
-}
-
 interface QRCodeStateSetDotStyle {
   type: 'setDotStyle';
   dotStyle: 'square' | 'dot' | 'text';
@@ -136,7 +130,6 @@ type QRCodeStateUpdate =
   | QRCodeResetNextPushStateText
   | QRCodeStateSetButtonText
   | QRCodeStateUpdateGeneration
-  | QRCodeStatePopState
   | QRCodeStateSetDotStyle
   | QRCodeStateSetDotRadius
   | QRCodeStateSetMinErrorCorrectionLevel
@@ -153,13 +146,6 @@ function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
       if (draft.previousPushStateText !== draft.qrState.text) {
         draft.nextPushStateText = draft.qrState.text;
       }
-      break;
-    }
-    case 'popState': {
-      recipe(draft, { type: 'setText', text: instructions.text });
-      draft.previousPushStateText = undefined;
-      draft.nextPushStateText = undefined;
-      recipe(draft, { type: 'updateGeneration' });
       break;
     }
     case 'resetNextPushStateText': {
@@ -258,6 +244,7 @@ export function QRCodeForm(): JSX.Element {
   const searchParams = useSearchParams();
   const [state, dispatch] = useReducer(producer, searchParams, initState);
   const [_inTransition, startTransition] = useTransition();
+  const router = useRouter();
 
   function copyToClipboard() {
     startTransition(async () => {
@@ -317,63 +304,6 @@ export function QRCodeForm(): JSX.Element {
     });
   }
 
-  const onPopState = useEffectEvent(() => {
-    dispatch({ type: 'popState', text: searchParams.get('text') ?? '' });
-    const popDotStyleParam = searchParams.get('dotStyle');
-    dispatch({
-      type: 'setDotStyle',
-      dotStyle:
-        popDotStyleParam === 'dot'
-          ? 'dot'
-          : popDotStyleParam === 'text'
-            ? 'text'
-            : DEFAULTS.dotStyle,
-    });
-    const rawRadius = searchParams.get('dotRadius');
-    dispatch({
-      type: 'setDotRadius',
-      dotRadius:
-        rawRadius !== null && !Number.isNaN(Number(rawRadius))
-          ? Number(rawRadius) / 200
-          : DEFAULTS.dotRadius,
-    });
-    dispatch({
-      type: 'setRasterText',
-      rasterText: searchParams.get('rasterText') ?? DEFAULTS.rasterText,
-    });
-    dispatch({
-      type: 'setRasterFont',
-      rasterFont: searchParams.get('rasterFont') ?? DEFAULTS.rasterFont,
-    });
-    const eclParam = searchParams.get('ecl') ?? 'L';
-    dispatch({
-      type: 'setMinErrorCorrectionLevel',
-      minErrorCorrectionLevel: (['L', 'M', 'Q', 'H'] as const).includes(
-        eclParam as ErrorCorrectionLevel,
-      )
-        ? (eclParam as ErrorCorrectionLevel)
-        : DEFAULTS.minErrorCorrectionLevel,
-    });
-    dispatch({
-      type: 'setShouldOptimiseUrl',
-      shouldOptimiseUrl: searchParams.get('optimise') !== 'false',
-    });
-    if (resetRef.current) {
-      startTransition(resetRef.current);
-    }
-  });
-  useEffect(() => {
-    const abortController = new AbortController();
-    globalThis.addEventListener('popstate', onPopState, {
-      passive: true,
-      signal: abortController.signal,
-    });
-
-    return () => {
-      abortController.abort();
-    };
-  }, []);
-
   const pushStateUrl =
     state.nextPushStateText !== undefined &&
     state.nextPushStateText !== state.qrState.text
@@ -382,16 +312,16 @@ export function QRCodeForm(): JSX.Element {
 
   useEffect(() => {
     if (pushStateUrl !== null) {
-      globalThis.history.pushState({}, '', pushStateUrl);
+      router.push(pushStateUrl);
       dispatch({ type: 'resetNextPushStateText' });
     }
-  }, [pushStateUrl]);
+  }, [router, pushStateUrl]);
 
   const replaceStateUrl = buildQrUrl(state.qrState);
 
   useEffect(() => {
-    globalThis.history.replaceState({}, '', replaceStateUrl);
-  }, [replaceStateUrl]);
+    router.replace(replaceStateUrl);
+  }, [router, replaceStateUrl]);
 
   function setText(newText: string, updateGeneration?: boolean) {
     dispatch({

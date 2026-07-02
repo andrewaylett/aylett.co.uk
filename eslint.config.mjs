@@ -12,6 +12,7 @@ export default tseslint.config(
       '**/*.scss',
       '**/build/*',
       'tmp/*',
+      '.*/**/*',
     ],
   },
   {

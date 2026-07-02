@@ -10,20 +10,6 @@ export async function nullToError<T>(
   return result;
 }
 
-/**
- * RFC 3986 allows:
- *   pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
- *   query = *( pchar / "/" / "?" )
- * So we replace everything else with its percent-encoded value.
- * @param component
- */
-export function encodeQueryComponent(component: string): string {
-  return component.replaceAll(/[^a-zA-Z0-9:@/?]/g, (c) => {
-    const codePoint = c.codePointAt(0);
-    return codePoint ? `%${codePoint.toString(16).toUpperCase()}` : c;
-  });
-}
-
 /** Returns a GitHub URL pointing to the commit history for a given page's markdown source. */
 export const gitHubUrl = (pageName: string): string =>
   `https://github.com/andrewaylett/aylett.co.uk/commits/main/md${pageName.replace(
