@@ -62,7 +62,7 @@ catalog:
   jsdom: 29.1.1
   mdast-util-from-markdown: 2.0.3
   mdast-util-to-markdown: 2.1.2
-  mermaid: 11.15.0
+  mermaid: 11.16.0
   micromark-util-types: 2.0.2
   next: 16.3.0-preview.3
   next-plausible: 4.0.0
