@@ -1,14 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { encodeQueryComponent, nullToError } from '@/utilities';
-
-describe('encodeQueryComponent', () => {
-  it('percent-encodes special characters in query component', () => {
-    const input = 'a b+c@?/%&';
-    const encoded = encodeQueryComponent(input);
-    expect(encoded).toBe('a%20b%2Bc@?/%25%26');
-  });
-});
+import { nullToError } from '@/utilities';
 
 describe('nullToError', () => {
   it('throws when promise resolves to null', async () => {

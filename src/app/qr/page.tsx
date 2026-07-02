@@ -5,8 +5,6 @@ import type { JSX } from 'react';
 import type { Metadata } from 'next';
 
 import { QRCodeForm } from '@/client/qr/QRCodeForm';
-import { PageStructure } from '@/components/PageStructure';
-import { TitleHeader } from '@/components/TitleHeader';
 
 const TITLE = 'QR Code Generator';
 
@@ -16,14 +14,5 @@ export const metadata: Metadata = {
 } as const;
 
 export default function QRPage(): JSX.Element {
-  return (
-    <PageStructure
-      breadcrumbs={[]}
-      header={<TitleHeader>{TITLE}</TitleHeader>}
-      schemaType="Item"
-      resource="/qr"
-    >
-      <QRCodeForm />
-    </PageStructure>
-  );
+  return <QRCodeForm />;
 }
