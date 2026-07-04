@@ -276,7 +276,7 @@ const STRUCTURAL_TOP_ROWS = 9;
 const STRUCTURAL_BOTTOM_ROWS = 8;
 
 // Renders rasterText onto an off-screen canvas covering only the interior data
-// region (between the locator squares): width size*3, height (size−17)*3.
+// area (between the locator squares): width size*3, height (size−17)*3.
 // Returns null while loading or when rasterText is empty.
 // Stale cached pixels are suppressed by gating the return on rasterText.
 function useRasterPixels(
@@ -603,6 +603,10 @@ function SquareQRCodeSVGDetails(
     title,
     cellSize = DEFAULT_CELL_SIZE,
     ref,
+    dotStyle: _dotStyle,
+    dotRadius: _dotRadius,
+    rasterFont: _rasterFont,
+    rasterText: _rasterText,
     ...otherProps
   } = props;
 
@@ -657,6 +661,9 @@ function DotQRCodeSVGDetails(
     title,
     cellSize = DEFAULT_CELL_SIZE,
     dotRadius = 0.25,
+    dotStyle: _dotStyle,
+    rasterFont: _rasterFont,
+    rasterText: _rasterText,
     ref,
     ...otherProps
   } = props;
@@ -740,6 +747,8 @@ function TextQRCodeSVGDetails(
     cellSize = DEFAULT_CELL_SIZE,
     rasterText = '',
     rasterFont = 'Impact',
+    dotStyle: _dotStyle,
+    dotRadius: _dotRadius,
     ref,
     ...otherProps
   } = props;

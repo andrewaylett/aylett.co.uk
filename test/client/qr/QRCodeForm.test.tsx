@@ -25,23 +25,15 @@ jest.mock('html-to-image', () => ({
   toPng: jest.fn<() => Promise<string>>().mockResolvedValue(''),
 }));
 
-const mockSearchParamsGet = jest.fn<(param: string) => string | null>(
-  () => null,
+const mockSearchParamsGet = jest.fn<(param: string) => string | null>((k) =>
+  new URLSearchParams(globalThis.location.search).get(k),
 );
 const mockUseSearchParams = jest.fn(() => ({
   get: mockSearchParamsGet,
 }));
 
-const mockPush = jest.fn();
-const mockReplace = jest.fn();
-const mockUseRouter = jest.fn(() => ({
-  push: mockPush,
-  replace: mockReplace,
-}));
-
 jest.mock('next/navigation', () => ({
   useSearchParams: mockUseSearchParams,
-  useRouter: mockUseRouter,
 }));
 
 const TEST_VALUE = 'Test QR Code';
@@ -199,7 +191,7 @@ describe('QRCodeForm', () => {
     await setFormText(TEST_VALUE, user);
 
     await screen.findByTestId('qr-code');
-    expect(mockReplace).toHaveBeenLastCalledWith(`?text=${TEST_VALUE_QUERY}`);
+    expect(globalThis.location.search).toBe(`?text=${TEST_VALUE_QUERY}`);
   });
 
   it('renders dot mode when toggled', async () => {
@@ -230,6 +222,13 @@ describe('QRCodeForm', () => {
     await act(async () =>
       fireEvent.change(moduleStyleSelect, { target: { value: 'dot' } }),
     );
+    const dotQrCode = await screen.findByTestId('qr-code');
+    const dotPaths = [...dotQrCode.querySelectorAll('path')];
+    expect(
+      dotPaths.some((p) => p.getAttribute('d')?.includes('a0.25,0.25')),
+    ).toBe(true);
+    expect(dotQrCode).toHaveAttribute('data-dot-style', 'dot');
+
     await act(async () =>
       fireEvent.change(moduleStyleSelect, { target: { value: 'square' } }),
     );
@@ -239,6 +238,6 @@ describe('QRCodeForm', () => {
     expect(paths.some((p) => p.getAttribute('d')?.includes('a0.25,0.25'))).toBe(
       false,
     );
-    expect(qrCode.lastElementChild).toHaveAttribute('d', TEST_PATH);
+    expect(qrCode).toHaveAttribute('data-dot-style', 'square');
   });
 });

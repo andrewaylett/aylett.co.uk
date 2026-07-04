@@ -9,10 +9,13 @@ import {
 import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
 export interface QRCodeState {
-  text: string;
+  qr: QRCodeContent;
   buttonText: ButtonText;
+}
+
+export interface QRCodeContent {
+  text: string;
   shouldOptimiseUrl: boolean;
-  generation: number;
   dotStyle: 'square' | 'dot' | 'text';
   dotRadius: number;
   rasterText: string;
@@ -41,7 +44,7 @@ function useQrValue(text: string, shouldOptimiseUrl: boolean): string {
   return text;
 }
 
-function useOptimisedQr(state: QRCodeState) {
+function useOptimisedQr(state: QRCodeContent) {
   'use memo';
   const optimisedValue: string = useQrValue(
     state.text,
@@ -103,16 +106,16 @@ function useOptimisedQr(state: QRCodeState) {
 }
 
 export function QRCode({
-  state,
+  content,
   ref,
   showDebug = false,
   children,
 }: PropsWithChildren<{
-  state: QRCodeState;
+  content: QRCodeContent;
   showDebug?: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }>): JSX.Element {
-  const { actualValue, qrDetails, debugMessage } = useOptimisedQr(state);
+  const { actualValue, qrDetails, debugMessage } = useOptimisedQr(content);
   const qrDebugDetails = useDebugDetails(qrDetails);
 
   return (
@@ -121,13 +124,15 @@ export function QRCode({
         <QRCodeSVGDetails
           details={qrDetails}
           cellSize={9}
-          dotStyle={state.dotStyle}
-          dotRadius={state.dotRadius}
-          rasterText={state.rasterText}
-          rasterFont={state.rasterFont}
+          dotStyle={content.dotStyle}
+          dotRadius={content.dotRadius}
+          rasterText={content.rasterText}
+          rasterFont={content.rasterFont}
           data-testid="qr-code"
+          data-text-content={content.text}
+          data-dot-style={content.dotStyle}
           className="transition-[height,width] duration-300 ease even:transition-all even:duration-300 even:ease max-w-screen max-h-[100vw]"
-          aria-description={`A QR code that contains the text: ${state.text}`}
+          aria-description={`A QR code that contains the text: ${content.text}`}
         />
       </div>
       {children}
@@ -135,7 +140,6 @@ export function QRCode({
         <QRDebugPanel
           qrDebugDetails={qrDebugDetails}
           qrValue={actualValue}
-          state={state}
           debugMessage={debugMessage}
         />
       )}
