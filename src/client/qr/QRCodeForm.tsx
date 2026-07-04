@@ -1,16 +1,15 @@
 'use client';
 
 import {
-  useEffect,
-  useReducer,
-  useRef,
-  useTransition,
   type ChangeEvent,
   type JSX,
+  useCallback,
+  useRef,
+  useState,
+  useTransition,
 } from 'react';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { produce } from 'immer';
+import { produce, type Producer } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { toBlob, toPng } from 'html-to-image';
 
@@ -20,13 +19,14 @@ import { QRCodeErrorContext } from './QRCodeErrorContext';
 import type { ErrorCorrectionLevel } from '@/client/qr/thirdparty/qrcode.react';
 
 import {
-  type ButtonText,
-  type QRCodeState,
   BUTTON_TEXT,
+  type ButtonText,
   QRCode,
+  type QRCodeContent,
   URL_SPLITTER,
 } from '@/client/qr/QRCode';
 import { nullToError } from '@/utilities';
+import { useSearchParamsWithEdit } from '@/client/hooks/useSearchParamsWithEdit';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
@@ -37,7 +37,7 @@ const DEFAULTS = {
   rasterFont: 'Impact',
 };
 
-function buildQrUrl(qrState: QRCodeState): string {
+function buildSearchParams(qrState: QRCodeContent): URLSearchParams {
   const params = new URLSearchParams();
   if (qrState.text) {
     params.set('text', qrState.text);
@@ -62,138 +62,10 @@ function buildQrUrl(qrState: QRCodeState): string {
   if (qrState.minErrorCorrectionLevel !== 'L') {
     params.set('ecl', qrState.minErrorCorrectionLevel);
   }
-  return `?${params.toString()}`;
+  return params;
 }
 
-export interface QRCodeFormState {
-  nextPushStateText?: string;
-  previousPushStateText?: string;
-  qrState: QRCodeState;
-}
-
-interface QRCodeStateSetShouldOptimiseUrl {
-  type: 'setShouldOptimiseUrl';
-  shouldOptimiseUrl: boolean;
-}
-
-interface QRCodeStateSetText {
-  type: 'setText';
-  text: string;
-}
-
-interface QRCodeStatePushState {
-  type: 'pushState';
-}
-
-interface QRCodeResetNextPushStateText {
-  type: 'resetNextPushStateText';
-}
-
-interface QRCodeStateSetButtonText {
-  type: 'setButtonText';
-  buttonText: ButtonText;
-}
-
-interface QRCodeStateUpdateGeneration {
-  type: 'updateGeneration';
-}
-
-interface QRCodeStateSetDotStyle {
-  type: 'setDotStyle';
-  dotStyle: 'square' | 'dot' | 'text';
-}
-
-interface QRCodeStateSetRasterText {
-  type: 'setRasterText';
-  rasterText: string;
-}
-
-interface QRCodeStateSetRasterFont {
-  type: 'setRasterFont';
-  rasterFont: string;
-}
-
-interface QRCodeStateSetDotRadius {
-  type: 'setDotRadius';
-  dotRadius: number;
-}
-
-interface QRCodeStateSetMinErrorCorrectionLevel {
-  type: 'setMinErrorCorrectionLevel';
-  minErrorCorrectionLevel: ErrorCorrectionLevel;
-}
-
-type QRCodeStateUpdate =
-  | QRCodeStateSetShouldOptimiseUrl
-  | QRCodeStateSetText
-  | QRCodeStatePushState
-  | QRCodeResetNextPushStateText
-  | QRCodeStateSetButtonText
-  | QRCodeStateUpdateGeneration
-  | QRCodeStateSetDotStyle
-  | QRCodeStateSetDotRadius
-  | QRCodeStateSetMinErrorCorrectionLevel
-  | QRCodeStateSetRasterText
-  | QRCodeStateSetRasterFont;
-
-function recipe(draft: QRCodeFormState, instructions: QRCodeStateUpdate) {
-  switch (instructions.type) {
-    case 'setText': {
-      draft.qrState.text = instructions.text;
-      break;
-    }
-    case 'pushState': {
-      if (draft.previousPushStateText !== draft.qrState.text) {
-        draft.nextPushStateText = draft.qrState.text;
-      }
-      break;
-    }
-    case 'resetNextPushStateText': {
-      draft.previousPushStateText = draft.nextPushStateText;
-      draft.nextPushStateText = undefined;
-      break;
-    }
-    case 'setShouldOptimiseUrl': {
-      draft.qrState.shouldOptimiseUrl = instructions.shouldOptimiseUrl;
-      break;
-    }
-    case 'setDotStyle': {
-      draft.qrState.dotStyle = instructions.dotStyle;
-      break;
-    }
-    case 'setDotRadius': {
-      draft.qrState.dotRadius = instructions.dotRadius;
-      break;
-    }
-    case 'setMinErrorCorrectionLevel': {
-      draft.qrState.minErrorCorrectionLevel =
-        instructions.minErrorCorrectionLevel;
-      break;
-    }
-    case 'setRasterText': {
-      draft.qrState.rasterText = instructions.rasterText;
-      break;
-    }
-    case 'setRasterFont': {
-      draft.qrState.rasterFont = instructions.rasterFont;
-      break;
-    }
-    case 'setButtonText': {
-      draft.qrState.buttonText = instructions.buttonText;
-      break;
-    }
-    case 'updateGeneration': {
-      draft.qrState.generation = draft.qrState.generation + 1;
-      break;
-    }
-    default: {
-      throw new Error('Unknown state update');
-    }
-  }
-}
-const producer = produce<QRCodeFormState, [QRCodeStateUpdate]>(recipe);
-
-function initState(searchParams: URLSearchParams): QRCodeFormState {
+function extractContent(searchParams: URLSearchParams): QRCodeContent {
   const isQuine = searchParams.get('quine') === 'true';
   const paramText = searchParams.get('text') ?? '';
   const text = isQuine
@@ -223,17 +95,13 @@ function initState(searchParams: URLSearchParams): QRCodeFormState {
   const rasterFont = searchParams.get('rasterFont') ?? DEFAULTS.rasterFont;
 
   return {
-    qrState: {
-      text,
-      buttonText: BUTTON_TEXT.INITIAL_TEXT,
-      generation: 0,
-      shouldOptimiseUrl,
-      dotStyle,
-      dotRadius,
-      rasterText,
-      rasterFont,
-      minErrorCorrectionLevel,
-    },
+    text,
+    shouldOptimiseUrl,
+    dotStyle,
+    dotRadius,
+    rasterText,
+    rasterFont,
+    minErrorCorrectionLevel,
   };
 }
 
@@ -241,10 +109,27 @@ export function QRCodeForm(): JSX.Element {
   const resetRef = useRef<() => void>(undefined);
   const ref = useRef<HTMLDivElement>(null);
 
-  const searchParams = useSearchParams();
-  const [state, dispatch] = useReducer(producer, searchParams, initState);
+  const [searchParams, setSearchParams] = useSearchParamsWithEdit();
+  const [buttonText, setButtonText] = useState<ButtonText>(
+    BUTTON_TEXT.INITIAL_TEXT,
+  );
   const [_inTransition, startTransition] = useTransition();
-  const router = useRouter();
+
+  const qrContent = extractContent(searchParams);
+
+  const updateQRCode = useCallback(
+    (updateFn?: Producer<QRCodeContent>, replace: boolean = false) => {
+      if (updateFn) {
+        setSearchParams((previous) => {
+          const updated = produce(extractContent(previous), updateFn);
+          return buildSearchParams(updated);
+        }, replace);
+      } else {
+        setSearchParams();
+      }
+    },
+    [setSearchParams],
+  );
 
   function copyToClipboard() {
     startTransition(async () => {
@@ -264,27 +149,19 @@ export function QRCodeForm(): JSX.Element {
           new ClipboardItem({ 'image/png': blob }),
         ]);
         startTransition(() => {
-          dispatch({
-            type: 'pushState',
-          });
-          dispatch({
-            type: 'setButtonText',
-            buttonText: BUTTON_TEXT.SUCCESS_TEXT,
-          });
+          updateQRCode((draft) => draft);
+          setButtonText(BUTTON_TEXT.SUCCESS_TEXT);
         });
       } catch (error) {
         console.error(error);
         startTransition(() => {
-          dispatch({
-            type: 'setButtonText',
-            buttonText: BUTTON_TEXT.FAILED_TEXT,
-          });
+          setButtonText(BUTTON_TEXT.FAILED_TEXT);
         });
       }
     });
   }
 
-  const alphanumericValue = state.qrState.text.replaceAll(/[^A-Z0-9]/gi, '-');
+  const alphanumericValue = qrContent.text.replaceAll(/[^A-Z0-9]/gi, '-');
 
   function download() {
     startTransition(async () => {
@@ -304,64 +181,39 @@ export function QRCodeForm(): JSX.Element {
     });
   }
 
-  const pushStateUrl =
-    state.nextPushStateText !== undefined &&
-    state.nextPushStateText !== state.qrState.text
-      ? buildQrUrl({ ...state.qrState, text: state.nextPushStateText })
-      : null;
+  function setText(newText: string, inputChanged: boolean = false) {
+    updateQRCode((draft) => {
+      draft.text = newText;
+    }, inputChanged);
+    setButtonText(BUTTON_TEXT.INITIAL_TEXT);
+    setButtonText(BUTTON_TEXT.INITIAL_TEXT);
 
-  useEffect(() => {
-    if (pushStateUrl !== null) {
-      router.push(pushStateUrl);
-      dispatch({ type: 'resetNextPushStateText' });
-    }
-  }, [router, pushStateUrl]);
-
-  const replaceStateUrl = buildQrUrl(state.qrState);
-
-  useEffect(() => {
-    router.replace(replaceStateUrl);
-  }, [router, replaceStateUrl]);
-
-  function setText(newText: string, updateGeneration?: boolean) {
-    dispatch({
-      type: 'setText',
-      text: newText,
-    });
-    if (updateGeneration) {
-      dispatch({ type: 'updateGeneration' });
-    }
-    dispatch({
-      type: 'setButtonText',
-      buttonText: BUTTON_TEXT.INITIAL_TEXT,
-    });
     if (resetRef.current) {
       resetRef.current();
     }
   }
 
-  const canOptimiseUrl = URL_SPLITTER.test(state.qrState.text);
+  const canOptimiseUrl = URL_SPLITTER.test(qrContent.text);
 
   return (
     <form className="flex items-center flex-col contain-content">
       <input
-        key={state.qrState.generation}
         type="text"
-        defaultValue={state.qrState.text}
+        value={qrContent.text}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           startTransition(() => {
-            setText(e.target.value);
+            setText(e.target.value, true);
           });
         }}
+        onFocus={() => {
+          updateQRCode();
+        }}
         onBlur={() => {
-          dispatch({
-            type: 'pushState',
-          });
+          updateQRCode();
         }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
         data-testid="qr-code-input"
-        data-generation={state.qrState.generation}
         aria-label="Text to render as a QR code"
       />
       <details className="w-full mt-2">
@@ -376,12 +228,11 @@ export function QRCodeForm(): JSX.Element {
             type="checkbox"
             disabled={!canOptimiseUrl}
             className="m-1"
-            defaultChecked={state.qrState.shouldOptimiseUrl}
+            checked={qrContent.shouldOptimiseUrl}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setShouldOptimiseUrl',
-                  shouldOptimiseUrl: event.target.checked,
+                updateQRCode((draft) => {
+                  draft.shouldOptimiseUrl = event.target.checked;
                 });
               });
             }}
@@ -391,12 +242,14 @@ export function QRCodeForm(): JSX.Element {
         <label className="w-full flex flex-row items-center gap-2">
           Module style
           <select
-            value={state.qrState.dotStyle}
+            value={qrContent.dotStyle}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setDotStyle',
-                  dotStyle: event.target.value as 'square' | 'dot' | 'text',
+                updateQRCode((draft) => {
+                  draft.dotStyle = event.target.value as
+                    | 'square'
+                    | 'dot'
+                    | 'text';
                 });
               });
             }}
@@ -409,7 +262,7 @@ export function QRCodeForm(): JSX.Element {
         <label
           className={
             'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (state.qrState.dotStyle === 'dot' ? ' h-lh' : ' h-0')
+            (qrContent.dotStyle === 'dot' ? ' h-lh' : ' h-0')
           }
         >
           Dot size
@@ -419,55 +272,64 @@ export function QRCodeForm(): JSX.Element {
             min={30}
             max={100}
             step={5}
-            value={Math.round(state.qrState.dotRadius * 200)}
+            value={Math.round(qrContent.dotRadius * 200)}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setDotRadius',
-                  dotRadius: Number(event.target.value) / 200,
+                updateQRCode((draft) => {
+                  draft.dotRadius = Number(event.target.value) / 200;
                 });
               });
             }}
+            onFocus={() => {
+              updateQRCode();
+            }}
+            onBlur={() => {
+              updateQRCode();
+            }}
           />
           <output className="w-[3ch] text-right">
-            {Math.round(state.qrState.dotRadius * 200)}%
+            {Math.round(qrContent.dotRadius * 200)}%
           </output>
         </label>
         <label
           className={
-            'w-full overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (state.qrState.dotStyle === 'text' ? ' h-lh' : ' h-0')
+            'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
+            (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
           }
         >
           Raster text
           <input
             type="text"
             className="border border-gray-300 rounded p-1 ml-2"
-            value={state.qrState.rasterText}
+            value={qrContent.rasterText}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setRasterText',
-                  rasterText: event.target.value,
+                updateQRCode((draft) => {
+                  draft.rasterText = event.target.value;
                 });
               });
+            }}
+            onFocus={() => {
+              updateQRCode();
+            }}
+            onBlur={() => {
+              updateQRCode();
             }}
           />
         </label>
         <label
           className={
             'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (state.qrState.dotStyle === 'text' ? ' h-lh' : ' h-0')
+            (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
           }
         >
           Font
           <select
-            value={state.qrState.rasterFont}
+            value={qrContent.rasterFont}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setRasterFont',
-                  rasterFont: event.target.value,
+                updateQRCode((draft) => {
+                  draft.rasterFont = event.target.value;
                 });
               });
             }}
@@ -483,13 +345,12 @@ export function QRCodeForm(): JSX.Element {
         <label className="w-full flex flex-row items-center gap-2">
           Min error correction
           <select
-            value={state.qrState.minErrorCorrectionLevel}
+            value={qrContent.minErrorCorrectionLevel}
             onChange={(event) => {
               startTransition(() => {
-                dispatch({
-                  type: 'setMinErrorCorrectionLevel',
-                  minErrorCorrectionLevel: event.target
-                    .value as ErrorCorrectionLevel,
+                updateQRCode((draft) => {
+                  draft.minErrorCorrectionLevel = event.target
+                    .value as ErrorCorrectionLevel;
                 });
               });
             }}
@@ -504,7 +365,7 @@ export function QRCodeForm(): JSX.Element {
       <QRCodeErrorContext
         value={{
           resetText: () => {
-            setText('', true);
+            setText('');
           },
           updateResetRef: (newRef) => {
             resetRef.current = newRef;
@@ -512,7 +373,7 @@ export function QRCodeForm(): JSX.Element {
         }}
       >
         <ErrorBoundary errorComponent={QRCodeError}>
-          <QRCode state={state.qrState} ref={ref} showDebug={true}>
+          <QRCode content={qrContent} ref={ref} showDebug={true}>
             <div className="mt-4 w-full flex flex-row flex-wrap *:grow *:basis-0 gap-4">
               <button
                 type="button"
@@ -520,7 +381,7 @@ export function QRCodeForm(): JSX.Element {
                   startTransition(copyToClipboard);
                 }}
               >
-                {state.qrState.buttonText}
+                {buttonText}
               </button>
               <button
                 type="button"
