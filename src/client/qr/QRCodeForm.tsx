@@ -3,13 +3,11 @@
 import {
   type ChangeEvent,
   type JSX,
-  useCallback,
   useRef,
   useState,
   useTransition,
 } from 'react';
 
-import { produce, type Producer } from 'immer';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { toBlob, toPng } from 'html-to-image';
 
@@ -27,6 +25,8 @@ import {
 } from '@/client/qr/QRCode';
 import { nullToError } from '@/utilities';
 import { useSearchParamsWithEdit } from '@/client/hooks/useSearchParamsWithEdit';
+import QRTextStyleControls from '@/client/qr/QRTextStyleControls';
+import { useTransformedState } from '@/client/hooks/useTransformedState';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
@@ -110,26 +110,16 @@ export function QRCodeForm(): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   const [searchParams, setSearchParams] = useSearchParamsWithEdit();
+  const [qrContent, setQRContent] = useTransformedState<
+    QRCodeContent,
+    URLSearchParams,
+    [boolean] | []
+  >(searchParams, setSearchParams, extractContent, buildSearchParams);
+
   const [buttonText, setButtonText] = useState<ButtonText>(
     BUTTON_TEXT.INITIAL_TEXT,
   );
   const [_inTransition, startTransition] = useTransition();
-
-  const qrContent = extractContent(searchParams);
-
-  const updateQRCode = useCallback(
-    (updateFn?: Producer<QRCodeContent>, replace: boolean = false) => {
-      if (updateFn) {
-        setSearchParams((previous) => {
-          const updated = produce(extractContent(previous), updateFn);
-          return buildSearchParams(updated);
-        }, replace);
-      } else {
-        setSearchParams();
-      }
-    },
-    [setSearchParams],
-  );
 
   function copyToClipboard() {
     startTransition(async () => {
@@ -149,7 +139,7 @@ export function QRCodeForm(): JSX.Element {
           new ClipboardItem({ 'image/png': blob }),
         ]);
         startTransition(() => {
-          updateQRCode((draft) => draft);
+          setQRContent((draft) => draft);
           setButtonText(BUTTON_TEXT.SUCCESS_TEXT);
         });
       } catch (error) {
@@ -182,7 +172,7 @@ export function QRCodeForm(): JSX.Element {
   }
 
   function setText(newText: string, inputChanged: boolean = false) {
-    updateQRCode((draft) => {
+    setQRContent((draft) => {
       draft.text = newText;
     }, inputChanged);
     setButtonText(BUTTON_TEXT.INITIAL_TEXT);
@@ -206,10 +196,10 @@ export function QRCodeForm(): JSX.Element {
           });
         }}
         onFocus={() => {
-          updateQRCode();
+          setQRContent((draft) => draft);
         }}
         onBlur={() => {
-          updateQRCode();
+          setQRContent((draft) => draft);
         }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
@@ -231,7 +221,7 @@ export function QRCodeForm(): JSX.Element {
             checked={qrContent.shouldOptimiseUrl}
             onChange={(event) => {
               startTransition(() => {
-                updateQRCode((draft) => {
+                setQRContent((draft) => {
                   draft.shouldOptimiseUrl = event.target.checked;
                 });
               });
@@ -245,7 +235,7 @@ export function QRCodeForm(): JSX.Element {
             value={qrContent.dotStyle}
             onChange={(event) => {
               startTransition(() => {
-                updateQRCode((draft) => {
+                setQRContent((draft) => {
                   draft.dotStyle = event.target.value as
                     | 'square'
                     | 'dot'
@@ -275,80 +265,33 @@ export function QRCodeForm(): JSX.Element {
             value={Math.round(qrContent.dotRadius * 200)}
             onChange={(event) => {
               startTransition(() => {
-                updateQRCode((draft) => {
+                setQRContent((draft) => {
                   draft.dotRadius = Number(event.target.value) / 200;
                 });
               });
             }}
             onFocus={() => {
-              updateQRCode();
+              setQRContent((draft) => draft);
             }}
             onBlur={() => {
-              updateQRCode();
+              setQRContent((draft) => draft);
             }}
           />
           <output className="w-[3ch] text-right">
             {Math.round(qrContent.dotRadius * 200)}%
           </output>
         </label>
-        <label
-          className={
-            'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
-          }
-        >
-          Raster text
-          <input
-            type="text"
-            className="border border-gray-300 rounded p-1 ml-2"
-            value={qrContent.rasterText}
-            onChange={(event) => {
-              startTransition(() => {
-                updateQRCode((draft) => {
-                  draft.rasterText = event.target.value;
-                });
-              });
-            }}
-            onFocus={() => {
-              updateQRCode();
-            }}
-            onBlur={() => {
-              updateQRCode();
-            }}
-          />
-        </label>
-        <label
-          className={
-            'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-            (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
-          }
-        >
-          Font
-          <select
-            value={qrContent.rasterFont}
-            onChange={(event) => {
-              startTransition(() => {
-                updateQRCode((draft) => {
-                  draft.rasterFont = event.target.value;
-                });
-              });
-            }}
-          >
-            <option value="Impact">Impact</option>
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Trebuchet MS">Trebuchet MS</option>
-          </select>
-        </label>
+        <QRTextStyleControls
+          qrContent={qrContent}
+          updateQRCode={setQRContent}
+        />
         <label className="w-full flex flex-row items-center gap-2">
           Min error correction
           <select
             value={qrContent.minErrorCorrectionLevel}
             onChange={(event) => {
               startTransition(() => {
-                updateQRCode((draft) => {
+                setQRContent((draft) => {
                   draft.minErrorCorrectionLevel = event.target
                     .value as ErrorCorrectionLevel;
                 });
