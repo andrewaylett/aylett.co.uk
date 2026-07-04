@@ -2,12 +2,17 @@ import { startTransition, type JSX } from 'react';
 
 import type { QRCodeContent } from '@/client/qr/QRCode';
 
+import { BoundEditableInput } from '@/components/BoundEditableInput';
+
 export default function QRTextStyleControls({
   qrContent,
   updateQRCode,
 }: {
   qrContent: QRCodeContent;
-  updateQRCode: (updateFn: (draft: QRCodeContent) => void) => void;
+  updateQRCode: (
+    updateFn?: (draft: QRCodeContent) => void,
+    isEdit?: boolean,
+  ) => void;
 }): JSX.Element {
   return (
     <>
@@ -18,7 +23,7 @@ export default function QRTextStyleControls({
         }
       >
         Raster text
-        <input
+        <BoundEditableInput
           type="text"
           className="border border-gray-300 rounded p-1 ml-2"
           value={qrContent.rasterText}
@@ -26,14 +31,14 @@ export default function QRTextStyleControls({
             startTransition(() => {
               updateQRCode((draft) => {
                 draft.rasterText = event.target.value;
-              });
+              }, true);
             });
           }}
           onBlur={() => {
-            updateQRCode((draft) => draft);
+            updateQRCode();
           }}
           onFocus={() => {
-            updateQRCode((draft) => draft);
+            updateQRCode();
           }}
         />
       </label>
@@ -50,8 +55,14 @@ export default function QRTextStyleControls({
             startTransition(() => {
               updateQRCode((draft) => {
                 draft.rasterFont = event.target.value;
-              });
+              }, true);
             });
+          }}
+          onBlur={() => {
+            updateQRCode();
+          }}
+          onFocus={() => {
+            updateQRCode();
           }}
         >
           <option value="Impact">Impact</option>

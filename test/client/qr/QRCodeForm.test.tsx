@@ -87,7 +87,7 @@ describe('QRCodeForm', () => {
     const qrCode = await screen.findByTestId('qr-code');
     const path = qrCode.lastElementChild;
 
-    expect(input.value).toBe(TEST_VALUE);
+    expect(input).toHaveValue(TEST_VALUE);
     expect(path).toHaveAttribute('d', TEST_PATH);
   });
 
@@ -159,7 +159,7 @@ describe('QRCodeForm', () => {
     const qrCode = await screen.findByTestId('qr-code');
     const path = qrCode.lastElementChild;
 
-    expect(input.value).toBe(TEST_VALUE);
+    expect(input).toHaveValue(TEST_VALUE);
     expect(path).toHaveAttribute('d', TEST_PATH);
   });
 
@@ -169,7 +169,7 @@ describe('QRCodeForm', () => {
     await act(async () => render(<QRCodeForm />));
 
     const largeInput = 'A'.repeat(5000); // Exceeds QR code capacity
-    await setFormText(largeInput, user);
+    const input = await setFormText(largeInput, user);
 
     await expect(
       screen.findByText('Error generating QR code'),
@@ -178,9 +178,7 @@ describe('QRCodeForm', () => {
     const resetButton = await screen.findByText('Reset');
     await act(async () => fireEvent.click(resetButton));
 
-    await expect(
-      screen.findByTestId<HTMLInputElement>('qr-code-input'),
-    ).resolves.toHaveAttribute('value', '');
+    expect(input).toHaveValue('');
   });
 
   it('updates the URL when text entered', async () => {

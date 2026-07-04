@@ -27,6 +27,7 @@ import { nullToError } from '@/utilities';
 import { useSearchParamsWithEdit } from '@/client/hooks/useSearchParamsWithEdit';
 import QRTextStyleControls from '@/client/qr/QRTextStyleControls';
 import { useTransformedState } from '@/client/hooks/useTransformedState';
+import { BoundEditableInput } from '@/components/BoundEditableInput';
 
 const DEFAULTS = {
   shouldOptimiseUrl: true,
@@ -69,7 +70,7 @@ function extractContent(searchParams: URLSearchParams): QRCodeContent {
   const isQuine = searchParams.get('quine') === 'true';
   const paramText = searchParams.get('text') ?? '';
   const text = isQuine
-    ? `https://www.aylett.co.uk/qr/?text=${paramText}`
+    ? `https://www.aylett.co.uk/qr?${searchParams.toString()}`
     : paramText;
 
   const dotStyleParam = searchParams.get('dotStyle');
@@ -110,11 +111,12 @@ export function QRCodeForm(): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   const [searchParams, setSearchParams] = useSearchParamsWithEdit();
-  const [qrContent, setQRContent] = useTransformedState<
-    QRCodeContent,
-    URLSearchParams,
-    [boolean] | []
-  >(searchParams, setSearchParams, extractContent, buildSearchParams);
+  const [qrContent, setQRContent] = useTransformedState(
+    searchParams,
+    setSearchParams,
+    extractContent,
+    buildSearchParams,
+  );
 
   const [buttonText, setButtonText] = useState<ButtonText>(
     BUTTON_TEXT.INITIAL_TEXT,
@@ -139,7 +141,7 @@ export function QRCodeForm(): JSX.Element {
           new ClipboardItem({ 'image/png': blob }),
         ]);
         startTransition(() => {
-          setQRContent((draft) => draft);
+          setQRContent();
           setButtonText(BUTTON_TEXT.SUCCESS_TEXT);
         });
       } catch (error) {
@@ -172,34 +174,33 @@ export function QRCodeForm(): JSX.Element {
   }
 
   function setText(newText: string, inputChanged: boolean = false) {
-    setQRContent((draft) => {
-      draft.text = newText;
-    }, inputChanged);
-    setButtonText(BUTTON_TEXT.INITIAL_TEXT);
-    setButtonText(BUTTON_TEXT.INITIAL_TEXT);
+    startTransition(() => {
+      setQRContent((draft) => {
+        draft.text = newText;
+      }, inputChanged);
+      setButtonText(BUTTON_TEXT.INITIAL_TEXT);
 
-    if (resetRef.current) {
-      resetRef.current();
-    }
+      if (resetRef.current) {
+        resetRef.current();
+      }
+    });
   }
 
   const canOptimiseUrl = URL_SPLITTER.test(qrContent.text);
 
   return (
     <form className="flex items-center flex-col contain-content">
-      <input
+      <BoundEditableInput
         type="text"
         value={qrContent.text}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          startTransition(() => {
-            setText(e.target.value, true);
-          });
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          setText(event.target.value, true);
         }}
         onFocus={() => {
-          setQRContent((draft) => draft);
+          setQRContent();
         }}
         onBlur={() => {
-          setQRContent((draft) => draft);
+          setQRContent();
         }}
         placeholder="Paste your text here"
         className="border-2 border-gray-300 rounded-md p-2 mb-4 grid-cols-centre w-full"
@@ -271,10 +272,10 @@ export function QRCodeForm(): JSX.Element {
               });
             }}
             onFocus={() => {
-              setQRContent((draft) => draft);
+              setQRContent();
             }}
             onBlur={() => {
-              setQRContent((draft) => draft);
+              setQRContent();
             }}
           />
           <output className="w-[3ch] text-right">
