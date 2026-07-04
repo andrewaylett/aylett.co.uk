@@ -68,7 +68,7 @@ export function useSearchParamsWithEdit(): [
         typeof newParams === 'function' ? newParams(oldParams) : newParams;
       const newParamsString = effectiveParams.toString();
 
-      if (effectiveParams === oldParams) {
+      if (effectiveParams.toString() === oldParams.toString()) {
         return;
       }
 

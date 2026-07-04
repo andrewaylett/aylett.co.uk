@@ -1,3 +1,5 @@
+import type { SetStateAction } from 'react';
+
 import { describe, expect, it, jest } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
 
@@ -12,7 +14,8 @@ const identity = (v: Stored): Stored => v;
 describe('useTransformedState', () => {
   it('wraps storedValue via transformFromStored', () => {
     const storedValue: Stored = { count: 1 };
-    const setStoredValue = jest.fn();
+    const setStoredValue: (newParams: SetStateAction<Stored>) => void =
+      jest.fn();
 
     const { result } = renderHook(() =>
       useTransformedState(storedValue, setStoredValue, identity, identity),
