@@ -208,3 +208,40 @@ describe('analyseImage damage reporting', () => {
     expect(result.partial?.inverted).toBe(false);
   });
 });
+
+describe('analyseImage quiet zone truncation', () => {
+  it('reports all four sides truncated when the image has no quiet zone', () => {
+    // quietModules: 0 means the QR fills the image edge-to-edge; all four
+    // quiet zone sides project outside the frame and must be flagged.
+    const result = analyseImage(
+      matrixToImage(encode(5).getModules(), { quietModules: 0 }),
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.analysis.quietZoneTruncation).toEqual({
+      top: true,
+      right: true,
+      bottom: true,
+      left: true,
+    });
+    expect(result.analysis.quietZoneViolations).toEqual([]);
+  });
+
+  it('reports no truncation when the image has a full quiet zone', () => {
+    const result = analyseImage(
+      matrixToImage(encode(5).getModules(), { quietModules: 4 }),
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.analysis.quietZoneTruncation).toEqual({
+      top: false,
+      right: false,
+      bottom: false,
+      left: false,
+    });
+  });
+});

@@ -38,6 +38,9 @@ export default function QRDebuggerInner(): JSX.Element {
   const quietZoneViolations = result?.ok
     ? result.analysis.quietZoneViolations
     : undefined;
+  const quietZoneTruncation = result?.ok
+    ? result.analysis.quietZoneTruncation
+    : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -71,6 +74,7 @@ export default function QRDebuggerInner(): JSX.Element {
           matrix={matrix}
           diffs={diffs}
           quietZoneViolations={quietZoneViolations}
+          quietZoneTruncation={quietZoneTruncation}
           label={
             result?.ok
               ? 'Corrected QR code with error-corrected modules highlighted'

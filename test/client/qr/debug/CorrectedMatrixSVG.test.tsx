@@ -39,4 +39,35 @@ describe('CorrectedMatrixSVG', () => {
     expect(violation).toHaveAttribute('x', '2');
     expect(violation).toHaveAttribute('y', '7');
   });
+
+  it('renders grey strips for all truncated sides', () => {
+    render(
+      <CorrectedMatrixSVG
+        matrix={matrix}
+        label="test matrix"
+        quietZoneTruncation={{
+          top: true,
+          right: true,
+          bottom: true,
+          left: true,
+        }}
+      />,
+    );
+    expect(screen.getByTestId('qr-debug-quiet-truncation-top')).not.toBeNull();
+    expect(
+      screen.getByTestId('qr-debug-quiet-truncation-right'),
+    ).not.toBeNull();
+    expect(
+      screen.getByTestId('qr-debug-quiet-truncation-bottom'),
+    ).not.toBeNull();
+    expect(screen.getByTestId('qr-debug-quiet-truncation-left')).not.toBeNull();
+  });
+
+  it('renders no truncation strips when quiet zone is fully visible', () => {
+    render(<CorrectedMatrixSVG matrix={matrix} label="test matrix" />);
+    expect(screen.queryByTestId('qr-debug-quiet-truncation-top')).toBeNull();
+    expect(screen.queryByTestId('qr-debug-quiet-truncation-right')).toBeNull();
+    expect(screen.queryByTestId('qr-debug-quiet-truncation-bottom')).toBeNull();
+    expect(screen.queryByTestId('qr-debug-quiet-truncation-left')).toBeNull();
+  });
 });

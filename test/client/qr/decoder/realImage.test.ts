@@ -25,7 +25,9 @@ describe('real image: mirrored Skyscanner QR', () => {
     const image = loadPng(FIXTURE);
     const result = analyseImage(image);
     expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error(result.message);
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
     return result.analysis;
   }
 
@@ -52,6 +54,19 @@ describe('real image: mirrored Skyscanner QR', () => {
     expect(analysis.diffs?.length).toBe(0);
   });
 
+  it('reports quiet zone truncated on all four sides', () => {
+    const analysis = getAnalysis();
+    // The image fills the frame with no quiet zone, so all four sides of the
+    // quiet zone project outside the image boundary.
+    expect(analysis.quietZoneTruncation).toEqual({
+      top: true,
+      right: true,
+      bottom: true,
+      left: true,
+    });
+    expect(analysis.quietZoneViolations).toEqual([]);
+  });
+
   it('canonical matrix is not the same as the original (mirrored) orientation', () => {
     const analysis = getAnalysis();
     // The source QR was mirrored, so the original pixel at (col, row) maps to
@@ -62,19 +77,13 @@ describe('real image: mirrored Skyscanner QR', () => {
     const canonical = analysis.canonicalMatrix;
     const sampled = analysis.sampledMatrix;
     expect(canonical).toBeDefined();
-    if (!canonical) return;
-
-    const size = sampled.length;
-    let matchesOriginalOrientation = true;
-    outer: for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        // canonical[y][x] vs original pixel = sampled[x][y]
-        if (canonical[y][x] !== sampled[x][y]) {
-          matchesOriginalOrientation = false;
-          break outer;
-        }
-      }
+    if (!canonical) {
+      return;
     }
+
+    const matchesOriginalOrientation = canonical.every((row, y) =>
+      row.every((cell, x) => cell === sampled[x][y]),
+    );
     expect(matchesOriginalOrientation).toBe(false);
   });
 });
