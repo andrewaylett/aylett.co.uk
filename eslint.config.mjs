@@ -19,7 +19,13 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.js', '*.mjs', '*.cjs', 'jest.config.ts'],
+          allowDefaultProject: [
+            '*.js',
+            '*.mjs',
+            '*.cjs',
+            'jest.config.ts',
+            'jest.setup.ts',
+          ],
         },
       },
       globals: {

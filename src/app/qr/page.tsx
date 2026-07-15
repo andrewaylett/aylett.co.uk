@@ -2,6 +2,8 @@ import 'server-only';
 
 import type { JSX } from 'react';
 
+import Link from 'next/link';
+
 import type { Metadata } from 'next';
 
 import { QRCodeForm } from '@/client/qr/QRCodeForm';
@@ -14,5 +16,13 @@ export const metadata: Metadata = {
 } as const;
 
 export default function QRPage(): JSX.Element {
-  return <QRCodeForm />;
+  return (
+    <>
+      <QRCodeForm />
+      <p className="mt-4 text-center">
+        Got a QR code you want to pick apart? Try the{' '}
+        <Link href="/tools/qr/debug/">QR code debugger</Link>.
+      </p>
+    </>
+  );
 }
