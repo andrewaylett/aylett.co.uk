@@ -35,6 +35,11 @@ export default function ToolsPage(): JSX.Element {
           </Link>
         </p>
         <p>
+          <Link href="/tools/qr/debug/">
+            <span property="name">QR Code Debugger</span>
+          </Link>
+        </p>
+        <p>
           <Link href="/tools/sun/">
             <span property="name">Sunrise and Sunset</span>
           </Link>

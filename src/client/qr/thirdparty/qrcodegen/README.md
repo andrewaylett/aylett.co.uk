@@ -9,3 +9,6 @@ Obtained via https://github.com/nayuki/QR-Code-generator/blob/942f4319a6ba913dbc
 ## Modifications:
 - Export for use as a module
 - Added `getModules` method to `QrCode` class, to bypass excessive calls to `getModule`.
+- Made `ECC_CODEWORDS_PER_BLOCK`, `NUM_ERROR_CORRECTION_BLOCKS`, and
+  `getNumRawDataModules` public, so the QR debugger's decoder can derive block
+  structures without duplicating the tables.

@@ -16,8 +16,8 @@ const presetConfig = createDefaultEsmPreset({
 // Add any custom config to be passed to Jest
 const config = {
   testEnvironment: 'jsdom',
-  // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  watchman: false,
   ...presetConfig,
 } satisfies JestConfigWithTsJest;
 

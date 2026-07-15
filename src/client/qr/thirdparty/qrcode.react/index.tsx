@@ -127,7 +127,8 @@ const DEFAULT_MINVERSION = 1;
 
 const SPEC_MARGIN_SIZE = 4;
 
-function generatePath(modules: Modules, margin = 0): string {
+// Modified to be exported so the QR debugger can render decoded matrices.
+export function generatePath(modules: Modules, margin = 0): string {
   const ops: string[] = [];
   for (const [y, row] of modules.entries()) {
     let start: number | null = null;
