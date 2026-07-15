@@ -43,8 +43,8 @@ function buildSearchParams(qrState: QRCodeContent): URLSearchParams {
   if (qrState.text) {
     params.set('text', qrState.text);
   }
-  if (!qrState.shouldOptimiseUrl) {
-    params.set('optimise', 'false');
+  if (qrState.shouldOptimiseUrl) {
+    params.set('optimise', 'true');
   }
   if (qrState.dotStyle === 'dot') {
     params.set('dotStyle', 'dot');
@@ -91,7 +91,7 @@ function extractContent(searchParams: URLSearchParams): QRCodeContent {
   )
     ? (eclParam as ErrorCorrectionLevel)
     : DEFAULTS.minErrorCorrectionLevel;
-  const shouldOptimiseUrl = searchParams.get('optimise') !== 'false';
+  const shouldOptimiseUrl = searchParams.get('optimise') === 'true';
   const rasterText = searchParams.get('rasterText') ?? DEFAULTS.rasterText;
   const rasterFont = searchParams.get('rasterFont') ?? DEFAULTS.rasterFont;
 
