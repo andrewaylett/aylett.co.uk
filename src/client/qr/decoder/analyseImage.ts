@@ -19,6 +19,7 @@ import type {
   ImageAnalysis,
   Point,
   QRLocationReport,
+  QuietZoneTruncation,
   QuietZoneViolation,
   RgbaImage,
   ThresholdInfo,
@@ -743,15 +744,25 @@ function sampleMatrix(
 /**
  * Samples the 4-module quiet zone through the same transform: any dark module
  * there is a spec violation worth reporting, even though the decode usually
- * survives it. Points that project outside the image are simply unknowable
- * and are not reported.
+ * survives it.
+ *
+ * Points that project outside the image are unknowable from the pixel data,
+ * but their absence is still significant: when a side's entire quiet zone lies
+ * outside the frame, the required quiet zone was never present in the image.
+ * Those sides are recorded in the returned truncation flags.
  */
 function findQuietZoneViolations(
   grid: BitGrid,
   transform: PerspectiveTransform,
   dimension: number,
-): QuietZoneViolation[] {
+): { violations: QuietZoneViolation[]; truncation: QuietZoneTruncation } {
   const violations: QuietZoneViolation[] = [];
+  const truncation: QuietZoneTruncation = {
+    top: false,
+    right: false,
+    bottom: false,
+    left: false,
+  };
   for (let y = -4; y < dimension + 4; y++) {
     for (let x = -4; x < dimension + 4; x++) {
       if (x >= 0 && x < dimension && y >= 0 && y < dimension) {
@@ -761,6 +772,18 @@ function findQuietZoneViolations(
       const px = Math.floor(point.x);
       const py = Math.floor(point.y);
       if (px < 0 || px >= grid.width || py < 0 || py >= grid.height) {
+        if (y < 0) {
+          truncation.top = true;
+        }
+        if (y >= dimension) {
+          truncation.bottom = true;
+        }
+        if (x < 0) {
+          truncation.left = true;
+        }
+        if (x >= dimension) {
+          truncation.right = true;
+        }
         continue;
       }
       if (grid.bits[py * grid.width + px] === 1) {
@@ -768,7 +791,7 @@ function findQuietZoneViolations(
       }
     }
   }
-  return violations;
+  return { violations, truncation };
 }
 
 export function analyseImage(image: RgbaImage): AnalysisResult<ImageAnalysis> {
@@ -860,16 +883,14 @@ export function analyseImage(image: RgbaImage): AnalysisResult<ImageAnalysis> {
     };
   }
 
-  const quietZoneViolations = findQuietZoneViolations(
-    grid,
-    transform,
-    dimension,
-  );
+  const { violations: quietZoneViolations, truncation: quietZoneTruncation } =
+    findQuietZoneViolations(grid, transform, dimension);
   const imageFields = {
     location,
     mapToImage,
     inverted,
     quietZoneViolations,
+    quietZoneTruncation,
     threshold,
   };
   const matrixResult = analyseMatrix(sampled);

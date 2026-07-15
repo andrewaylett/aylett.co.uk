@@ -147,6 +147,19 @@ export interface QuietZoneViolation {
   y: number;
 }
 
+/**
+ * Records which sides of the 4-module quiet zone extend beyond the source
+ * image boundary and are therefore unobservable.  All four sides being true
+ * means no quiet zone was rendered at all — typical of a provider-issued QR
+ * image that fills the frame.
+ */
+export interface QuietZoneTruncation {
+  top: boolean;
+  right: boolean;
+  bottom: boolean;
+  left: boolean;
+}
+
 export interface MatrixAnalysis {
   size: number;
   /** True when the matrix only decoded after transposition (mirrored code). */
@@ -182,6 +195,7 @@ export interface ImageAnalysis extends MatrixAnalysis {
   /** True when the code was light-on-dark in the source image. */
   inverted: boolean;
   quietZoneViolations: QuietZoneViolation[];
+  quietZoneTruncation: QuietZoneTruncation;
   threshold: ThresholdInfo;
 }
 

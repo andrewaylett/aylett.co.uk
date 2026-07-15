@@ -1,6 +1,10 @@
 import type { JSX } from 'react';
 
-import type { ModuleDiff, QuietZoneViolation } from '@/client/qr/decoder/types';
+import type {
+  ModuleDiff,
+  QuietZoneTruncation,
+  QuietZoneViolation,
+} from '@/client/qr/decoder/types';
 
 import { generatePath } from '@/client/qr/thirdparty/qrcode.react';
 
@@ -17,11 +21,13 @@ export function CorrectedMatrixSVG({
   matrix,
   diffs = [],
   quietZoneViolations = [],
+  quietZoneTruncation,
   label,
 }: {
   matrix: readonly boolean[][];
   diffs?: readonly ModuleDiff[];
   quietZoneViolations?: readonly QuietZoneViolation[];
+  quietZoneTruncation?: QuietZoneTruncation;
   label: string;
 }): JSX.Element {
   const numCells = matrix.length + MARGIN * 2;
@@ -35,6 +41,50 @@ export function CorrectedMatrixSVG({
       data-testid="qr-debug-corrected-svg"
     >
       <rect width={numCells} height={numCells} fill="#FFFFFF" />
+      {quietZoneTruncation?.top && (
+        <rect
+          x={0}
+          y={0}
+          width={numCells}
+          height={MARGIN}
+          fill="#9CA3AF"
+          fillOpacity={0.35}
+          data-testid="qr-debug-quiet-truncation-top"
+        />
+      )}
+      {quietZoneTruncation?.bottom && (
+        <rect
+          x={0}
+          y={numCells - MARGIN}
+          width={numCells}
+          height={MARGIN}
+          fill="#9CA3AF"
+          fillOpacity={0.35}
+          data-testid="qr-debug-quiet-truncation-bottom"
+        />
+      )}
+      {quietZoneTruncation?.left && (
+        <rect
+          x={0}
+          y={0}
+          width={MARGIN}
+          height={numCells}
+          fill="#9CA3AF"
+          fillOpacity={0.35}
+          data-testid="qr-debug-quiet-truncation-left"
+        />
+      )}
+      {quietZoneTruncation?.right && (
+        <rect
+          x={numCells - MARGIN}
+          y={0}
+          width={MARGIN}
+          height={numCells}
+          fill="#9CA3AF"
+          fillOpacity={0.35}
+          data-testid="qr-debug-quiet-truncation-right"
+        />
+      )}
       <path
         d={generatePath(
           matrix.map((row) => [...row]),

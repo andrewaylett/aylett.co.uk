@@ -4,6 +4,7 @@ import type {
   AnalysisResult,
   ImageAnalysis,
   ParsedSegment,
+  QuietZoneTruncation,
   StreamReport,
 } from '@/client/qr/decoder/types';
 
@@ -40,6 +41,16 @@ function formatPadding(stream: StreamReport): string {
 
 function yesNo(value: boolean | undefined): string {
   return value ? 'yes' : 'no';
+}
+
+function formatTruncation(t: QuietZoneTruncation): string {
+  const sides = (['top', 'right', 'bottom', 'left'] as const).filter(
+    (s) => t[s],
+  );
+  if (sides.length === 4) {
+    return 'all sides — likely a render with no quiet zone';
+  }
+  return sides.join(', ');
 }
 
 /** Renders whatever analysis fields are available — the full set on success,
@@ -132,6 +143,18 @@ function AnalysisDetails({
             </dd>
           </>
         )}
+        {analysis.quietZoneTruncation &&
+          (analysis.quietZoneTruncation.top ||
+            analysis.quietZoneTruncation.right ||
+            analysis.quietZoneTruncation.bottom ||
+            analysis.quietZoneTruncation.left) && (
+            <>
+              <dt>Quiet zone outside frame</dt>
+              <dd data-testid="qr-debug-quiet-truncation">
+                {formatTruncation(analysis.quietZoneTruncation)}
+              </dd>
+            </>
+          )}
         {threshold && (
           <>
             <dt>Binarisation threshold (min/mean/max)</dt>

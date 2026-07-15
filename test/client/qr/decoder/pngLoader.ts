@@ -27,10 +27,15 @@ export function loadPng(path: string): RgbaImage {
   const colorType = buf[25]; // 2 = RGB, 6 = RGBA
   const interlace = buf[28];
 
-  if (bitDepth !== 8) throw new Error(`Unsupported bit depth: ${bitDepth}`);
-  if (colorType !== 2 && colorType !== 6)
+  if (bitDepth !== 8) {
+    throw new Error(`Unsupported bit depth: ${bitDepth}`);
+  }
+  if (colorType !== 2 && colorType !== 6) {
     throw new Error(`Unsupported colour type: ${colorType}`);
-  if (interlace !== 0) throw new Error('Interlaced PNGs are not supported');
+  }
+  if (interlace !== 0) {
+    throw new Error('Interlaced PNGs are not supported');
+  }
 
   const channels = colorType === 6 ? 4 : 3;
 
@@ -40,8 +45,12 @@ export function loadPng(path: string): RgbaImage {
   while (pos + 12 <= buf.length) {
     const len = buf.readUInt32BE(pos);
     const type = buf.subarray(pos + 4, pos + 8).toString('ascii');
-    if (type === 'IDAT') idatChunks.push(buf.subarray(pos + 8, pos + 8 + len));
-    if (type === 'IEND') break;
+    if (type === 'IDAT') {
+      idatChunks.push(buf.subarray(pos + 8, pos + 8 + len));
+    }
+    if (type === 'IEND') {
+      break;
+    }
     pos += 12 + len;
   }
 
@@ -65,18 +74,22 @@ export function loadPng(path: string): RgbaImage {
 
       let val: number;
       switch (filterType) {
-        case 0:
+        case 0: {
           val = raw_val;
           break;
-        case 1:
+        }
+        case 1: {
           val = (raw_val + a) & 0xff;
           break;
-        case 2:
+        }
+        case 2: {
           val = (raw_val + b) & 0xff;
           break;
-        case 3:
+        }
+        case 3: {
           val = (raw_val + Math.floor((a + b) / 2)) & 0xff;
           break;
+        }
         case 4: {
           const p = a + b - c;
           const pa = Math.abs(p - a);
@@ -86,8 +99,9 @@ export function loadPng(path: string): RgbaImage {
           val = (raw_val + pr) & 0xff;
           break;
         }
-        default:
+        default: {
           throw new Error(`Unknown PNG filter type: ${filterType}`);
+        }
       }
       pixels[outRow + x] = val;
     }
