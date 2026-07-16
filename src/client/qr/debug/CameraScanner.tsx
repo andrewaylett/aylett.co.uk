@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState, type JSX } from 'react';
 
-import type { RgbaImage } from '@/client/qr/decoder/types';
+import type {
+  Point,
+  QRLocationReport,
+  RgbaImage,
+} from '@/client/qr/decoder/types';
 
 import { videoFrameToRgba } from '@/client/qr/debug/imageSource';
 
@@ -35,15 +39,31 @@ function friendlyCameraError(error: unknown): string {
  * Live camera preview that captures frames for decoding while `active`.
  * The single effect owns the MediaStream lifecycle: the camera light must go
  * out the moment scanning stops or the component unmounts.
+ *
+ * When overlay props are supplied, a transparent canvas is layered over the
+ * video showing the detected QR boundary (green quadrilateral when the full
+ * perspective transform is known, amber triangle through finder centres when
+ * only their positions are known).
  */
 export function CameraScanner({
   active,
   onFrame,
+  overlayLocation,
+  overlaySize,
+  overlayMapToImage,
+  overlayFrameWidth,
+  overlayFrameHeight,
 }: {
   active: boolean;
   onFrame: (image: RgbaImage) => void;
+  overlayLocation?: QRLocationReport;
+  overlaySize?: number;
+  overlayMapToImage?: (x: number, y: number) => Point;
+  overlayFrameWidth?: number;
+  overlayFrameHeight?: number;
 }): JSX.Element {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,17 +118,75 @@ export function CameraScanner({
     };
   }, [active, onFrame]);
 
+  useEffect(() => {
+    const canvas = overlayRef.current;
+    if (!canvas) {
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    const frameWidth = overlayFrameWidth ?? 1;
+    const frameHeight = overlayFrameHeight ?? 1;
+    canvas.width = frameWidth;
+    canvas.height = frameHeight;
+    ctx.clearRect(0, 0, frameWidth, frameHeight);
+
+    ctx.lineWidth = Math.max(2, frameWidth / 200);
+
+    if (overlayMapToImage != null && overlaySize != null) {
+      const corners = [
+        overlayMapToImage(-0.5, -0.5),
+        overlayMapToImage(overlaySize - 0.5, -0.5),
+        overlayMapToImage(overlaySize - 0.5, overlaySize - 0.5),
+        overlayMapToImage(-0.5, overlaySize - 0.5),
+      ];
+      ctx.strokeStyle = '#22C55E';
+      ctx.beginPath();
+      ctx.moveTo(corners[0].x, corners[0].y);
+      for (const { x, y } of corners.slice(1)) {
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    } else if (overlayLocation != null) {
+      const { topLeft, topRight, bottomLeft } = overlayLocation;
+      ctx.strokeStyle = '#F59E0B';
+      ctx.beginPath();
+      ctx.moveTo(topLeft.x, topLeft.y);
+      ctx.lineTo(topRight.x, topRight.y);
+      ctx.lineTo(bottomLeft.x, bottomLeft.y);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }, [
+    overlayLocation,
+    overlaySize,
+    overlayMapToImage,
+    overlayFrameWidth,
+    overlayFrameHeight,
+  ]);
+
   if (error) {
     return <p role="alert">{error}</p>;
   }
 
   return (
-    <video
-      ref={videoRef}
-      playsInline
-      muted
-      className={active ? 'mx-auto w-full max-w-96' : 'hidden'}
-      data-testid="qr-debug-video"
-    />
+    <div className={active ? 'relative mx-auto w-full max-w-96' : 'hidden'}>
+      <video
+        ref={videoRef}
+        playsInline
+        muted
+        className="w-full"
+        data-testid="qr-debug-video"
+      />
+      <canvas
+        ref={overlayRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        aria-hidden="true"
+      />
+    </div>
   );
 }

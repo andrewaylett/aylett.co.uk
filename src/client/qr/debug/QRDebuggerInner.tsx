@@ -9,6 +9,7 @@ import { CameraScanner } from '@/client/qr/debug/CameraScanner';
 import { CorrectedMatrixSVG } from '@/client/qr/debug/CorrectedMatrixSVG';
 import { ImageInput } from '@/client/qr/debug/ImageInput';
 import { fileToRgba } from '@/client/qr/debug/imageSource';
+import { SourceImageCanvas } from '@/client/qr/debug/SourceImageCanvas';
 import { analyseImage } from '@/client/qr/decoder/analyseImage';
 
 export default function QRDebuggerInner(): JSX.Element {
@@ -41,6 +42,13 @@ export default function QRDebuggerInner(): JSX.Element {
   const quietZoneTruncation = result?.ok
     ? result.analysis.quietZoneTruncation
     : undefined;
+  const location = result?.ok
+    ? result.analysis.location
+    : result?.partial?.location;
+  const mapToImage = result?.ok
+    ? result.analysis.mapToImage
+    : result?.partial?.mapToImage;
+  const size = result?.ok ? result.analysis.size : result?.partial?.size;
 
   return (
     <div className="flex flex-col gap-4">
@@ -62,13 +70,33 @@ export default function QRDebuggerInner(): JSX.Element {
             setCameraRequested((requested) => !requested);
           }}
         >
-          {cameraRequested ? 'Stop camera' : 'Scan with camera'}
+          {cameraRequested
+            ? scanning
+              ? 'Stop camera'
+              : 'Scan again'
+            : 'Scan with camera'}
         </button>
       )}
       {cameraRequested && (
-        <CameraScanner active={scanning} onFrame={setFrame} />
+        <CameraScanner
+          active={scanning}
+          onFrame={setFrame}
+          overlayLocation={location}
+          overlaySize={size}
+          overlayMapToImage={mapToImage}
+          overlayFrameWidth={frame?.width}
+          overlayFrameHeight={frame?.height}
+        />
       )}
       {loadError && <p role="alert">{loadError}</p>}
+      {frame && !scanning && (
+        <SourceImageCanvas
+          frame={frame}
+          size={size}
+          mapToImage={mapToImage}
+          location={location}
+        />
+      )}
       {matrix && (
         <CorrectedMatrixSVG
           matrix={matrix}
