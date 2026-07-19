@@ -66,17 +66,54 @@ function expandList(raw: string): Set<string> {
   return out;
 }
 
+function expandListWithRoots(raw: string): {
+  words: Set<string>;
+  roots: Map<string, string>;
+} {
+  const words = new Set<string>();
+  const roots = new Map<string, string>();
+  for (const token of raw.split(/\s+/)) {
+    if (!token) {
+      continue;
+    }
+    const [base, flags = ''] = token.split('/');
+    if (!/^[a-z]+$/.test(base)) {
+      continue;
+    }
+    const upperBase = base.toUpperCase();
+    for (const w of inflect(base, flags)) {
+      if (w.length >= 4) {
+        const upper = w.toUpperCase();
+        words.add(upper);
+        roots.set(upper, upperBase);
+      }
+    }
+  }
+  return { words, roots };
+}
+
 export const AVOID: Set<string> = expandList(RAW_AVOID);
-const COMMON = new Set(
-  [...expandList(RAW_COMMON)].filter((w) => !AVOID.has(w)),
+const { words: COMMON_RAW, roots: COMMON_ROOTS } =
+  expandListWithRoots(RAW_COMMON);
+const COMMON = new Set([...COMMON_RAW].filter((w) => !AVOID.has(w)));
+export const WORD_ROOTS: ReadonlyMap<string, string> = new Map(
+  [...COMMON_ROOTS.entries()].filter(([w]) => COMMON.has(w)),
 );
+export function shareRoot(w1: string, w2: string): boolean {
+  const r1 = WORD_ROOTS.get(w1);
+  const r2 = WORD_ROOTS.get(w2);
+  return r1 !== undefined && r2 !== undefined && r1 === r2;
+}
 export const DEFAULT_WORDS: string[] = [
   ...new Set(
     [...COMMON, ...expandList(RAW_EXTRA)].filter((w) => !AVOID.has(w)),
   ),
 ].sort();
 export const SEEDS: string[] = [...COMMON].filter(
-  (w) => w.length >= 11 && w.length <= 14,
+  (w) => w.length >= 9 && w.length <= 14,
+);
+export const SECONDARY_SEEDS: string[] = [...COMMON].filter(
+  (w) => w.length >= 8 && w.length <= 14,
 );
 export const FILLWORDS: string[] = [...COMMON].filter(
   (w) => w.length >= 4 && w.length <= 9,

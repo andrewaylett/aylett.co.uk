@@ -24,6 +24,7 @@ export interface Puzzle {
   edges: string[];
   words: WordsRecord;
   seed: string;
+  seed2: string;
   critters: string[];
 }
 
@@ -65,6 +66,7 @@ function pack(res: BuildResult): Puzzle {
     edges: [...res.edges],
     words,
     seed: res.seed,
+    seed2: res.seed2,
     critters: shuffle(CRITTERS).slice(0, 16),
   };
 }

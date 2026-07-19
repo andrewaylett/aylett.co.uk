@@ -33,6 +33,7 @@ const PuzzleSchema = z.object({
   edges: z.array(z.string()),
   words: z.record(z.string(), WordsValueSchema.optional()),
   seed: z.string(),
+  seed2: z.string(),
   critters: z.array(z.string()),
 });
 
