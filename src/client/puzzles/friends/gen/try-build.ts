@@ -81,15 +81,15 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
   );
   let seed2: string | null = null;
   for (const candidate of secondaryPool) {
-    const placement = searchPlacement(
+    const placements = searchPlacement(
       candidate,
       [...initialGrid],
       initialEdges,
     );
-    if (!placement) {
+    if (placements.length === 0) {
       continue;
     }
-    applyWord(candidate, placement.path, initialGrid, initialEdges);
+    applyWord(candidate, placements[0].path, initialGrid, initialEdges);
     seed2 = candidate;
     break;
   }
@@ -170,19 +170,21 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
         if (usedWords.has(word)) {
           continue;
         }
-        const placement = searchPlacement(word, state.grid, state.edges);
-        if (!placement) {
+        const placements = searchPlacement(word, state.grid, state.edges);
+        if (placements.length === 0) {
           continue;
         }
         targetLen = len;
-        // Temp copy for scoring; produce would be wasteful here.
-        const tempGrid = [...state.grid];
-        const tempEdges = new Set(state.edges);
-        applyWord(word, placement.path, tempGrid, tempEdges);
-        const nextRemaining = remaining.filter((w) => w !== word);
-        const candidateScore =
-          wordsPlaced + 1 + countPotentialFit(tempGrid, nextRemaining);
-        candidates.push({ word, placement, candidateScore });
+        for (const placement of placements) {
+          // Temp copy for scoring; produce would be wasteful here.
+          const tempGrid = [...state.grid];
+          const tempEdges = new Set(state.edges);
+          applyWord(word, placement.path, tempGrid, tempEdges);
+          const nextRemaining = remaining.filter((w) => w !== word);
+          const candidateScore =
+            wordsPlaced + 1 + countPotentialFit(tempGrid, nextRemaining);
+          candidates.push({ word, placement, candidateScore });
+        }
       }
       if (targetLen !== null) {
         break;
@@ -194,8 +196,9 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
     }
     candidates.sort((a, b) => b.candidateScore - a.candidateScore);
     const capturedLen = targetLen;
+    const MAX_BRANCH = 15;
 
-    for (const { word, placement } of candidates) {
+    for (const { word, placement } of candidates.slice(0, MAX_BRANCH)) {
       usedWords.add(word);
       const nextState = produce(state, (draft) => {
         applyWord(word, placement.path, draft.grid, draft.edges);

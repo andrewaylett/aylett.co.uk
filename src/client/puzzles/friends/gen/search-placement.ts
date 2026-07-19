@@ -12,12 +12,14 @@ export interface Placement {
   fills: number;
 }
 
+const MAX_PLACEMENTS = 3;
+
 export function searchPlacement(
   word: string,
   grid: (string | null)[],
   edges: Set<string>,
-): Placement | null {
-  let best: Placement | null = null;
+): Placement[] {
+  const results: Placement[] = [];
   let nodes = 0;
   const L = word.length;
   const degAdj = Array.from<number>({ length: 16 }).fill(0);
@@ -35,9 +37,7 @@ export function searchPlacement(
     if (i === L) {
       if (fills > 0) {
         const score = L * 30 + fills * 60 + reuse * 12 - newE * 2;
-        if (!best || score > best.score) {
-          best = { path: [...path], score, fills };
-        }
+        results.push({ path: [...path], score, fills });
       }
       return;
     }
@@ -84,5 +84,6 @@ export function searchPlacement(
     }
     dfs(1, s, [s], g === null ? 1 : 0, 0, g === null ? 0 : 1);
   }
-  return best;
+  results.sort((a, b) => b.score - a.score);
+  return results.slice(0, MAX_PLACEMENTS);
 }
