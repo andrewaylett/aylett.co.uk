@@ -10,7 +10,11 @@ import { boardContext } from '@/client/puzzles/friends/lexicon';
 import { placeSeedPath } from '@/client/puzzles/friends/gen/place-seed-path';
 import { applyWord } from '@/client/puzzles/friends/gen/apply-word';
 import { shuffle } from '@/client/puzzles/friends/helpers';
-import { FILLWORDS } from '@/client/puzzles/friends/words';
+import {
+  FILLWORDS,
+  SECONDARY_SEEDS,
+  shareRoot,
+} from '@/client/puzzles/friends/words';
 import {
   type Placement,
   searchPlacement,
@@ -23,6 +27,7 @@ export interface BuildResult {
   edges: Set<string>;
   accepted: Map<string, WordInfo>;
   seed: string;
+  seed2: string;
 }
 
 interface DfsState {
@@ -70,6 +75,29 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
   }
   applyWord(seed, seedPath, initialGrid, initialEdges);
 
+  // Place a second anchor word (length ≥ 8, different root from seed1).
+  const secondaryPool = shuffle(
+    SECONDARY_SEEDS.filter((w) => w !== seed && !shareRoot(seed, w)),
+  );
+  let seed2: string | null = null;
+  for (const candidate of secondaryPool) {
+    const placement = searchPlacement(
+      candidate,
+      [...initialGrid],
+      initialEdges,
+    );
+    if (!placement) {
+      continue;
+    }
+    applyWord(candidate, placement.path, initialGrid, initialEdges);
+    seed2 = candidate;
+    break;
+  }
+  if (!seed2) {
+    return null;
+  }
+  const seed2Word = seed2;
+
   const shuffled = shuffle(FILLWORDS);
   const allLens = [9, 8, 7, 6, 5, 4] as const;
   const wordsByLen = new Map<number, string[]>();
@@ -83,7 +111,8 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
 
   let bestResult: BuildResult | null = null;
   let bestScore = -Infinity;
-  const usedWords = new Set<string>();
+  // Exclude both seeds from fill DFS so they can't be re-placed.
+  const usedWords = new Set<string>([seed, seed2Word]);
 
   const dfs = async (state: DfsState, wordsPlaced: number): Promise<void> => {
     const remaining = FILLWORDS.filter(
@@ -109,12 +138,18 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
       const ctx = await boardContext(filledGrid);
       enrich(filledGrid, edges, ctx);
       const accepted = scanWords(filledGrid, edges, ctx);
-      if (!accepted.has(seed)) {
+      if (!accepted.has(seed) || !accepted.has(seed2Word)) {
         return;
       }
       if (upperBound > bestScore) {
         bestScore = upperBound;
-        bestResult = { grid: filledGrid, edges, accepted, seed };
+        bestResult = {
+          grid: filledGrid,
+          edges,
+          accepted,
+          seed,
+          seed2: seed2Word,
+        };
       }
       return;
     }
