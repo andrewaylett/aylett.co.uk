@@ -38,7 +38,7 @@ catalog:
   babel-plugin-react-compiler: 1.0.0
   baseline-browser-mapping: 2.10.40
   browserslist: 4.28.4
-  caniuse-lite: 1.0.30001799
+  caniuse-lite: 1.0.30001806
   client-only: 0.0.1
   date-fns: 4.4.0
   encoding: 0.1.13
