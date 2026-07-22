@@ -28,7 +28,7 @@ export function FoundWords({
       ) : (
         <ul className="list-none m-0 p-0 overflow-y-auto">
           {[...found].reverse().map((w) => {
-            const starCount = Math.max(0, 3 - (maxLen - w.length));
+            const starCount = Math.min(3, Math.max(0, 3 - (maxLen - w.length)));
             return (
               <li
                 key={w}
