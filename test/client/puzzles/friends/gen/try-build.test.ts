@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { produce } from 'immer';
 
 // Importing try-build triggers enableMapSet(), which is required for Immer to
-// handle the Set<string> edges field in DfsState. This import must be present
+// handle the Set<string> edges field in FillState. This import must be present
 // for the test below to pass, and removing enableMapSet() from try-build will
 // break it.
 import { countPotentialFit } from '@/client/puzzles/friends/gen/try-build';
