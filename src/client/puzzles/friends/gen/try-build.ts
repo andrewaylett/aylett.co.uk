@@ -15,12 +15,13 @@ import {
   SECONDARY_SEEDS,
   shareRoot,
 } from '@/client/puzzles/friends/words';
-import {
-  type Placement,
-  searchPlacement,
-} from '@/client/puzzles/friends/gen/search-placement';
+import { searchPlacement } from '@/client/puzzles/friends/gen/search-placement';
 import { scanAvoid } from '@/client/puzzles/friends/gen/scan-avoid';
 import { enrich } from '@/client/puzzles/friends/gen/enrich';
+import {
+  bestFirst,
+  type Candidate,
+} from '@/client/puzzles/friends/gen/best-first';
 
 export interface BuildResult {
   grid: string[];
@@ -30,10 +31,12 @@ export interface BuildResult {
   seed2: string;
 }
 
-interface DfsState {
+interface FillState {
   grid: (string | null)[];
   edges: Set<string>;
   maxWordLen: number;
+  wordsPlaced: number;
+  usedWords: Set<string>;
 }
 
 export function countPotentialFit(
@@ -109,110 +112,106 @@ export async function tryBuild(seed: string): Promise<BuildResult | null> {
   }
   const sortedLens = allLens.filter((l) => wordsByLen.has(l));
 
-  let bestResult: BuildResult | null = null;
-  let bestScore = -Infinity;
-  // Exclude both seeds from fill DFS so they can't be re-placed.
-  const usedWords = new Set<string>([seed, seed2Word]);
+  const initialMaxWordLen = sortedLens[0] ?? 9;
+  const seedCandidate = new FillCandidate(
+    {
+      grid: initialGrid,
+      edges: initialEdges,
+      maxWordLen: initialMaxWordLen,
+      wordsPlaced: 0,
+      // Exclude both seeds from the fill search so they can't be re-placed.
+      usedWords: new Set<string>([seed, seed2Word]),
+    },
+    wordsByLen,
+    sortedLens,
+  );
 
-  const dfs = async (state: DfsState, wordsPlaced: number): Promise<void> => {
+  // bestFirst yields fully-filled grids in strictly descending maxScore
+  // order, and a full grid's real value can never exceed its own bound — so
+  // the first one that verifies is provably the best reachable result. No
+  // need to keep searching for a higher-scoring accepted grid.
+  for (const filled of bestFirst([seedCandidate])) {
+    const filledGrid = filled.grid as string[];
+    // Copy edges: enrich mutates them; filled.edges may be frozen by immer.
+    const edges = new Set(filled.edges);
+    if (scanAvoid(filledGrid, edges).size > 0) {
+      continue;
+    }
+    const ctx = await boardContext(filledGrid);
+    enrich(filledGrid, edges, ctx);
+    const accepted = scanWords(filledGrid, edges, ctx);
+    if (!accepted.has(seed) || !accepted.has(seed2Word)) {
+      continue;
+    }
+    return { grid: filledGrid, edges, accepted, seed, seed2: seed2Word };
+  }
+  return null;
+}
+
+/**
+ * A node in the fill search tree: a grid partially filled with words, plus
+ * the bookkeeping (`maxWordLen`, `usedWords`) needed to expand it further.
+ * Immutable — best-first expansion order isn't depth-first, so state the old
+ * DFS mutated in place around the recursive call (`usedWords`, added before
+ * recursing and deleted after) must instead be carried per-candidate.
+ */
+class FillCandidate implements Candidate<FillState> {
+  constructor(
+    private readonly state: FillState,
+    private readonly wordsByLen: Map<number, string[]>,
+    private readonly sortedLens: readonly number[],
+  ) {}
+
+  get maxScore(): number {
+    const { grid, maxWordLen, usedWords, wordsPlaced } = this.state;
     const remaining = FILLWORDS.filter(
-      (w) => !usedWords.has(w) && w.length <= state.maxWordLen,
+      (w) => !usedWords.has(w) && w.length <= maxWordLen,
     );
-    const emptyCount = state.grid.filter((c) => c === null).length;
+    // Valid for both pruning and leaf scoring: placing a word increments
+    // wordsPlaced by 1 but removes the word from remaining and tightens the
+    // empty-slot budget, so the bound is non-increasing along any path.
+    return wordsPlaced + countPotentialFit(grid, remaining);
+  }
 
-    // upperBound is valid for both pruning and leaf scoring: placing a word
-    // increments wordsPlaced by 1 but removes the word from remaining and
-    // tightens empty-slot budget, so the bound is non-increasing along any path.
-    const upperBound = wordsPlaced + countPotentialFit(state.grid, remaining);
-    if (upperBound <= bestScore) {
-      return;
-    }
+  resolution(): FillState | undefined {
+    return this.state.grid.includes(null) ? undefined : this.state;
+  }
 
-    if (emptyCount === 0) {
-      const filledGrid = state.grid as string[];
-      // Copy edges: enrich mutates them; state.edges may be frozen by immer.
-      const edges = new Set(state.edges);
-      if (scanAvoid(filledGrid, edges).size > 0) {
-        return;
-      }
-      const ctx = await boardContext(filledGrid);
-      enrich(filledGrid, edges, ctx);
-      const accepted = scanWords(filledGrid, edges, ctx);
-      if (!accepted.has(seed) || !accepted.has(seed2Word)) {
-        return;
-      }
-      if (upperBound > bestScore) {
-        bestScore = upperBound;
-        bestResult = {
-          grid: filledGrid,
-          edges,
-          accepted,
-          seed,
-          seed2: seed2Word,
-        };
-      }
-      return;
-    }
-
+  expand(): Iterable<Candidate<FillState>> {
+    const { grid, edges, maxWordLen, usedWords } = this.state;
     let targetLen: number | null = null;
-    const candidates: {
-      word: string;
-      placement: Placement;
-      candidateScore: number;
-    }[] = [];
+    const children: Candidate<FillState>[] = [];
 
-    for (const len of sortedLens) {
-      if (len > state.maxWordLen) {
+    for (const len of this.sortedLens) {
+      if (len > maxWordLen) {
         continue;
       }
-      const wordsOfLen = wordsByLen.get(len) ?? [];
+      const wordsOfLen = this.wordsByLen.get(len) ?? [];
       for (const word of wordsOfLen) {
         if (usedWords.has(word)) {
           continue;
         }
-        const placements = searchPlacement(word, state.grid, state.edges);
+        const placements = searchPlacement(word, grid, edges);
         if (placements.length === 0) {
           continue;
         }
         targetLen = len;
         for (const placement of placements) {
-          // Temp copy for scoring; produce would be wasteful here.
-          const tempGrid = [...state.grid];
-          const tempEdges = new Set(state.edges);
-          applyWord(word, placement.path, tempGrid, tempEdges);
-          const nextRemaining = remaining.filter((w) => w !== word);
-          const candidateScore =
-            wordsPlaced + 1 + countPotentialFit(tempGrid, nextRemaining);
-          candidates.push({ word, placement, candidateScore });
+          const nextState = produce(this.state, (draft) => {
+            applyWord(word, placement.path, draft.grid, draft.edges);
+            draft.maxWordLen = len;
+            draft.wordsPlaced += 1;
+            draft.usedWords.add(word);
+          });
+          children.push(
+            new FillCandidate(nextState, this.wordsByLen, this.sortedLens),
+          );
         }
       }
       if (targetLen !== null) {
         break;
       }
     }
-
-    if (candidates.length === 0 || targetLen === null) {
-      return;
-    }
-    candidates.sort((a, b) => b.candidateScore - a.candidateScore);
-    const capturedLen = targetLen;
-    const MAX_BRANCH = 15;
-
-    for (const { word, placement } of candidates.slice(0, MAX_BRANCH)) {
-      usedWords.add(word);
-      const nextState = produce(state, (draft) => {
-        applyWord(word, placement.path, draft.grid, draft.edges);
-        draft.maxWordLen = capturedLen;
-      });
-      await dfs(nextState, wordsPlaced + 1);
-      usedWords.delete(word);
-    }
-  };
-
-  const initialMaxWordLen = sortedLens[0] ?? 9;
-  await dfs(
-    { grid: initialGrid, edges: initialEdges, maxWordLen: initialMaxWordLen },
-    0,
-  );
-  return bestResult;
+    return children;
+  }
 }

@@ -6,6 +6,10 @@ import {
   shuffle,
 } from '@/client/puzzles/friends/helpers';
 import { isUniqueTrace } from '@/client/puzzles/friends/gen/is-unique-trace';
+import {
+  bestFirst,
+  type Candidate,
+} from '@/client/puzzles/friends/gen/best-first';
 
 export interface Placement {
   path: number[];
@@ -16,8 +20,8 @@ export interface Placement {
 const MAX_PLACEMENTS = 3;
 
 /**
- * Upper bound on the score of any completion reachable from a DFS node that
- * has taken `i` of `L` steps with the given running totals.
+ * Upper bound on the score of any completion reachable from a search node
+ * that has taken `i` of `L` steps with the given running totals.
  *
  * The leaf score is `L*30 + fills*60 + reuse*12 - newE*2`, and `fills`,
  * `reuse`, `newE` only ever increase as the path extends. Each remaining
@@ -41,106 +45,145 @@ export function upperBoundScore(
   return L * 30 + fills * 60 + reuse * 12 - newE * 2 + 58 * (L - i);
 }
 
+/**
+ * A node in the placement search tree: a partial path of `word` through the
+ * grid. Immutable (each expansion produces new child instances) because
+ * best-first expansion order isn't depth-first — the old hand-rolled DFS
+ * relied on push/pop symmetry around a shared `degAdj` array, which only
+ * works under strict LIFO recursion.
+ */
+class PlacementCandidate implements Candidate<Placement> {
+  constructor(
+    private readonly word: string,
+    private readonly grid: (string | null)[],
+    private readonly edges: Set<string>,
+    private readonly i: number,
+    private readonly cell: number,
+    private readonly path: number[],
+    private readonly fills: number,
+    private readonly newE: number,
+    private readonly reuse: number,
+    private readonly degAdj: readonly number[],
+  ) {}
+
+  get maxScore(): number {
+    return upperBoundScore(
+      this.word.length,
+      this.i,
+      this.fills,
+      this.reuse,
+      this.newE,
+    );
+  }
+
+  resolution(): Placement | undefined {
+    if (this.i !== this.word.length || this.fills === 0) {
+      return undefined;
+    }
+    // Reject placements that would let the word be traced more than one way
+    // once committed — a word must be unambiguous to find.
+    const tempGrid = [...this.grid];
+    const tempEdges = new Set(this.edges);
+    for (let k = 0; k < this.path.length; k++) {
+      tempGrid[this.path[k]] = this.word[k];
+      if (k > 0) {
+        tempEdges.add(
+          ekey(this.path[k - 1].toString(), this.path[k].toString()),
+        );
+      }
+    }
+    if (!isUniqueTrace(this.word, tempGrid, tempEdges)) {
+      return undefined;
+    }
+    return { path: [...this.path], score: this.maxScore, fills: this.fills };
+  }
+
+  expand(): Iterable<Candidate<Placement>> {
+    if (this.i === this.word.length) {
+      // Terminal node with no valid resolution (ambiguous trace, or
+      // fills === 0) — dead end.
+      return [];
+    }
+    const children: Candidate<Placement>[] = [];
+    for (const nb of shuffle(NEIGH[this.cell])) {
+      if (this.path.includes(nb)) {
+        continue;
+      }
+      const g = this.grid[nb];
+      if (g !== null && g !== this.word[this.i]) {
+        continue;
+      }
+      const ek = ekey(this.cell.toString(), nb.toString());
+      const isNew = !this.edges.has(ek);
+      let degAdj = this.degAdj;
+      if (isNew) {
+        const degCell = cellDegree(this.cell, this.edges) + degAdj[this.cell];
+        const degNb = cellDegree(nb, this.edges) + degAdj[nb];
+        if (
+          degCell >= maxEdgesForCell(this.cell) ||
+          degNb >= maxEdgesForCell(nb)
+        ) {
+          continue;
+        }
+        degAdj = degAdj
+          .with(this.cell, degAdj[this.cell] + 1)
+          .with(nb, degAdj[nb] + 1);
+      }
+      children.push(
+        new PlacementCandidate(
+          this.word,
+          this.grid,
+          this.edges,
+          this.i + 1,
+          nb,
+          [...this.path, nb],
+          this.fills + (g === null ? 1 : 0),
+          this.newE + (isNew ? 1 : 0),
+          this.reuse + (g === null ? 0 : 1) + (isNew ? 0 : 1),
+          degAdj,
+        ),
+      );
+    }
+    return children;
+  }
+}
+
 export function searchPlacement(
   word: string,
   grid: (string | null)[],
   edges: Set<string>,
 ): Placement[] {
-  const results: Placement[] = [];
-  let nodes = 0;
-  const L = word.length;
-  const degAdj = Array.from<number>({ length: 16 }).fill(0);
-  const insertResult = (p: Placement): void => {
-    let idx = results.findIndex((r) => r.score < p.score);
-    if (idx === -1) {
-      idx = results.length;
-    }
-    if (idx < MAX_PLACEMENTS) {
-      results.splice(idx, 0, p);
-      if (results.length > MAX_PLACEMENTS) {
-        results.pop();
-      }
-    }
-  };
-  const dfs = (
-    i: number,
-    cell: number,
-    path: number[],
-    fills: number,
-    newE: number,
-    reuse: number,
-  ): void => {
-    if (nodes++ > 6000) {
-      return;
-    }
-    if (
-      results.length === MAX_PLACEMENTS &&
-      upperBoundScore(L, i, fills, reuse, newE) <=
-        results[MAX_PLACEMENTS - 1].score
-    ) {
-      return;
-    }
-    if (i === L) {
-      if (fills > 0) {
-        // Reject placements that would let the word be traced more than one
-        // way once committed — a word must be unambiguous to find.
-        const tempGrid = [...grid];
-        const tempEdges = new Set(edges);
-        for (let k = 0; k < path.length; k++) {
-          tempGrid[path[k]] = word[k];
-          if (k > 0) {
-            tempEdges.add(ekey(path[k - 1].toString(), path[k].toString()));
-          }
-        }
-        if (isUniqueTrace(word, tempGrid, tempEdges)) {
-          const score = L * 30 + fills * 60 + reuse * 12 - newE * 2;
-          insertResult({ path: [...path], score, fills });
-        }
-      }
-      return;
-    }
-    for (const nb of shuffle(NEIGH[cell])) {
-      if (path.includes(nb)) {
-        continue;
-      }
-      const g = grid[nb];
-      if (g !== null && g !== word[i]) {
-        continue;
-      }
-      const ek = ekey(cell.toString(), nb.toString());
-      const isNew = !edges.has(ek);
-      if (isNew) {
-        if (
-          cellDegree(cell, edges) + degAdj[cell] >= maxEdgesForCell(cell) ||
-          cellDegree(nb, edges) + degAdj[nb] >= maxEdgesForCell(nb)
-        ) {
-          continue;
-        }
-        degAdj[cell]++;
-        degAdj[nb]++;
-      }
-      path.push(nb);
-      dfs(
-        i + 1,
-        nb,
-        path,
-        fills + (g === null ? 1 : 0),
-        newE + (isNew ? 1 : 0),
-        reuse + (g === null ? 0 : 1) + (isNew ? 0 : 1),
-      );
-      path.pop();
-      if (isNew) {
-        degAdj[cell]--;
-        degAdj[nb]--;
-      }
-    }
-  };
+  const zeroDegAdj = Array.from<number>({ length: 16 }).fill(0);
+  const seeds: Candidate<Placement>[] = [];
   for (let s = 0; s < 16; s++) {
     const g = grid[s];
     if (g !== null && g !== word[0]) {
       continue;
     }
-    dfs(1, s, [s], g === null ? 1 : 0, 0, g === null ? 0 : 1);
+    seeds.push(
+      new PlacementCandidate(
+        word,
+        grid,
+        edges,
+        1,
+        s,
+        [s],
+        g === null ? 1 : 0,
+        0,
+        g === null ? 0 : 1,
+        zeroDegAdj,
+      ),
+    );
+  }
+  const results: Placement[] = [];
+  // maxExpansions counts expand() calls, not total node visits like the old
+  // `nodes` counter, so this is an approximate carryover of the old budget
+  // rather than an exact equivalent.
+  for (const placement of bestFirst(seeds, { maxExpansions: 6000 })) {
+    results.push(placement);
+    if (results.length >= MAX_PLACEMENTS) {
+      break;
+    }
   }
   return results;
 }
