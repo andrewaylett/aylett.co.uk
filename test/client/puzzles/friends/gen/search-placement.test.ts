@@ -128,6 +128,20 @@ describe('searchPlacement', () => {
     }
   });
 
+  it('rejects every candidate when the word is already traceable elsewhere on the board', () => {
+    // 'cat' is already fully spelled via 12(c)-13(a)-14(t), all existing
+    // edges. That trace is never disturbed by a new placement, so any
+    // fill-based completion elsewhere on the board would leave the word
+    // traceable two ways — every candidate must therefore be rejected.
+    const grid = emptyGrid();
+    grid[12] = 'c';
+    grid[13] = 'a';
+    grid[14] = 't';
+    const edges = new Set([ekey('12', '13'), ekey('13', '14')]);
+    const results = searchPlacement('cat', grid, edges);
+    expect(results).toHaveLength(0);
+  });
+
   describe('upperBoundScore', () => {
     it('equals the exact leaf formula when i === L', () => {
       const L = 4;

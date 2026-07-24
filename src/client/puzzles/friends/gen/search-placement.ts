@@ -5,6 +5,7 @@ import {
   NEIGH,
   shuffle,
 } from '@/client/puzzles/friends/helpers';
+import { isUniqueTrace } from '@/client/puzzles/friends/gen/is-unique-trace';
 
 export interface Placement {
   path: number[];
@@ -81,8 +82,20 @@ export function searchPlacement(
     }
     if (i === L) {
       if (fills > 0) {
-        const score = L * 30 + fills * 60 + reuse * 12 - newE * 2;
-        insertResult({ path: [...path], score, fills });
+        // Reject placements that would let the word be traced more than one
+        // way once committed — a word must be unambiguous to find.
+        const tempGrid = [...grid];
+        const tempEdges = new Set(edges);
+        for (let k = 0; k < path.length; k++) {
+          tempGrid[path[k]] = word[k];
+          if (k > 0) {
+            tempEdges.add(ekey(path[k - 1].toString(), path[k].toString()));
+          }
+        }
+        if (isUniqueTrace(word, tempGrid, tempEdges)) {
+          const score = L * 30 + fills * 60 + reuse * 12 - newE * 2;
+          insertResult({ path: [...path], score, fills });
+        }
       }
       return;
     }
