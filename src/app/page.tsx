@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 
 export const metadata: Metadata = {
   verification: {
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 function Home(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       header={
         <>
           <h1 className="text-center">Welcome to aylett.co.uk</h1>
@@ -81,7 +81,7 @@ function Home(): JSX.Element {
           </Link>
         </p>
       </main>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }
 

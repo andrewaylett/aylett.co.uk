@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 
 const TITLE = 'Tools';
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function ToolsPage(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       breadcrumbs={[]}
       header={<h1 className="text-center">{TITLE}</h1>}
       schemaType="Item"
@@ -45,6 +45,6 @@ export default function ToolsPage(): JSX.Element {
           </Link>
         </p>
       </main>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

@@ -4,7 +4,7 @@ import type { Metadata } from '@/remark/traverse';
 import type { Article, Thought } from '@/types';
 
 import { ListingEntry } from '@/components/ListingEntry';
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export function TagPageContent({
@@ -49,7 +49,7 @@ export function TagPageContent({
       <></>
     );
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="ItemList"
       resource={`/tags/${tag}`}
       breadcrumbs={[{ href: '/tags', text: 'Tags' }]}
@@ -57,6 +57,6 @@ export function TagPageContent({
     >
       {articles}
       {thoughts}
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

@@ -4,7 +4,7 @@ import type { JSX } from 'react';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 function Schema(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="ItemList"
       resource="/schema"
       breadcrumbs={[]}
@@ -52,7 +52,7 @@ function Schema(): JSX.Element {
           </a>
         </li>
       </ol>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }
 

@@ -1,5 +1,3 @@
-import { Suspense } from 'react';
-
 import { buildMetadata } from '@/remark/traverse';
 import { ArticleSchema } from '@/types';
 import { ListingEntry } from '@/components/ListingEntry';
@@ -17,9 +15,7 @@ export async function Articles(): Promise<JSX.Element> {
   return (
     <>
       {sorted.map(({ id: name, data }) => (
-        <Suspense key={name}>
-          <ListingEntry name={name} data={data} />
-        </Suspense>
+        <ListingEntry key={name} name={name} data={data} />
       ))}
     </>
   );

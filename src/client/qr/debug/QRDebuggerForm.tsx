@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, type JSX } from 'react';
+import { type JSX, Suspense } from 'react';
 
 import {
   ErrorBoundary,
@@ -9,11 +9,7 @@ import {
 import dynamic from 'next/dynamic';
 
 function DebuggerError({ error }: ErrorInfo): JSX.Element {
-  const message =
-    typeof error === 'object' && error && 'message' in error
-      ? String(error.message)
-      : 'An unknown error occurred';
-  return <p role="alert">Error decoding QR code: {message}</p>;
+  return <p role="alert">Error decoding QR code: {error.message}</p>;
 }
 
 function Loading(): JSX.Element {

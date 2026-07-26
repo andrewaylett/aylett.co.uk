@@ -4,7 +4,7 @@ import type { JSX } from 'react';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { SuspensePageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 import { SunriseSunset } from '@/app/tools/sun/sunriseSunset';
 
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
 
 export default function SunPage(): JSX.Element {
   return (
-    <PageStructure
+    <SuspensePageStructure
       breadcrumbs={[{ href: '/tools', text: 'Tools' }]}
       header={<TitleHeader>{TITLE}</TitleHeader>}
       schemaType="Item"
       resource="/tools/sun"
     >
       <SunriseSunset />
-    </PageStructure>
+    </SuspensePageStructure>
   );
 }

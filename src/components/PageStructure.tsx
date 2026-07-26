@@ -1,4 +1,9 @@
-import { Suspense, type PropsWithChildren, type JSX } from 'react';
+import {
+  Suspense,
+  type PropsWithChildren,
+  type JSX,
+  type ReactNode,
+} from 'react';
 
 import { Footer, type FooterProps } from './Footer';
 
@@ -13,7 +18,34 @@ export interface PageStructureProps extends FooterProps {
   resource: string;
 }
 
-export function PageStructure({
+export function SuspensePageStructure({
+  children,
+  fallback,
+  ...props
+}: PropsWithChildren<
+  PageStructureProps & { fallback?: ReactNode }
+>): JSX.Element {
+  return (
+    <BasePageStructure {...props}>
+      <Suspense fallback={fallback ?? <BasicFallback />}>
+        <main className="hyphens-manual">{children}</main>
+      </Suspense>
+    </BasePageStructure>
+  );
+}
+
+export function StaticPageStructure({
+  children,
+  ...props
+}: PropsWithChildren<PageStructureProps>): JSX.Element {
+  return (
+    <BasePageStructure {...props}>
+      <main className="hyphens-manual">{children}</main>
+    </BasePageStructure>
+  );
+}
+
+export function BasePageStructure({
   author,
   breadcrumbs,
   children,
@@ -37,9 +69,7 @@ export function PageStructure({
           <Breadcrumbs breadcrumbs={breadcrumbs} />
         )}
         <div className="contain-content">{header}</div>
-        <Suspense fallback={<BasicFallback />}>
-          <main className="hyphens-manual">{children}</main>
-        </Suspense>
+        <main className="hyphens-manual">{children}</main>
         <div className="grow bg-transparent min-h-[50vh] content-end overflow-visible contain-content">
           <Footer author={author} keywords={keywords} copyright={copyright} />
         </div>

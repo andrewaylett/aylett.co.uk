@@ -1,9 +1,9 @@
-import { Suspense, type JSX } from 'react';
+import type { JSX } from 'react';
 
 import Link from 'next/link';
 
 import { ListingEntry } from './ListingEntry';
-import { PageStructure } from './PageStructure';
+import { StaticPageStructure } from './PageStructure';
 import { TitleHeader } from './TitleHeader';
 
 import { buildMetadata, type MDFile } from '@/remark/traverse';
@@ -20,7 +20,7 @@ export async function Thoughts({
   );
   const sorted = sortByKey(pages, (page) => page.data.date);
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="ItemList"
       resource="/thoughts"
       breadcrumbs={[]}
@@ -32,10 +32,8 @@ export async function Thoughts({
         </Link>
       </p>
       {sorted.reverse().map(({ id: name, data }) => (
-        <Suspense key={name}>
-          <ListingEntry name={name} data={data} />
-        </Suspense>
+        <ListingEntry key={name} name={name} data={data} />
       ))}
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

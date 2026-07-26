@@ -2,18 +2,18 @@ import 'server-only';
 
 import type { JSX } from 'react';
 
-import { PageStructure } from '@/components/PageStructure';
+import { SuspensePageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export default function Layout({ children }: LayoutProps<'/qr'>): JSX.Element {
   return (
-    <PageStructure
-      breadcrumbs={[]}
+    <SuspensePageStructure
+      breadcrumbs={[{ href: '/tools', text: 'Tools' }]}
       header={<TitleHeader>QR Code Generator</TitleHeader>}
       schemaType="Item"
       resource="/qr"
     >
       {children}
-    </PageStructure>
+    </SuspensePageStructure>
   );
 }

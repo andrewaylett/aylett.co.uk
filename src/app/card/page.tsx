@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 function Card(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="Organization"
       resource="/card"
       breadcrumbs={[]}
@@ -48,7 +48,7 @@ function Card(): JSX.Element {
           are publicly-viewable.
         </li>
       </ul>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }
 

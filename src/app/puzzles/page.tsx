@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 
-const TITLE = 'Tools';
+const TITLE = 'Puzzles';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function PuzzlesPage(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       breadcrumbs={[]}
       header={<h1 className="text-center">{TITLE}</h1>}
       schemaType="Item"
@@ -35,6 +35,6 @@ export default function PuzzlesPage(): JSX.Element {
           </Link>
         </p>
       </main>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

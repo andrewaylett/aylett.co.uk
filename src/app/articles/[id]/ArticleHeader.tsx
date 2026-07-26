@@ -2,18 +2,16 @@ import type { JSX } from 'react';
 
 import { Revisions } from './Revisions';
 
-import type { Article } from '@/types';
-
 import { Description } from '@/components/Description';
 import { TitleSeparator } from '@/components/TitleSeparator';
+import { articleForId } from '@/app/articles/articles';
 
-export function ArticleHeader({
+export async function ArticleHeader({
   id,
-  data,
 }: {
   id: string;
-  data: Article;
-}): JSX.Element {
+}): Promise<JSX.Element> {
+  const data = (await articleForId(id)).metadata;
   return (
     <header className="contain-content">
       <h1 property="headline">{data.title}</h1>
