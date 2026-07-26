@@ -2,7 +2,7 @@ import 'server-only';
 
 import React, { type JSX } from 'react';
 
-import { PageStructure } from '@/components/PageStructure';
+import { SuspensePageStructure } from '@/components/PageStructure';
 
 const TITLE = 'Word Friends';
 
@@ -12,7 +12,7 @@ export default function Layout({
   children: JSX.Element;
 }): JSX.Element {
   return (
-    <PageStructure
+    <SuspensePageStructure
       breadcrumbs={[]}
       header={<h1 className="text-center">{TITLE}</h1>}
       schemaType="Item"
@@ -21,6 +21,6 @@ export default function Layout({
       <main className="flex flex-col justify-center items-center">
         {children}
       </main>
-    </PageStructure>
+    </SuspensePageStructure>
   );
 }

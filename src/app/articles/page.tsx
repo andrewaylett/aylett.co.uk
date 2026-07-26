@@ -4,7 +4,7 @@ import type { JSX } from 'react';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 import { Articles } from '@/components/Articles';
 
@@ -21,13 +21,13 @@ export const metadata: Metadata = {
 
 export default function articles(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="ItemList"
       resource="/articles"
       breadcrumbs={[]}
       header={<TitleHeader>Articles</TitleHeader>}
     >
       <Articles />
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

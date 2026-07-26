@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { allTags } from './allTags';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleHeader } from '@/components/TitleHeader';
 
 export default async function TagsPage(): Promise<JSX.Element> {
@@ -13,7 +13,7 @@ export default async function TagsPage(): Promise<JSX.Element> {
   const sortedTags = [...tags].sort();
 
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="ItemList"
       resource="/tags"
       breadcrumbs={[]}
@@ -29,6 +29,6 @@ export default async function TagsPage(): Promise<JSX.Element> {
           );
         })}
       </div>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

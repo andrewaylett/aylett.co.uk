@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "pnpm install --frozen-lockfile",
     "dev": "next dev --turbopack",
-    "build": "next build --experimental-app-only --webpack",
+    "build": "next build --experimental-app-only --turbopack",
     "start": "next start",
     "postinstall": "pnpm typegen",
     "format": "pnpm run lint --fix",
@@ -65,6 +65,7 @@
     "@jest/globals": "catalog:",
     "@next/eslint-plugin-next": "catalog:",
     "@prettier/plugin-xml": "catalog:",
+    "@swc/helpers": "catalog:",
     "@swc/jest": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@testing-library/dom": "catalog:",

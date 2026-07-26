@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { ArticleHeader } from './ArticleHeader';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { articleForId } from '@/app/articles/articles';
 
 function makeCopyrightString(
@@ -25,12 +25,12 @@ export async function ArticlePage({
 
   const copyrightString = makeCopyrightString(copyright, revised);
   return (
-    <PageStructure
+    <StaticPageStructure
       lifecycle={lifecycle}
       schemaType="Article"
       resource={`/articles/${id}`}
       breadcrumbs={[{ href: '/articles', text: 'Articles' }]}
-      header={<ArticleHeader id={id} data={metadata} />}
+      header={<ArticleHeader id={id} />}
       author={author}
       copyright={copyrightString}
       keywords={tags}
@@ -38,6 +38,6 @@ export async function ArticlePage({
       <div className="article-body" property="articleBody">
         {content}
       </div>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }

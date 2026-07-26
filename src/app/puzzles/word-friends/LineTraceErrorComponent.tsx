@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 import type {
@@ -12,23 +10,12 @@ import { PuzzleView } from '@/client/puzzles/friends/PuzzleView';
 export const LineTraceErrorComponent: ErrorComponent = ({
   error,
   reset,
-  retry,
 }: ErrorInfo) => {
-  const message =
-    error && typeof error === 'object' && 'message' in error
-      ? String(error.message)
-      : 'Unknown error: ' + String(error);
+  const message = error.message;
   return (
     <div className={'w-full max-w-200 mx-auto'}>
       <div className="flex justify-between flex-wrap gap-2 mb-3">
         <p className="text-red-500 flex-1">{message}</p>
-        <button
-          onClick={() => {
-            retry();
-          }}
-        >
-          Retry
-        </button>
         <button
           onClick={() => {
             reset();

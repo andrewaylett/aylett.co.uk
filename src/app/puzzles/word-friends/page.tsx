@@ -2,12 +2,9 @@ import 'server-only';
 
 import React, { type JSX } from 'react';
 
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-
 import type { Metadata } from 'next';
 
-import { LineTraceWordGame } from '@/client/puzzles/friends/LineTraceWordGame';
-import { LineTraceErrorComponent } from '@/app/puzzles/word-friends/LineTraceErrorComponent';
+import { PuzzleClient } from '@/app/puzzles/word-friends/puzzleClient';
 
 const TITLE = 'Word Friends';
 
@@ -24,9 +21,7 @@ export default function PuzzlesPage(): JSX.Element {
         longer needed turn into friends; lines fade away when they&apos;re
         spent.
       </p>
-      <ErrorBoundary errorComponent={LineTraceErrorComponent}>
-        <LineTraceWordGame />
-      </ErrorBoundary>
+      <PuzzleClient />
     </>
   );
 }

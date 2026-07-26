@@ -7,7 +7,7 @@ import type { Thought } from '@/types';
 
 import { Description } from '@/components/Description';
 import { Optional } from '@/components/Optional';
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 import { TitleSeparator } from '@/components/TitleSeparator';
 import { gitHubUrl } from '@/utilities';
 
@@ -85,7 +85,7 @@ async function Thought({ id }: { id: string }) {
   const { date, tags } = metadata;
 
   return (
-    <PageStructure
+    <StaticPageStructure
       schemaType="Article"
       resource={`/thoughts/${id}`}
       breadcrumbs={[{ href: '/thoughts', text: 'Thoughts' }]}
@@ -96,7 +96,7 @@ async function Thought({ id }: { id: string }) {
       <div className="article-body" property="articleBody">
         {content}
       </div>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }
 

@@ -8,11 +8,6 @@ import {
 } from '@/client/qr/thirdparty/qrcode.react';
 import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
-export interface QRCodeState {
-  qr: QRCodeContent;
-  buttonText: ButtonText;
-}
-
 export interface QRCodeContent {
   text: string;
   shouldOptimiseUrl: boolean;

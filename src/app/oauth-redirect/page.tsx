@@ -4,7 +4,7 @@ import type { JSX } from 'react';
 
 import type { Metadata } from 'next';
 
-import { PageStructure } from '@/components/PageStructure';
+import { StaticPageStructure } from '@/components/PageStructure';
 
 export const metadata: Metadata = {
   title: 'Home Assistant Desktop',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 function Redirect(): JSX.Element {
   return (
-    <PageStructure
+    <StaticPageStructure
       header={
         <>
           <h1 className="text-center">Home Assistant Desktop</h1>
@@ -31,7 +31,7 @@ function Redirect(): JSX.Element {
         If you see this, it's probably because something has gone wrong with
         logging into your Home Assistant instance.
       </p>
-    </PageStructure>
+    </StaticPageStructure>
   );
 }
 
