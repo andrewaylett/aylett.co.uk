@@ -17,7 +17,7 @@ onlyBuiltDependencies:
 - sharp
 - unrs-resolver
 catalog:
-  "@eslint/js": 9.39.4
+  "@eslint/js": 9.39.5
   "@jest/globals": 30.4.1
   "@next/eslint-plugin-next": 16.2.9
   "@prettier/plugin-xml": 3.4.2
@@ -42,7 +42,7 @@ catalog:
   client-only: 0.0.1
   date-fns: 4.4.0
   encoding: 0.1.13
-  eslint: 9.39.4
+  eslint: 9.39.5
   eslint-config-andrewaylett: 7.0.0
   eslint-config-next: 16.2.9
   eslint-import-resolver-typescript: 4.4.5
