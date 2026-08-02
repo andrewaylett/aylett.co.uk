@@ -67,8 +67,8 @@ catalogs:
       specifier: 1.0.0
       version: 1.0.0
     baseline-browser-mapping:
-      specifier: 2.11.7
-      version: 2.11.7
+      specifier: 2.11.8
+      version: 2.11.8
     browserslist:
       specifier: 4.28.7
       version: 4.28.7
@@ -419,7 +419,7 @@ importers:
         version: 1.0.0
       baseline-browser-mapping:
         specifier: 'catalog:'
-        version: 2.11.7
+        version: 2.11.8
       browserslist:
         specifier: 'catalog:'
         version: 4.28.7
@@ -1999,8 +1999,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.11.7:
-    resolution: {integrity: sha512-APw5YuIQAg6L9w4sHDI6j26DGFJI6RpYOhnkMPdC9lWbkKvsyPHzDsve1yd73lk21yz7Y09Kci8B2Pp9FonzWA==}
+  baseline-browser-mapping@2.11.8:
+    resolution: {integrity: sha512-zAgkquC2WYF0PIc6XbNYkA2uuxxFavzgmX61R+dHDUa558V8Ejf8ozTZFR6QzM24RWu4kBcRkhJ5kpz77j9fnQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -6323,7 +6323,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.11.7: {}
+  baseline-browser-mapping@2.11.8: {}
 
   bidi-js@1.0.3:
     dependencies:
@@ -6344,7 +6344,7 @@ snapshots:
 
   browserslist@4.28.7:
     dependencies:
-      baseline-browser-mapping: 2.11.7
+      baseline-browser-mapping: 2.11.8
       caniuse-lite: 1.0.30001806
       electron-to-chromium: 1.5.396
       node-releases: 2.0.51
@@ -8710,7 +8710,7 @@ snapshots:
     dependencies:
       '@next/env': 16.2.12
       '@swc/helpers': 0.5.15
-      baseline-browser-mapping: 2.11.7
+      baseline-browser-mapping: 2.11.8
       caniuse-lite: 1.0.30001806
       postcss: 8.4.31
       react: 19.2.4
