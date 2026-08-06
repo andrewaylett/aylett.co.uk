@@ -69,7 +69,15 @@ const LOW_REMAINING_FRACTION = 0.1;
 const MAX_VERSION_ATTEMPTS = 30;
 
 export interface CutoutLayout {
-  version: number;
+  /** The QR code actually encoded and rendered — its own version and error-correction
+   *  level, which the cutout may have chosen independently of the caller's request. */
+  qrcode: QrCode;
+  /** The modules as actually rendered: the surrounding pattern with the text+border's
+   *  clip zone forced light, exactly as a scanner would read them. */
+  cells: boolean[][];
+  /** Same segments the caller encoded — carried through so this can double as a
+   *  QrCodeDetails-shaped source for debug reporting. */
+  segments: readonly QrSegment[];
   margin: number;
   numCells: number;
   /** The surrounding QR pattern, with every module clipping the text+border left light. */
@@ -395,6 +403,7 @@ function fitTextAtVersion(
 // where to draw the real SVG <text> glyph on top of it.
 function buildLayout(
   qrcode: QrCode,
+  segments: readonly QrSegment[],
   fit: TextFit,
   rasterText: string,
   rasterFont: string,
@@ -425,7 +434,9 @@ function buildLayout(
   const baselineY = textBaselineY(ctx, rasterText, interiorHeight);
 
   return {
-    version: qrcode.version,
+    qrcode,
+    cells: clearedCells,
+    segments,
     margin: SPEC_MARGIN_SIZE,
     numCells: size + SPEC_MARGIN_SIZE * 2,
     patternPath: generateFillPath(
@@ -483,7 +494,7 @@ function fitCutout(
       requiredSpare,
     );
     if (fit) {
-      return buildLayout(qrcode, fit, rasterText, rasterFont, ctx);
+      return buildLayout(qrcode, segments, fit, rasterText, rasterFont, ctx);
     }
 
     const nextVersion = qrcode.version + 1;
