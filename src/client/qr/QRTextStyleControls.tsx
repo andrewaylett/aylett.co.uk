@@ -19,7 +19,9 @@ export default function QRTextStyleControls({
       <label
         className={
           'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-          (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
+          (qrContent.dotStyle === 'text' || qrContent.dotStyle === 'cutout'
+            ? ' h-lh'
+            : ' h-0')
         }
       >
         Raster text
@@ -45,7 +47,9 @@ export default function QRTextStyleControls({
       <label
         className={
           'w-full flex flex-row items-center gap-2 overflow-hidden transition-discrete transition-[height] duration-300 ease' +
-          (qrContent.dotStyle === 'text' ? ' h-lh' : ' h-0')
+          (qrContent.dotStyle === 'text' || qrContent.dotStyle === 'cutout'
+            ? ' h-lh'
+            : ' h-0')
         }
       >
         Font
