@@ -110,10 +110,10 @@ interface QRProps {
    * modules (finders, timing, format/version info) square; 'text' splits each
    * module into a 3×3 sub-cell grid where the centre carries the QR value and
    * the outer eight cells show a rasterised text pattern; 'cutout' draws
-   * `rasterText` as solid black full modules with a narrow (half-module)
-   * white border separating it from the surrounding pattern, at whichever
-   * version high error correction naturally requires — sized so only a low
-   * amount of correction capacity remains spare afterwards.
+   * `rasterText` as real (non-pixelated) SVG text with a narrow (half-module)
+   * clear border, omitting any data module the text or border touch, at
+   * whichever version high error correction naturally requires — sized so
+   * only a low amount of correction capacity remains spare afterwards.
    * @defaultValue square
    */
   dotStyle?: 'square' | 'dot' | 'text' | 'cutout';
@@ -812,8 +812,8 @@ function CutoutQRCodeSVGDetails(
     ...otherProps
   } = props;
 
-  // The cutout re-encodes at a high enough version that its text (always
-  // solid black, full modules) and half-module white border fit with a low
+  // The cutout re-encodes at a high enough version that its text, drawn as
+  // real SVG text with a half-module clear border, fits with a low
   // remaining error-correction margin; when that hasn't resolved yet (or no
   // text is set), fall back to the plain square rendering of `details`.
   const cutout = useCutoutLayout(details, rasterText, rasterFont);
@@ -824,11 +824,11 @@ function CutoutQRCodeSVGDetails(
   // Quiet-zone frame: fills the margin band around the module grid.
   const bgPath = `M0,0 h${numCells}v${numCells}H0z`;
 
-  // The text's modules (and everything else) at native resolution; the
-  // fractional half-module border is a separate, finer-grained path drawn
-  // on top of it.
+  // Every module except those the text and its border clip, which are left
+  // light — the text itself is drawn as a real <text> element below, not
+  // approximated by forcing modules dark.
   const fgPath =
-    cutout?.blackPath ?? generatePath(details.cells, details.margin);
+    cutout?.patternPath ?? generatePath(details.cells, details.margin);
 
   return (
     <svg
@@ -848,11 +848,16 @@ function CutoutQRCodeSVGDetails(
       <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
       {!!cutout && (
-        <path
-          fill={bgColor}
-          d={cutout.borderOverlayPath}
-          shapeRendering="crispEdges"
-        />
+        <text
+          x={cutout.text.x}
+          y={cutout.text.y}
+          fontSize={cutout.text.fontSize}
+          fontFamily={`"${rasterFont}"`}
+          textAnchor="middle"
+          fill={fgColor}
+        >
+          {rasterText}
+        </text>
       )}
     </svg>
   );
