@@ -13,6 +13,15 @@
  * running this project's QR decoder over the resulting matrix before it's
  * accepted — the same simulation a real scan would produce, not a guess
  * about how much can safely be erased.
+ *
+ * The cutout must not swallow the error-correction budget the user selected
+ * in "Min error correction" — that budget is meant for real-world scan
+ * damage, not for a hole the generator put there on purpose. So at least
+ * half of the selected level's own nominal correction capacity is always
+ * kept spare afterwards (see KEEP_FRACTION), and extra room for a bigger
+ * cutout is found "for free" wherever possible first by raising the
+ * error-correction level at the same version (more ECC codewords, no
+ * bigger symbol), and only then by raising the version.
  */
 
 import { useEffect, useState } from 'react';
@@ -24,10 +33,10 @@ import {
   STRUCTURAL_BOTTOM_ROWS,
 } from './constants';
 
-import type { Ecc } from '@/client/qr/thirdparty/qrcodegen/Ecc';
 import type { QrSegment } from '@/client/qr/thirdparty/qrcodegen/qrSegment';
 import type { ModuleRegion } from '@/client/qr/decoder/types';
 
+import { Ecc } from '@/client/qr/thirdparty/qrcodegen/Ecc';
 import { QrCode } from '@/client/qr/thirdparty/qrcodegen/qrCode';
 import { functionModuleMap } from '@/client/qr/decoder/functionModules';
 import {
@@ -37,26 +46,38 @@ import {
 } from '@/client/qr/decoder/codewords';
 import { rsDecode } from '@/client/qr/decoder/reedSolomon';
 
-// Below this height (in modules) the cutout is no longer legible, so a
-// smaller height is never attempted — the version is bumped instead.
-const MIN_TEXT_HEIGHT_MODULES = 6;
+// Below this height (in modules) the cutout is not attempted — a smaller
+// glyph than this is illegible however clean the render, and blocky/heavy
+// display fonts (Impact and friends) tend to blob together at this scale
+// once dilated for the border.
+const MIN_TEXT_HEIGHT_MODULES = 8;
 
-// Once a version yields at least this tall a cutout, stop bumping the
-// version further — anything beyond this is a diminishing-returns trade of
-// a bigger symbol for marginally clearer text.
-const COMFORTABLE_TEXT_HEIGHT_MODULES = 14;
+// Once a version/level combination yields at least this tall a cutout, stop
+// searching further — this is comfortably legible for a couple of
+// characters, and anything beyond is a diminishing-returns trade of a
+// bigger symbol for marginally clearer text.
+const COMFORTABLE_TEXT_HEIGHT_MODULES = 20;
 
 // Radius (in modules) of the clear halo drawn around each glyph's ink,
 // forming the "white border" that keeps the QR noise clear of the text.
 const BORDER_MODULES = 1;
 
-// Fraction of each Reed–Solomon block's correction capacity the cutout is
-// allowed to spend, leaving the remainder as a margin for real-world scan
-// damage (dirt, glare, print defects, perspective distortion, ...).
-const MAX_CAPACITY_FRACTION = 0.7;
+// However the cutout's cost is funded (see fitCutout's doc comment), at
+// least this fraction of the selected level's own nominal correction
+// capacity must remain spare afterwards — the "small margin" for real-world
+// scan damage (dirt, glare, print defects, perspective distortion, ...)
+// that the cutout must never fully spend.
+const KEEP_FRACTION = 0.5;
+
+// Every level from the user's selection upward is tried (at the same
+// version) before the version itself is bumped, since a higher level costs
+// nothing in symbol size and — because the required spare is always pegged
+// to the *selected* level's own capacity, never the escalated one — funds
+// a bigger cutout without eroding the guaranteed floor any further.
+const LEVELS = [Ecc.LOW, Ecc.MEDIUM, Ecc.QUARTILE, Ecc.HIGH];
 
 // Safety cap on how many versions we'll try before giving up.
-const MAX_VERSION_ATTEMPTS = 20;
+const MAX_VERSION_ATTEMPTS = 30;
 
 export interface CutoutLayout {
   cells: boolean[][];
@@ -68,6 +89,34 @@ export interface CutoutLayout {
 interface CutoutSource {
   qrcode: QrCode;
   segments: readonly QrSegment[];
+}
+
+// Total codewords correctable across every Reed–Solomon block at this
+// version/level — a pure function of the standard tables, independent of
+// what's actually encoded, so it can be used as a reference even for a
+// level/version combination nothing has been encoded at.
+function totalCorrectableCapacity(version: number, ecl: Ecc): number {
+  const structure = getBlockStructure(version, ecl);
+  return structure.blocks.reduce(
+    (sum, block) => sum + Math.floor(block.eccLen / 2),
+    0,
+  );
+}
+
+// Re-encodes `segments` at an exact (version, level), or returns null if the
+// data doesn't fit that combination (never boosts the level or version
+// beyond what's asked, since the caller is deliberately probing a specific
+// combination).
+function tryEncode(
+  segments: readonly QrSegment[],
+  level: Ecc,
+  version: number,
+): QrCode | null {
+  try {
+    return QrCode.encodeSegments(segments, level, version, version, -1, false);
+  } catch {
+    return null;
+  }
 }
 
 // Forces every module inside `interiorClear` light, but only where that
@@ -123,7 +172,9 @@ function dilate(
 }
 
 // Rasterises `text` centred in a `width`×`height` module-resolution canvas,
-// returning a boolean ink mask (true = dark/glyph pixel).
+// returning a boolean ink mask (true = dark/glyph pixel). Rendered at the
+// font's natural weight (not synthetically bolded) — see fitFontSize's doc
+// for why that matters here specifically.
 function rasterInkMask(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -137,7 +188,7 @@ function rasterInkMask(
   ctx.fillStyle = '#000000';
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'center';
-  ctx.font = `bold ${fontSize}px "${font}"`;
+  ctx.font = `${fontSize}px "${font}"`;
 
   const m = ctx.measureText(text);
   const inkCy =
@@ -160,33 +211,37 @@ function rasterInkMask(
 }
 
 // Runs this project's own QR decoder over the candidate matrix and checks
-// that every Reed–Solomon block both decodes and keeps at least
-// (1 − MAX_CAPACITY_FRACTION) of its correction capacity spare. This is the
-// same check a real scanner's error correction would perform, so it directly
-// answers "would a reader still recover this?" rather than approximating it
-// from module counts.
+// that every Reed–Solomon block decodes, and that the total spare
+// correction capacity left afterwards is at least `requiredSpare` — the
+// same check a real scanner's error correction would perform, so it
+// directly answers "would a reader still recover this, with the selected
+// level's protection intact?" rather than approximating it from module
+// counts.
 function verifyDecodable(
   clearedCells: readonly (readonly boolean[])[],
   version: number,
   mask: number,
-  ecl: Ecc,
+  candidateLevel: Ecc,
+  requiredSpare: number,
 ): boolean {
-  const structure = getBlockStructure(version, ecl);
+  const structure = getBlockStructure(version, candidateLevel);
   const { codewords } = extractCodewords(
     clearedCells.map((row) => [...row]),
     version,
     mask,
   );
   const { blocks } = deinterleave(codewords, structure);
-  return blocks.every((block, i) => {
+
+  let spare = 0;
+  for (const [i, block] of blocks.entries()) {
     const { eccLen } = structure.blocks[i];
     const result = rsDecode(block, eccLen);
     if (!result) {
       return false;
     }
-    const maxAllowed = Math.floor((eccLen / 2) * MAX_CAPACITY_FRACTION);
-    return result.errorPositions.length <= maxAllowed;
-  });
+    spare += Math.floor(eccLen / 2) - result.errorPositions.length;
+  }
+  return spare >= requiredSpare;
 }
 
 interface TextFit {
@@ -194,14 +249,15 @@ interface TextFit {
   height: number;
 }
 
-// Finds the tallest legible cutout that still verifies as decodable with
-// margin at this QR version, or null if even the minimum legible size
-// doesn't leave enough error-correction budget spare.
+// Finds the tallest legible cutout at this exact (version, level) that still
+// leaves `requiredSpare` correction capacity, or null if even the minimum
+// legible size doesn't.
 function fitTextAtVersion(
   qrcode: QrCode,
   rasterText: string,
   rasterFont: string,
   ctx: CanvasRenderingContext2D,
+  requiredSpare: number,
 ): TextFit | null {
   const cells = qrcode.getModules();
   const size = cells.length;
@@ -227,6 +283,7 @@ function fitTextAtVersion(
       rasterFont,
       interiorWidth - 2 * BORDER_MODULES,
       targetHeight,
+      false,
     );
     const inkMask = rasterInkMask(
       ctx,
@@ -243,13 +300,14 @@ function fitTextAtVersion(
       version,
       qrcode.mask,
       qrcode.errorCorrectionLevel,
+      requiredSpare,
     )
       ? clearMask
       : null;
   };
 
   // The smallest legible size sets the floor: if even that doesn't leave
-  // enough spare capacity, no size at this version will.
+  // enough spare capacity, no size at this version/level will.
   const minResult = tryHeight(MIN_TEXT_HEIGHT_MODULES);
   if (!minResult) {
     return null;
@@ -277,12 +335,19 @@ function fitTextAtVersion(
   };
 }
 
-// Tries the cutout at increasing QR versions (re-encoding the same segments
-// and error-correction level each time), since a fixed-size text patch
-// becomes a proportionally smaller — and so more easily correctable —
-// erasure as the symbol grows. Keeps bumping until a comfortably legible
-// height is reached, then uses the tallest layout found across all versions
-// tried (never returning a shorter cutout for a version tried later).
+// Tries the cutout at the selected error-correction level first, then at
+// each higher level (still at the same version — free extra budget), then
+// bumps the version and repeats, until a comfortably legible height is
+// reached or the version cap is exhausted.
+//
+// Whichever (version, level) combination actually ends up drawn, the
+// requirement checked at every step is the same: at least KEEP_FRACTION of
+// the *selected* level's own nominal correction capacity for that version —
+// never the escalated level's, so escalating only ever funds a bigger
+// cutout, it never lets the guaranteed floor slip. Escalating for free (a
+// higher level at the same version, or more raw codewords at a bigger one)
+// means the cutout increasingly comes out of that extra capacity rather
+// than the user's selected level's own share of it.
 function fitCutout(
   baseQrcode: QrCode,
   segments: readonly QrSegment[],
@@ -299,40 +364,54 @@ function fitCutout(
     return null;
   }
 
-  let qrcode = baseQrcode;
+  const targetLevel = baseQrcode.errorCorrectionLevel;
+  const levelsToTry = LEVELS.slice(targetLevel.ordinal);
+
   let bestLayout: CutoutLayout | null = null;
   let bestHeight = 0;
 
-  for (let attempt = 0; attempt < MAX_VERSION_ATTEMPTS; attempt++) {
-    const fit = fitTextAtVersion(qrcode, rasterText, rasterFont, ctx);
-    if (fit && fit.height > bestHeight) {
-      bestHeight = fit.height;
-      bestLayout = {
-        cells: fit.clearedCells,
-        version: qrcode.version,
-        margin: SPEC_MARGIN_SIZE,
-        numCells: fit.clearedCells.length + SPEC_MARGIN_SIZE * 2,
-      };
+  for (
+    let version = baseQrcode.version, attempt = 0;
+    attempt < MAX_VERSION_ATTEMPTS;
+    version++, attempt++
+  ) {
+    const requiredSpare = Math.ceil(
+      totalCorrectableCapacity(version, targetLevel) * KEEP_FRACTION,
+    );
+
+    for (const level of levelsToTry) {
+      const qrcode =
+        level.ordinal === targetLevel.ordinal && version === baseQrcode.version
+          ? baseQrcode
+          : tryEncode(segments, level, version);
+      if (!qrcode) {
+        continue;
+      }
+
+      const fit = fitTextAtVersion(
+        qrcode,
+        rasterText,
+        rasterFont,
+        ctx,
+        requiredSpare,
+      );
+      if (fit && fit.height > bestHeight) {
+        bestHeight = fit.height;
+        bestLayout = {
+          cells: fit.clearedCells,
+          version,
+          margin: SPEC_MARGIN_SIZE,
+          numCells: fit.clearedCells.length + SPEC_MARGIN_SIZE * 2,
+        };
+      }
     }
 
     if (bestHeight >= COMFORTABLE_TEXT_HEIGHT_MODULES) {
       break;
     }
-
-    const nextVersion = qrcode.version + 1;
-    if (nextVersion > QrCode.MAX_VERSION) {
+    if (version + 1 > QrCode.MAX_VERSION) {
       break;
     }
-    // boostEcl: false — keep the level the user asked for exactly, rather
-    // than silently upgrading it now that a bigger version has spare room.
-    qrcode = QrCode.encodeSegments(
-      segments,
-      qrcode.errorCorrectionLevel,
-      nextVersion,
-      nextVersion,
-      -1,
-      false,
-    );
   }
 
   return bestLayout;
@@ -352,7 +431,7 @@ export function useCutoutLayout(
     let cancelled = false;
 
     async function run() {
-      await document.fonts.load(`bold 72px "${rasterFont}"`);
+      await document.fonts.load(`72px "${rasterFont}"`);
       if (cancelled) {
         return;
       }
