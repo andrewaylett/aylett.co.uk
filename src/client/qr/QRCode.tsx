@@ -11,7 +11,7 @@ import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 export interface QRCodeContent {
   text: string;
   shouldOptimiseUrl: boolean;
-  dotStyle: 'square' | 'dot' | 'text';
+  dotStyle: 'square' | 'dot' | 'text' | 'cutout';
   dotRadius: number;
   rasterText: string;
   rasterFont: string;
