@@ -1,37 +1,35 @@
 /*
- * Implements the 'cutout' dot style: a legible hole shaped like `rasterText`
- * punched into the data modules, with every other module left as a normal
- * full square.
+ * Implements the 'cutout' dot style: `rasterText` drawn as solid black full
+ * modules, with a narrow (half-module) white border separating it from the
+ * surrounding pattern, with every other module left as a normal full
+ * square.
  *
  * Unlike the decorative 'text' style (which only ever redraws the true QR
- * value, just visually dressed up), this style actually forces modules
- * light regardless of their encoded value — a scanner reading those modules
- * sees plain white, exactly like any other reader would. That's only safe
+ * value, just visually dressed up), this style actually overwrites modules
+ * regardless of their encoded value — a scanner reading those modules sees
+ * whatever we drew, exactly like any other reader would. That's only safe
  * because the affected modules are always Reed–Solomon data/ECC modules
  * (never finder/timing/alignment/format/version, which carry no redundancy
  * at all), and because every candidate layout is verified by literally
  * running this project's QR decoder over the resulting matrix before it's
  * accepted — the same simulation a real scan would produce, not a guess
- * about how much can safely be erased.
+ * about how much can safely be overwritten.
  *
- * The cutout must not swallow the error-correction budget the user selected
- * in "Min error correction" — that budget is meant for real-world scan
- * damage, not for a hole the generator put there on purpose. So at least
- * half of the selected level's own nominal correction capacity is always
- * kept spare afterwards (see KEEP_FRACTION), and extra room for a bigger
- * cutout is found "for free" wherever possible first by raising the
- * error-correction level at the same version (more ECC codewords, no
- * bigger symbol), and only then by raising the version.
+ * The style always encodes at high error correction — that's the biggest
+ * error budget the format has — and then re-encodes at successively higher
+ * versions only if even the smallest legible text doesn't leave a low
+ * amount of that budget spare. Text is otherwise sized as large as the
+ * resulting version allows, right up to that low remaining margin.
  */
 
 import { useEffect, useState } from 'react';
 
-import { fitFontSize } from './fontFit';
 import {
   SPEC_MARGIN_SIZE,
   STRUCTURAL_TOP_ROWS,
   STRUCTURAL_BOTTOM_ROWS,
 } from './constants';
+import { fitFontSize } from './fontFit';
 
 import type { QrSegment } from '@/client/qr/thirdparty/qrcodegen/qrSegment';
 import type { ModuleRegion } from '@/client/qr/decoder/types';
@@ -47,54 +45,45 @@ import {
 import { rsDecode } from '@/client/qr/decoder/reedSolomon';
 
 // Below this height (in modules) the cutout is not attempted — a smaller
-// glyph than this is illegible however clean the render, and blocky/heavy
-// display fonts (Impact and friends) tend to blob together at this scale
-// once dilated for the border.
+// glyph than this is illegible however clean the render.
 const MIN_TEXT_HEIGHT_MODULES = 8;
 
-// Once a version/level combination yields at least this tall a cutout, stop
-// searching further — this is comfortably legible for a couple of
-// characters, and anything beyond is a diminishing-returns trade of a
-// bigger symbol for marginally clearer text.
-const COMFORTABLE_TEXT_HEIGHT_MODULES = 20;
+// Radius (in whole modules) of the ring around the text's ink treated as
+// "at risk" for the error-correction budget check. The border actually
+// drawn is only half a module wide (see generateBorderOverlayPath) —
+// checking against a full module is deliberately more pessimistic than
+// what's really overwritten, which only widens the safety margin.
+const RING_RADIUS_MODULES = 1;
 
-// Radius (in modules) of the clear halo drawn around each glyph's ink,
-// forming the "white border" that keeps the QR noise clear of the text.
-const BORDER_MODULES = 1;
+// The error-correction level is always the format's strongest, giving the
+// text and border the biggest possible budget to draw within.
+const LEVEL = Ecc.HIGH;
 
-// However the cutout's cost is funded (see fitCutout's doc comment), at
-// least this fraction of the selected level's own nominal correction
-// capacity must remain spare afterwards — the "small margin" for real-world
-// scan damage (dirt, glare, print defects, perspective distortion, ...)
-// that the cutout must never fully spend.
-const KEEP_FRACTION = 0.5;
-
-// Every level from the user's selection upward is tried (at the same
-// version) before the version itself is bumped, since a higher level costs
-// nothing in symbol size and — because the required spare is always pegged
-// to the *selected* level's own capacity, never the escalated one — funds
-// a bigger cutout without eroding the guaranteed floor any further.
-const LEVELS = [Ecc.LOW, Ecc.MEDIUM, Ecc.QUARTILE, Ecc.HIGH];
+// Only this fraction of the level's own nominal correction capacity needs
+// to remain spare after drawing the text and border — deliberately low, so
+// the text is sized as large as the version allows rather than kept small.
+const LOW_REMAINING_FRACTION = 0.1;
 
 // Safety cap on how many versions we'll try before giving up.
 const MAX_VERSION_ATTEMPTS = 30;
 
 export interface CutoutLayout {
-  cells: boolean[][];
   version: number;
   margin: number;
   numCells: number;
+  /** Full pattern at native module resolution, with the text's ink forced black. */
+  blackPath: string;
+  /** Half-module-wide white border around the text, drawn on top of blackPath. */
+  borderOverlayPath: string;
 }
 
 interface CutoutSource {
-  qrcode: QrCode;
   segments: readonly QrSegment[];
 }
 
 // Total codewords correctable across every Reed–Solomon block at this
 // version/level — a pure function of the standard tables, independent of
-// what's actually encoded, so it can be used as a reference even for a
-// level/version combination nothing has been encoded at.
+// what's actually encoded.
 function totalCorrectableCapacity(version: number, ecl: Ecc): number {
   const structure = getBlockStructure(version, ecl);
   return structure.blocks.reduce(
@@ -103,43 +92,57 @@ function totalCorrectableCapacity(version: number, ecl: Ecc): number {
   );
 }
 
-// Re-encodes `segments` at an exact (version, level), or returns null if the
-// data doesn't fit that combination (never boosts the level or version
-// beyond what's asked, since the caller is deliberately probing a specific
-// combination).
+// Re-encodes `segments` at an exact (version, LEVEL), or returns null if the
+// data doesn't fit (never boosts the level or version beyond what's asked).
 function tryEncode(
   segments: readonly QrSegment[],
-  level: Ecc,
   version: number,
 ): QrCode | null {
   try {
-    return QrCode.encodeSegments(segments, level, version, version, -1, false);
+    return QrCode.encodeSegments(segments, LEVEL, version, version, -1, false);
   } catch {
     return null;
   }
 }
 
-// Forces every module inside `interiorClear` light, but only where that
-// module is actually a data/ECC module — finder/timing/alignment/format/
-// version modules are never touched, however large the requested cutout.
-function applyCutout(
-  cells: readonly (readonly boolean[])[],
-  interiorClear: readonly (readonly boolean[])[],
-  fmap: readonly (readonly ModuleRegion[])[],
-  interiorTop: number,
-): boolean[][] {
-  return cells.map((row, y) => {
-    const my = y - interiorTop;
-    const clearRow =
-      my >= 0 && my < interiorClear.length ? interiorClear[my] : null;
-    return row.map((cell, x) =>
-      clearRow && clearRow[x] && fmap[y][x] === 'data' ? false : cell,
-    );
-  });
+// Generates an SVG fill path for a boolean grid. Grid cell (row, col)
+// occupies the square [offsetX+col*scale, offsetY+row*scale] sized
+// scale×scale — filled cells merge seamlessly at any scale, unlike a
+// stroked outline, which is what lets the border be drawn at a finer
+// (half-module) scale than the text without visible seams between rows.
+function generateFillPath(
+  mask: readonly (readonly boolean[])[],
+  offsetX: number,
+  offsetY: number,
+  scale: number,
+): string {
+  const ops: string[] = [];
+  for (const [row, cells] of mask.entries()) {
+    let start: number | null = null;
+    const emit = (from: number, to: number): void => {
+      const x = offsetX + from * scale;
+      const y = offsetY + row * scale;
+      const w = (to - from) * scale;
+      ops.push(`M${x},${y}h${w}v${scale}H${x}z`);
+    };
+    for (const [col, cell] of cells.entries()) {
+      if (cell && start === null) {
+        start = col;
+      } else if (!cell && start !== null) {
+        emit(start, col);
+        start = null;
+      }
+    }
+    if (start !== null) {
+      emit(start, cells.length);
+    }
+  }
+  return ops.join('');
 }
 
-// Chebyshev (square) dilation, used to grow glyph ink into the surrounding
-// clear border.
+// Chebyshev (square) dilation, used both to build the full-module "at risk"
+// ring for the budget check and, on an upsampled grid, the half-module
+// border ring for rendering.
 function dilate(
   mask: readonly (readonly boolean[])[],
   radius: number,
@@ -150,8 +153,8 @@ function dilate(
     Array.from({ length: width }, () => false),
   );
   for (const [y, row] of mask.entries()) {
-    for (const [x, isInk] of row.entries()) {
-      if (!isInk) {
+    for (const [x, isSet] of row.entries()) {
+      if (!isSet) {
         continue;
       }
       for (let dy = -radius; dy <= radius; dy++) {
@@ -171,10 +174,25 @@ function dilate(
   return result;
 }
 
+// Doubles a module-resolution mask into a 2×2-subcell-per-module grid, so a
+// 1-subcell dilation on the result is exactly a half-module grow.
+function upsample2x(mask: readonly (readonly boolean[])[]): boolean[][] {
+  const result: boolean[][] = [];
+  for (const row of mask) {
+    const r0: boolean[] = [];
+    for (const cell of row) {
+      r0.push(cell, cell);
+    }
+    result.push(r0, [...r0]);
+  }
+  return result;
+}
+
 // Rasterises `text` centred in a `width`×`height` module-resolution canvas,
 // returning a boolean ink mask (true = dark/glyph pixel). Rendered at the
-// font's natural weight (not synthetically bolded) — see fitFontSize's doc
-// for why that matters here specifically.
+// font's natural weight (not synthetically bolded), which keeps already-
+// heavy display fonts (Impact and friends) from blobbing strokes together
+// at this resolution.
 function rasterInkMask(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -210,21 +228,50 @@ function rasterInkMask(
   return mask;
 }
 
+// Forces every module inside `ink` black and every module inside `ring`
+// (but not already ink) white, except structural modules, which are never
+// touched. Used only for the decodability check — a full module's worth of
+// "at risk" ring, deliberately more pessimistic than the half-module border
+// actually drawn.
+function withInkAndRingForced(
+  cells: readonly (readonly boolean[])[],
+  ink: readonly (readonly boolean[])[],
+  ring: readonly (readonly boolean[])[],
+  fmap: readonly (readonly ModuleRegion[])[],
+  interiorTop: number,
+): boolean[][] {
+  return cells.map((row, y) => {
+    const my = y - interiorTop;
+    const inkRow = my >= 0 && my < ink.length ? ink[my] : null;
+    const ringRow = my >= 0 && my < ring.length ? ring[my] : null;
+    return row.map((cell, x) => {
+      if (fmap[y][x] !== 'data') {
+        return cell;
+      }
+      if (inkRow?.[x]) {
+        return true;
+      }
+      if (ringRow?.[x]) {
+        return false;
+      }
+      return cell;
+    });
+  });
+}
+
 // Runs this project's own QR decoder over the candidate matrix and checks
 // that every Reed–Solomon block decodes, and that the total spare
 // correction capacity left afterwards is at least `requiredSpare` — the
 // same check a real scanner's error correction would perform, so it
-// directly answers "would a reader still recover this, with the selected
-// level's protection intact?" rather than approximating it from module
-// counts.
+// directly answers "would a reader still recover this?" rather than
+// approximating it from module counts.
 function verifyDecodable(
   clearedCells: readonly (readonly boolean[])[],
   version: number,
   mask: number,
-  candidateLevel: Ecc,
   requiredSpare: number,
 ): boolean {
-  const structure = getBlockStructure(version, candidateLevel);
+  const structure = getBlockStructure(version, LEVEL);
   const { codewords } = extractCodewords(
     clearedCells.map((row) => [...row]),
     version,
@@ -245,13 +292,15 @@ function verifyDecodable(
 }
 
 interface TextFit {
-  clearedCells: boolean[][];
+  ink: boolean[][];
+  interiorTop: number;
+  fmap: ModuleRegion[][];
   height: number;
 }
 
-// Finds the tallest legible cutout at this exact (version, level) that still
-// leaves `requiredSpare` correction capacity, or null if even the minimum
-// legible size doesn't.
+// Finds the tallest legible text at this exact version that still leaves
+// `requiredSpare` correction capacity, or null if even the minimum legible
+// size doesn't.
 function fitTextAtVersion(
   qrcode: QrCode,
   rasterText: string,
@@ -267,7 +316,7 @@ function fitTextAtVersion(
   const interiorTop = STRUCTURAL_TOP_ROWS;
   const interiorWidth = size;
   const interiorHeight = size - STRUCTURAL_TOP_ROWS - STRUCTURAL_BOTTOM_ROWS;
-  const maxTextHeight = interiorHeight - 2 * BORDER_MODULES;
+  const maxTextHeight = interiorHeight - 2 * RING_RADIUS_MODULES;
 
   if (maxTextHeight < MIN_TEXT_HEIGHT_MODULES) {
     return null;
@@ -281,11 +330,11 @@ function fitTextAtVersion(
       ctx,
       rasterText,
       rasterFont,
-      interiorWidth - 2 * BORDER_MODULES,
+      interiorWidth - 2 * RING_RADIUS_MODULES,
       targetHeight,
       false,
     );
-    const inkMask = rasterInkMask(
+    const ink = rasterInkMask(
       ctx,
       rasterText,
       rasterFont,
@@ -293,21 +342,23 @@ function fitTextAtVersion(
       interiorWidth,
       interiorHeight,
     );
-    const clearMask = dilate(inkMask, BORDER_MODULES);
-    const clearedCells = applyCutout(cells, clearMask, fmap, interiorTop);
-    return verifyDecodable(
-      clearedCells,
-      version,
-      qrcode.mask,
-      qrcode.errorCorrectionLevel,
-      requiredSpare,
-    )
-      ? clearMask
+    const ring = dilate(ink, RING_RADIUS_MODULES).map((row, y) =>
+      row.map((cell, x) => cell && !ink[y]?.[x]),
+    );
+    const clearedCells = withInkAndRingForced(
+      cells,
+      ink,
+      ring,
+      fmap,
+      interiorTop,
+    );
+    return verifyDecodable(clearedCells, version, qrcode.mask, requiredSpare)
+      ? ink
       : null;
   };
 
   // The smallest legible size sets the floor: if even that doesn't leave
-  // enough spare capacity, no size at this version/level will.
+  // enough spare capacity, no size at this version will.
   const minResult = tryHeight(MIN_TEXT_HEIGHT_MODULES);
   if (!minResult) {
     return null;
@@ -329,27 +380,62 @@ function fitTextAtVersion(
     }
   }
 
-  return {
-    clearedCells: applyCutout(cells, best, fmap, interiorTop),
-    height: bestHeight,
-  };
+  return { ink: best, interiorTop, fmap, height: bestHeight };
 }
 
-// Tries the cutout at the selected error-correction level first, then at
-// each higher level (still at the same version — free extra budget), then
-// bumps the version and repeats, until a comfortably legible height is
-// reached or the version cap is exhausted.
-//
-// Whichever (version, level) combination actually ends up drawn, the
-// requirement checked at every step is the same: at least KEEP_FRACTION of
-// the *selected* level's own nominal correction capacity for that version —
-// never the escalated level's, so escalating only ever funds a bigger
-// cutout, it never lets the guaranteed floor slip. Escalating for free (a
-// higher level at the same version, or more raw codewords at a bigger one)
-// means the cutout increasingly comes out of that extra capacity rather
-// than the user's selected level's own share of it.
+// The text's ink, forced black, at native module resolution — everything
+// else in `cells` (including the border ring) is left exactly as encoded,
+// since the border overlay handles clearing it separately.
+function buildBlackPath(
+  cells: readonly (readonly boolean[])[],
+  fit: TextFit,
+  margin: number,
+): string {
+  const { ink, fmap, interiorTop } = fit;
+  const withInk = cells.map((row, y) => {
+    const my = y - interiorTop;
+    const inkRow = my >= 0 && my < ink.length ? ink[my] : null;
+    return row.map((cell, x) =>
+      inkRow?.[x] && fmap[y][x] === 'data' ? true : cell,
+    );
+  });
+  return generateFillPath(withInk, margin, margin, 1);
+}
+
+// A precise half-module-wide white border: the ink mask grown by exactly
+// one subcell on a 2×-supersampled grid, restricted to data modules. Drawn
+// on top of the black text (which re-covers everything inside the original
+// ink boundary), so only the outer half-module ring stays visible.
+function buildBorderOverlayPath(fit: TextFit, margin: number): string {
+  const { ink, fmap, interiorTop } = fit;
+  const ink2x = upsample2x(ink);
+  // dilate() keeps the original ink subcells set too, so subtract ink2x back
+  // out — the overlay must be only the ring, or it would paint over (and
+  // hide) the black text drawn on top of it.
+  const ring = dilate(ink2x, 1).map((row, sy) =>
+    row.map((isSet, sx) => isSet && !ink2x[sy]?.[sx]),
+  );
+  for (const [sy, row] of ring.entries()) {
+    for (const [sx, isSet] of row.entries()) {
+      if (!isSet) {
+        continue;
+      }
+      const y = Math.floor(sy / 2) + interiorTop;
+      const x = Math.floor(sx / 2);
+      if (fmap[y]?.[x] !== 'data') {
+        row[sx] = false;
+      }
+    }
+  }
+  return generateFillPath(ring, margin, margin + interiorTop, 0.5);
+}
+
+// Always encodes at high error correction, then tries successively higher
+// versions (re-encoding the same segments each time) only until the
+// smallest legible text leaves at least LOW_REMAINING_FRACTION of that
+// version's own correction capacity spare — text is otherwise sized as
+// large as it can be within that low remaining margin.
 function fitCutout(
-  baseQrcode: QrCode,
   segments: readonly QrSegment[],
   rasterText: string,
   rasterFont: string,
@@ -364,57 +450,50 @@ function fitCutout(
     return null;
   }
 
-  const targetLevel = baseQrcode.errorCorrectionLevel;
-  const levelsToTry = LEVELS.slice(targetLevel.ordinal);
+  let qrcode = QrCode.encodeSegments(
+    segments,
+    LEVEL,
+    1,
+    QrCode.MAX_VERSION,
+    -1,
+    false,
+  );
 
-  let bestLayout: CutoutLayout | null = null;
-  let bestHeight = 0;
-
-  for (
-    let version = baseQrcode.version, attempt = 0;
-    attempt < MAX_VERSION_ATTEMPTS;
-    version++, attempt++
-  ) {
+  for (let attempt = 0; attempt < MAX_VERSION_ATTEMPTS; attempt++) {
     const requiredSpare = Math.ceil(
-      totalCorrectableCapacity(version, targetLevel) * KEEP_FRACTION,
+      totalCorrectableCapacity(qrcode.version, LEVEL) * LOW_REMAINING_FRACTION,
     );
 
-    for (const level of levelsToTry) {
-      const qrcode =
-        level.ordinal === targetLevel.ordinal && version === baseQrcode.version
-          ? baseQrcode
-          : tryEncode(segments, level, version);
-      if (!qrcode) {
-        continue;
-      }
-
-      const fit = fitTextAtVersion(
-        qrcode,
-        rasterText,
-        rasterFont,
-        ctx,
-        requiredSpare,
-      );
-      if (fit && fit.height > bestHeight) {
-        bestHeight = fit.height;
-        bestLayout = {
-          cells: fit.clearedCells,
-          version,
-          margin: SPEC_MARGIN_SIZE,
-          numCells: fit.clearedCells.length + SPEC_MARGIN_SIZE * 2,
-        };
-      }
+    const fit = fitTextAtVersion(
+      qrcode,
+      rasterText,
+      rasterFont,
+      ctx,
+      requiredSpare,
+    );
+    if (fit) {
+      const cells = qrcode.getModules();
+      return {
+        version: qrcode.version,
+        margin: SPEC_MARGIN_SIZE,
+        numCells: cells.length + SPEC_MARGIN_SIZE * 2,
+        blackPath: buildBlackPath(cells, fit, SPEC_MARGIN_SIZE),
+        borderOverlayPath: buildBorderOverlayPath(fit, SPEC_MARGIN_SIZE),
+      };
     }
 
-    if (bestHeight >= COMFORTABLE_TEXT_HEIGHT_MODULES) {
-      break;
+    const nextVersion = qrcode.version + 1;
+    if (nextVersion > QrCode.MAX_VERSION) {
+      return null;
     }
-    if (version + 1 > QrCode.MAX_VERSION) {
-      break;
+    const next = tryEncode(segments, nextVersion);
+    if (!next) {
+      return null;
     }
+    qrcode = next;
   }
 
-  return bestLayout;
+  return null;
 }
 
 export function useCutoutLayout(
@@ -435,9 +514,7 @@ export function useCutoutLayout(
       if (cancelled) {
         return;
       }
-      setLayout(
-        fitCutout(details.qrcode, details.segments, rasterText, rasterFont),
-      );
+      setLayout(fitCutout(details.segments, rasterText, rasterFont));
     }
 
     run().catch(console.error);
