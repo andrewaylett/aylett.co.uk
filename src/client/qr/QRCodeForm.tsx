@@ -290,10 +290,18 @@ export function QRCodeForm(): JSX.Element {
           qrContent={qrContent}
           updateQRCode={setQRContent}
         />
-        <label className="w-full flex flex-row items-center gap-2">
+        <label
+          className="w-full flex flex-row items-center gap-2"
+          title={
+            qrContent.dotStyle === 'cutout'
+              ? 'Text cutout always uses High error correction'
+              : undefined
+          }
+        >
           Min error correction
           <select
             value={qrContent.minErrorCorrectionLevel}
+            disabled={qrContent.dotStyle === 'cutout'}
             onChange={(event) => {
               startTransition(() => {
                 setQRContent((draft) => {

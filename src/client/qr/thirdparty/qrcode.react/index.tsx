@@ -109,11 +109,11 @@ interface QRProps {
    * 'dot' renders data/alignment modules as circles while keeping structural
    * modules (finders, timing, format/version info) square; 'text' splits each
    * module into a 3×3 sub-cell grid where the centre carries the QR value and
-   * the outer eight cells show a rasterised text pattern; 'cutout' renders
-   * every module as a full square as normal, except that data modules inside
-   * `rasterText`'s silhouette (plus a small clear border) are forced light,
-   * leaving a legible hole in the pattern. The version is bumped as needed so
-   * enough error-correction budget remains spare after the cutout.
+   * the outer eight cells show a rasterised text pattern; 'cutout' draws
+   * `rasterText` as solid black full modules with a narrow (half-module)
+   * white border separating it from the surrounding pattern, at whichever
+   * version high error correction naturally requires — sized so only a low
+   * amount of correction capacity remains spare afterwards.
    * @defaultValue square
    */
   dotStyle?: 'square' | 'dot' | 'text' | 'cutout';
@@ -812,13 +812,11 @@ function CutoutQRCodeSVGDetails(
     ...otherProps
   } = props;
 
-  // The cutout may require a larger version than `details` to leave enough
-  // spare error-correction budget once the text's modules are cleared; when
-  // that hasn't resolved yet (or no text is set), fall back to the plain
-  // square rendering of `details` unchanged.
+  // The cutout re-encodes at a high enough version that its text (always
+  // solid black, full modules) and half-module white border fit with a low
+  // remaining error-correction margin; when that hasn't resolved yet (or no
+  // text is set), fall back to the plain square rendering of `details`.
   const cutout = useCutoutLayout(details, rasterText, rasterFont);
-  const cells = cutout?.cells ?? details.cells;
-  const margin = cutout?.margin ?? details.margin;
   const numCells = cutout?.numCells ?? details.numCells;
 
   const finalSize = numCells * cellSize;
@@ -826,10 +824,11 @@ function CutoutQRCodeSVGDetails(
   // Quiet-zone frame: fills the margin band around the module grid.
   const bgPath = `M0,0 h${numCells}v${numCells}H0z`;
 
-  // The cutout is already baked into `cells` — cleared modules are simply
-  // light, like any other light module — so the plain 'square' path
-  // generator produces full-square dark modules everywhere else.
-  const fgPath = generatePath(cells, margin);
+  // The text's modules (and everything else) at native resolution; the
+  // fractional half-module border is a separate, finer-grained path drawn
+  // on top of it.
+  const fgPath =
+    cutout?.blackPath ?? generatePath(details.cells, details.margin);
 
   return (
     <svg
@@ -848,6 +847,13 @@ function CutoutQRCodeSVGDetails(
       {!!title && <title>{title}</title>}
       <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      {!!cutout && (
+        <path
+          fill={bgColor}
+          d={cutout.borderOverlayPath}
+          shapeRendering="crispEdges"
+        />
+      )}
     </svg>
   );
 }
