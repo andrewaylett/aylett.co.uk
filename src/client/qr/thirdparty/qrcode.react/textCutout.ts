@@ -11,14 +11,16 @@
  * value, just visually dressed up), this style actually overwrites modules
  * regardless of their encoded value — a scanner reading those modules sees
  * whatever we drew, exactly like any other reader would. That's only safe
- * because the affected modules are always Reed–Solomon data/ECC modules
- * (never finder/timing/alignment/format/version, which carry no redundancy
- * at all), and because every candidate layout is verified by literally
- * running this project's QR decoder over the resulting matrix before it's
- * accepted — the same simulation a real scan would produce, not a guess
- * about how much can safely be overwritten. The verification always
- * assumes the whole clipped region reads back as light, which is exactly
- * what's actually drawn there other than the text glyphs themselves.
+ * because every candidate layout is checked by actually rendering it (real
+ * anti-aliased text and crisp module edges, at this app's real render
+ * scale) and running that rendering through this project's own image-based
+ * decoder — the same finder-pattern location, grid calibration, and
+ * Reed–Solomon correction a real scanner's camera feed goes through, not
+ * an idealised check on a perfect, already-located module grid. A boolean
+ * model can't see classes of damage this catches: anti-aliasing eating a
+ * too-thin border, or ink corrupting a timing or alignment pattern badly
+ * enough to throw off the whole grid's calibration rather than just the
+ * modules it visibly covers.
  *
  * The style always encodes at high error correction — that's the biggest
  * error budget the format has — and then re-encodes at successively higher
@@ -42,12 +44,8 @@ import type { ModuleRegion } from '@/client/qr/decoder/types';
 import { Ecc } from '@/client/qr/thirdparty/qrcodegen/Ecc';
 import { QrCode } from '@/client/qr/thirdparty/qrcodegen/qrCode';
 import { functionModuleMap } from '@/client/qr/decoder/functionModules';
-import {
-  deinterleave,
-  extractCodewords,
-  getBlockStructure,
-} from '@/client/qr/decoder/codewords';
-import { rsDecode } from '@/client/qr/decoder/reedSolomon';
+import { getBlockStructure } from '@/client/qr/decoder/codewords';
+import { analyseImage } from '@/client/qr/decoder/analyseImage';
 
 // Below this height (in modules) the cutout is not attempted — a smaller
 // glyph than this is illegible however clean the render.
@@ -288,6 +286,27 @@ function textBaselineY(
     : height / 2;
 }
 
+// Where the text's baseline sits, in the same module-unit coordinate space
+// as the surrounding pattern (including the outer quiet-zone margin).
+// Shared by the real-render decode check and the final SVG <text> element
+// so what gets verified is pixel-for-pixel what ends up on screen.
+function computeTextPosition(
+  ctx: CanvasRenderingContext2D,
+  rasterText: string,
+  rasterFont: string,
+  fontSize: number,
+  interiorWidth: number,
+  interiorHeight: number,
+  interiorTop: number,
+): { x: number; y: number } {
+  ctx.font = `${fontSize}px "${rasterFont}"`;
+  const baselineY = textBaselineY(ctx, rasterText, interiorHeight);
+  return {
+    x: SPEC_MARGIN_SIZE + interiorWidth / 2,
+    y: SPEC_MARGIN_SIZE + interiorTop + baselineY,
+  };
+}
+
 // True for every module whose square overlaps the text's ink or its
 // border, at the ink mask's own subpixel precision rather than module
 // resolution — a module counts as clipped if *any* of its subcells falls in
@@ -330,35 +349,91 @@ function withClipZoneForced(
   });
 }
 
-// Runs this project's own QR decoder over the candidate matrix and checks
-// that every Reed–Solomon block decodes, and that the total spare
-// correction capacity left afterwards is at least `requiredSpare` — the
-// same check a real scanner's error correction would perform, so it
-// directly answers "would a reader still recover this?" rather than
-// approximating it from module counts.
+// Scale (device pixels per module) used only for the real-render decode
+// check below — matches this app's actual on-screen and exported cell
+// size, so the anti-aliasing it produces is representative of what a real
+// reader would actually see, not a boolean approximation of it.
+const VERIFY_RENDER_SCALE = 9;
+
+// Renders a candidate exactly as it would actually look — real crisp-edged
+// module squares plus real anti-aliased text, at this app's real render
+// scale, with the standard quiet-zone margin around it — as a plain RGBA
+// bitmap ready for the decoder below.
+function renderCandidateImage(
+  clearedCells: readonly (readonly boolean[])[],
+  text: { x: number; y: number },
+  fontSize: number,
+  rasterText: string,
+  rasterFont: string,
+): ImageData {
+  const scale = VERIFY_RENDER_SCALE;
+  const numCells = clearedCells.length + SPEC_MARGIN_SIZE * 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = numCells * scale;
+  canvas.height = numCells * scale;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('2D canvas context unavailable');
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#000000';
+  for (const [y, row] of clearedCells.entries()) {
+    for (const [x, dark] of row.entries()) {
+      if (dark) {
+        ctx.fillRect(
+          (SPEC_MARGIN_SIZE + x) * scale,
+          (SPEC_MARGIN_SIZE + y) * scale,
+          scale,
+          scale,
+        );
+      }
+    }
+  }
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+  ctx.font = `${fontSize * scale}px "${rasterFont}"`;
+  ctx.fillText(rasterText, text.x * scale, text.y * scale);
+
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+// Renders this candidate as it would actually appear, then runs it through
+// this project's own image-based decoder — the same finder-pattern
+// location, grid calibration, and Reed–Solomon correction a real scanner's
+// camera feed goes through, rather than an idealised codeword check on a
+// perfect, already-located grid. That's the only way to catch damage a
+// boolean model can't see at all: anti-aliasing eating a too-thin border,
+// or text/border ink corrupting a timing or alignment pattern badly enough
+// to throw off the whole grid's calibration, not just the modules it
+// visibly covers. Requires `requiredSpare` correction capacity left over,
+// exactly as the real scanner's own error correction would report it.
 function verifyDecodable(
   clearedCells: readonly (readonly boolean[])[],
-  version: number,
-  mask: number,
+  text: { x: number; y: number },
+  fontSize: number,
+  rasterText: string,
+  rasterFont: string,
   requiredSpare: number,
 ): boolean {
-  const structure = getBlockStructure(version, LEVEL);
-  const { codewords } = extractCodewords(
-    clearedCells.map((row) => [...row]),
-    version,
-    mask,
+  const image = renderCandidateImage(
+    clearedCells,
+    text,
+    fontSize,
+    rasterText,
+    rasterFont,
   );
-  const { blocks } = deinterleave(codewords, structure);
-
-  let spare = 0;
-  for (const [i, block] of blocks.entries()) {
-    const { eccLen } = structure.blocks[i];
-    const result = rsDecode(block, eccLen);
-    if (!result) {
-      return false;
-    }
-    spare += Math.floor(eccLen / 2) - result.errorPositions.length;
+  const result = analyseImage(image);
+  if (!result.ok) {
+    return false;
   }
+  const spare = result.analysis.blocks.reduce(
+    (sum, block) =>
+      sum + Math.floor(block.eccCodewords / 2) - block.errorsCorrected,
+    0,
+  );
   return spare >= requiredSpare;
 }
 
@@ -379,7 +454,10 @@ function selectMask(
   clipZone: readonly (readonly boolean[])[],
   fmap: readonly (readonly ModuleRegion[])[],
   interiorTop: number,
-  version: number,
+  text: { x: number; y: number },
+  fontSize: number,
+  rasterText: string,
+  rasterFont: string,
   requiredSpare: number,
 ): { qrcode: QrCode; clearedCells: boolean[][] } | null {
   let best: {
@@ -394,7 +472,16 @@ function selectMask(
       fmap,
       interiorTop,
     );
-    if (!verifyDecodable(clearedCells, version, qrcode.mask, requiredSpare)) {
+    if (
+      !verifyDecodable(
+        clearedCells,
+        text,
+        fontSize,
+        rasterText,
+        rasterFont,
+        requiredSpare,
+      )
+    ) {
       continue;
     }
     const penalty = QrCode.getPenaltyScoreOf(clearedCells);
@@ -461,12 +548,24 @@ function fitTextAtVersion(
       interiorHeight,
     );
     const clipZone = computeClipZone(ink);
+    const text = computeTextPosition(
+      ctx,
+      rasterText,
+      rasterFont,
+      fontSize,
+      interiorWidth,
+      interiorHeight,
+      interiorTop,
+    );
     const best = selectMask(
       maskCandidates,
       clipZone,
       fmap,
       interiorTop,
-      version,
+      text,
+      fontSize,
+      rasterText,
+      rasterFont,
       requiredSpare,
     );
     return best ? { fontSize, qrcode: best.qrcode } : null;
@@ -528,8 +627,15 @@ function buildLayout(
   const clipZone = computeClipZone(ink);
   const clearedCells = withClipZoneForced(cells, clipZone, fmap, interiorTop);
 
-  ctx.font = `${fit.fontSize}px "${rasterFont}"`;
-  const baselineY = textBaselineY(ctx, rasterText, interiorHeight);
+  const text = computeTextPosition(
+    ctx,
+    rasterText,
+    rasterFont,
+    fit.fontSize,
+    interiorWidth,
+    interiorHeight,
+    interiorTop,
+  );
 
   return {
     qrcode,
@@ -543,8 +649,8 @@ function buildLayout(
       SPEC_MARGIN_SIZE,
     ),
     text: {
-      x: SPEC_MARGIN_SIZE + interiorWidth / 2,
-      y: SPEC_MARGIN_SIZE + interiorTop + baselineY,
+      x: text.x,
+      y: text.y,
       fontSize: fit.fontSize,
     },
   };
