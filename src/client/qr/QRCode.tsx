@@ -6,12 +6,13 @@ import {
   useQRCode,
   type ErrorCorrectionLevel,
 } from '@/client/qr/thirdparty/qrcode.react';
+import { useCutoutLayout } from '@/client/qr/thirdparty/qrcode.react/textCutout';
 import { QRDebugPanel } from '@/client/qr/QRDebugPanel';
 
 export interface QRCodeContent {
   text: string;
   shouldOptimiseUrl: boolean;
-  dotStyle: 'square' | 'dot' | 'text';
+  dotStyle: 'square' | 'dot' | 'text' | 'cutout';
   dotRadius: number;
   rasterText: string;
   rasterFont: string;
@@ -111,7 +112,16 @@ export function QRCode({
   ref: RefObject<HTMLDivElement | null>;
 }>): JSX.Element {
   const { actualValue, qrDetails, debugMessage } = useOptimisedQr(content);
-  const qrDebugDetails = useDebugDetails(qrDetails);
+  // The cutout style re-encodes independently (always High error correction,
+  // whatever version that needs) — when it's active, the debug panel should
+  // describe that actual encoding, not the plain one computed above, or it
+  // would show a version/level nothing on screen actually uses.
+  const cutoutLayout = useCutoutLayout(
+    qrDetails,
+    content.dotStyle === 'cutout' ? content.rasterText : '',
+    content.rasterFont,
+  );
+  const qrDebugDetails = useDebugDetails(cutoutLayout ?? qrDetails);
 
   return (
     <>

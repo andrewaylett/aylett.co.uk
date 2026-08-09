@@ -18,6 +18,14 @@ import {
 
 import * as qrcodegen from '../qrcodegen';
 
+import { fitFontSize } from './fontFit';
+import { useCutoutLayout } from './textCutout';
+import {
+  SPEC_MARGIN_SIZE,
+  STRUCTURAL_TOP_ROWS,
+  STRUCTURAL_BOTTOM_ROWS,
+} from './constants';
+
 import type { QrCode, QrSegment } from '../qrcodegen';
 
 type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
@@ -101,10 +109,14 @@ interface QRProps {
    * 'dot' renders data/alignment modules as circles while keeping structural
    * modules (finders, timing, format/version info) square; 'text' splits each
    * module into a 3×3 sub-cell grid where the centre carries the QR value and
-   * the outer eight cells show a rasterised text pattern.
+   * the outer eight cells show a rasterised text pattern; 'cutout' draws
+   * `rasterText` as real (non-pixelated) SVG text with a narrow (half-module)
+   * clear border, omitting any data module the text or border touch, at
+   * whichever version high error correction naturally requires — sized so
+   * only a low amount of correction capacity remains spare afterwards.
    * @defaultValue square
    */
-  dotStyle?: 'square' | 'dot' | 'text';
+  dotStyle?: 'square' | 'dot' | 'text' | 'cutout';
   /**
    * Radius of each dot in dot mode, as a fraction of the module size (0–0.5).
    * A value of 0.5 fills the full cell; 0.25 (default) renders at half diameter.
@@ -124,8 +136,6 @@ const DEFAULT_LEVEL: ErrorCorrectionLevel = 'L';
 const DEFAULT_BGCOLOR = '#FFFFFF';
 const DEFAULT_FGCOLOR = '#000000';
 const DEFAULT_MINVERSION = 1;
-
-const SPEC_MARGIN_SIZE = 4;
 
 // Modified to be exported so the QR debugger can render decoded matrices.
 export function generatePath(modules: Modules, margin = 0): string {
@@ -271,11 +281,6 @@ function generateDotPath(
   return ops.join('');
 }
 
-// Structural zones: top 9 rows (TL+TR finders + format info) and bottom 8 rows
-// (BL finder + format info). Interior data rows: 9 … size−9 = size−17 rows total.
-const STRUCTURAL_TOP_ROWS = 9;
-const STRUCTURAL_BOTTOM_ROWS = 8;
-
 // Renders rasterText onto an off-screen canvas covering only the interior data
 // area (between the locator squares): width size*3, height (size−17)*3.
 // Returns null while loading or when rasterText is empty.
@@ -320,24 +325,11 @@ function useRasterPixels(
 
       // Largest font where the actual ink bounds fit — not the nominal em size,
       // so text without descenders (e.g. "QR") can use a larger font.
-      let lo = 1,
-        hi = Math.max(cw, ch) * 2;
-      while (lo < hi - 1) {
-        const mid = (lo + hi) >> 1;
-        ctx.font = `bold ${mid}px "${rasterFont}"`;
-        const m = ctx.measureText(rasterText);
-        const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
-        // Fall back to font size when actual bounds are unavailable (e.g. jsdom)
-        if (m.width <= cw && (inkH > 0 ? inkH : mid) <= ch) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
+      const fontSize = fitFontSize(ctx, rasterText, rasterFont, cw, ch);
 
       // Center by ink bounds rather than the em box so the visual weight sits
       // in the middle of the data region regardless of descenders.
-      ctx.font = `bold ${lo}px "${rasterFont}"`;
+      ctx.font = `bold ${fontSize}px "${rasterFont}"`;
       const fm = ctx.measureText(rasterText);
       const inkCy =
         fm.actualBoundingBoxAscent > 0
@@ -585,8 +577,10 @@ export function QRCodeSVGDetails({
     <SquareQRCodeSVGDetails dotStyle="square" {...otherProps} />
   ) : dotStyle === 'dot' ? (
     <DotQRCodeSVGDetails dotStyle="dot" {...otherProps} />
-  ) : (
+  ) : dotStyle === 'text' ? (
     <TextQRCodeSVGDetails dotStyle="text" {...otherProps} />
+  ) : (
+    <CutoutQRCodeSVGDetails dotStyle="cutout" {...otherProps} />
   );
 }
 
@@ -793,6 +787,78 @@ function TextQRCodeSVGDetails(
       <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
       <path fill={fgColor} d={textPath} shapeRendering="crispEdges" />
+    </svg>
+  );
+}
+
+function CutoutQRCodeSVGDetails(
+  props: Omit<QRPropsSVG, 'value' | 'dotStyle'> & {
+    details: QrCodeDetails;
+    ref?: Ref<SVGSVGElement> | undefined;
+    dotStyle?: 'cutout';
+  },
+): JSX.Element {
+  const {
+    details,
+    bgColor = DEFAULT_BGCOLOR,
+    fgColor = DEFAULT_FGCOLOR,
+    title,
+    cellSize = DEFAULT_CELL_SIZE,
+    rasterText = '',
+    rasterFont = 'Impact',
+    dotStyle: _dotStyle,
+    dotRadius: _dotRadius,
+    ref,
+    ...otherProps
+  } = props;
+
+  // The cutout re-encodes at a high enough version that its text, drawn as
+  // real SVG text with a half-module clear border, fits with a low
+  // remaining error-correction margin; when that hasn't resolved yet (or no
+  // text is set), fall back to the plain square rendering of `details`.
+  const cutout = useCutoutLayout(details, rasterText, rasterFont);
+  const numCells = cutout?.numCells ?? details.numCells;
+
+  const finalSize = numCells * cellSize;
+
+  // Quiet-zone frame: fills the margin band around the module grid.
+  const bgPath = `M0,0 h${numCells}v${numCells}H0z`;
+
+  // Every module except those the text and its border clip, which are left
+  // light — the text itself is drawn as a real <text> element below, not
+  // approximated by forcing modules dark.
+  const fgPath =
+    cutout?.patternPath ?? generatePath(details.cells, details.margin);
+
+  return (
+    <svg
+      height={finalSize}
+      width={finalSize}
+      style={{
+        containIntrinsicHeight: `${finalSize}px`,
+        containIntrinsicWidth: `${finalSize}px`,
+        contain: 'strict',
+      }}
+      viewBox={`0 0 ${numCells} ${numCells}`}
+      ref={ref}
+      role="img"
+      {...otherProps}
+    >
+      {!!title && <title>{title}</title>}
+      <path fill={bgColor} d={bgPath} shapeRendering="crispEdges" />
+      <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      {!!cutout && (
+        <text
+          x={cutout.text.x}
+          y={cutout.text.y}
+          fontSize={cutout.text.fontSize}
+          fontFamily={`"${rasterFont}"`}
+          textAnchor="middle"
+          fill={fgColor}
+        >
+          {rasterText}
+        </text>
+      )}
     </svg>
   );
 }

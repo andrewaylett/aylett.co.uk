@@ -51,8 +51,8 @@ function buildSearchParams(qrState: QRCodeContent): URLSearchParams {
     if (qrState.dotRadius !== DEFAULTS.dotRadius) {
       params.set('dotRadius', Math.round(qrState.dotRadius * 200).toString());
     }
-  } else if (qrState.dotStyle === 'text') {
-    params.set('dotStyle', 'text');
+  } else if (qrState.dotStyle === 'text' || qrState.dotStyle === 'cutout') {
+    params.set('dotStyle', qrState.dotStyle);
     if (qrState.rasterText) {
       params.set('rasterText', qrState.rasterText);
     }
@@ -74,12 +74,14 @@ function extractContent(searchParams: URLSearchParams): QRCodeContent {
     : paramText;
 
   const dotStyleParam = searchParams.get('dotStyle');
-  const dotStyle: 'square' | 'dot' | 'text' =
+  const dotStyle: 'square' | 'dot' | 'text' | 'cutout' =
     dotStyleParam === 'dot'
       ? 'dot'
       : dotStyleParam === 'text'
         ? 'text'
-        : DEFAULTS.dotStyle;
+        : dotStyleParam === 'cutout'
+          ? 'cutout'
+          : DEFAULTS.dotStyle;
   const rawRadius = searchParams.get('dotRadius');
   const dotRadius =
     rawRadius !== null && !Number.isNaN(Number(rawRadius))
@@ -240,7 +242,8 @@ export function QRCodeForm(): JSX.Element {
                   draft.dotStyle = event.target.value as
                     | 'square'
                     | 'dot'
-                    | 'text';
+                    | 'text'
+                    | 'cutout';
                 });
               });
             }}
@@ -248,6 +251,7 @@ export function QRCodeForm(): JSX.Element {
             <option value="square">Square</option>
             <option value="dot">Dot</option>
             <option value="text">Text raster</option>
+            <option value="cutout">Text cutout</option>
           </select>
         </label>
         <label
@@ -286,10 +290,18 @@ export function QRCodeForm(): JSX.Element {
           qrContent={qrContent}
           updateQRCode={setQRContent}
         />
-        <label className="w-full flex flex-row items-center gap-2">
+        <label
+          className="w-full flex flex-row items-center gap-2"
+          title={
+            qrContent.dotStyle === 'cutout'
+              ? 'Text cutout always uses High error correction'
+              : undefined
+          }
+        >
           Min error correction
           <select
             value={qrContent.minErrorCorrectionLevel}
+            disabled={qrContent.dotStyle === 'cutout'}
             onChange={(event) => {
               startTransition(() => {
                 setQRContent((draft) => {
