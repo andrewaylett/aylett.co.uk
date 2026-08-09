@@ -1,11 +1,11 @@
 /*
  * Implements the 'cutout' dot style: `rasterText` drawn as real, smoothly
- * rendered SVG text (not quantised to the module grid), with a narrow
- * (half-module) white border separating it from the surrounding pattern.
- * Every QR module that doesn't clip that text-plus-border region is left as
- * a normal full square; any module that does is simply not drawn at all —
- * the text element and the plain white background underneath it are what
- * shows through instead.
+ * rendered SVG text (not quantised to the module grid), with a narrow white
+ * border separating it from the surrounding pattern. Every QR module that
+ * doesn't clip that text-plus-border region is left as a normal full
+ * square; any module that does is simply not drawn at all — the text
+ * element and the plain white background underneath it are what shows
+ * through instead.
  *
  * Unlike the decorative 'text' style (which only ever redraws the true QR
  * value, just visually dressed up), this style actually overwrites modules
@@ -54,7 +54,28 @@ import { rsDecode } from '@/client/qr/decoder/reedSolomon';
 const MIN_TEXT_HEIGHT_MODULES = 8;
 
 // Width, in modules, of the white border kept clear around the text's ink.
-const BORDER_WIDTH_MODULES = 0.5;
+// Narrower than this and the border stops being reliable: it's meant to
+// guarantee a strip of clean white between the text's ink and the
+// surrounding dark modules, but real rendering anti-aliases the vector
+// glyph edge, and at typical render resolutions (this app renders modules
+// 9 CSS pixels wide) anything much below this bleeds straight from glyph
+// ink into the adjacent module with no clean white pixel between them —
+// confirmed by round-tripping actual exported PNGs through this project's
+// own decoder: 0.1–0.3 modules failed to decode at all, 0.35 and up decoded
+// cleanly.
+const BORDER_WIDTH_MODULES = 0.4;
+
+// Subpixels rendered per module when rasterising the ink mask used to work
+// out the clip zone. High enough that the mask tracks the real vector
+// glyph edges closely rather than a blocky module-grid approximation of
+// them, and chosen so the border dilation below (which grows the mask by
+// whole subcells) lands on an exact multiple of BORDER_WIDTH_MODULES.
+const INK_RASTER_SCALE = 10;
+
+// The border width above, expressed in ink-mask subcells.
+const BORDER_RADIUS_SUBCELLS = Math.round(
+  BORDER_WIDTH_MODULES * INK_RASTER_SCALE,
+);
 
 // The error-correction level is always the format's strongest, giving the
 // text and border the biggest possible budget to draw within.
@@ -105,17 +126,44 @@ function totalCorrectableCapacity(version: number, ecl: Ecc): number {
   );
 }
 
-// Re-encodes `segments` at an exact (version, LEVEL), or returns null if the
-// data doesn't fit (never boosts the level or version beyond what's asked).
+// Re-encodes `segments` at an exact (version, LEVEL, mask), or returns null
+// if the data doesn't fit (never boosts the level or version beyond what's
+// asked). `mask` is fixed rather than auto-chosen (-1) so callers can build
+// every mask variant and pick between them themselves.
 function tryEncode(
   segments: readonly QrSegment[],
   version: number,
+  mask: number,
 ): QrCode | null {
   try {
-    return QrCode.encodeSegments(segments, LEVEL, version, version, -1, false);
+    return QrCode.encodeSegments(
+      segments,
+      LEVEL,
+      version,
+      version,
+      mask,
+      false,
+    );
   } catch {
     return null;
   }
+}
+
+// Encodes `segments` at this version under all 8 mask patterns, so mask
+// selection can happen after the text's clip zone is known and forced into
+// each candidate — see bestMaskCandidate() below.
+function buildMaskCandidates(
+  segments: readonly QrSegment[],
+  version: number,
+): QrCode[] {
+  const candidates: QrCode[] = [];
+  for (let mask = 0; mask < 8; mask++) {
+    const qrcode = tryEncode(segments, version, mask);
+    if (qrcode) {
+      candidates.push(qrcode);
+    }
+  }
+  return candidates;
 }
 
 // Generates an SVG fill path for a boolean grid at native module scale.
@@ -149,12 +197,16 @@ function generateFillPath(
   return ops.join('');
 }
 
-// Chebyshev (square) dilation by one cell of whatever grid it's given —
-// used on a 2×-supersampled ink grid so a single dilation is exactly a
-// half-module grow.
-function dilateBy1(mask: readonly (readonly boolean[])[]): boolean[][] {
+// Chebyshev (square) dilation by `radius` cells of whatever grid it's given.
+function dilateChebyshev(
+  mask: readonly (readonly boolean[])[],
+  radius: number,
+): boolean[][] {
   const height = mask.length;
   const width = mask[0]?.length ?? 0;
+  if (radius <= 0) {
+    return mask.map((row) => [...row]);
+  }
   const result: boolean[][] = Array.from({ length: height }, () =>
     Array.from({ length: width }, () => false),
   );
@@ -163,16 +215,13 @@ function dilateBy1(mask: readonly (readonly boolean[])[]): boolean[][] {
       if (!isSet) {
         continue;
       }
-      for (let dy = -1; dy <= 1; dy++) {
-        const ny = y + dy;
-        if (ny < 0 || ny >= height) {
-          continue;
-        }
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx;
-          if (nx >= 0 && nx < width) {
-            result[ny][nx] = true;
-          }
+      const y0 = Math.max(0, y - radius);
+      const y1 = Math.min(height - 1, y + radius);
+      const x0 = Math.max(0, x - radius);
+      const x1 = Math.min(width - 1, x + radius);
+      for (let ny = y0; ny <= y1; ny++) {
+        for (let nx = x0; nx <= x1; nx++) {
+          result[ny][nx] = true;
         }
       }
     }
@@ -180,28 +229,18 @@ function dilateBy1(mask: readonly (readonly boolean[])[]): boolean[][] {
   return result;
 }
 
-// Doubles a module-resolution mask into a 2×2-subcell-per-module grid, so a
-// 1-subcell dilation on the result is exactly a half-module grow.
-function upsample2x(mask: readonly (readonly boolean[])[]): boolean[][] {
-  const result: boolean[][] = [];
-  for (const row of mask) {
-    const r0: boolean[] = [];
-    for (const cell of row) {
-      r0.push(cell, cell);
-    }
-    result.push(r0, [...r0]);
-  }
-  return result;
-}
-
-// Rasterises `text` centred in a `width`×`height` module-resolution canvas,
-// returning a boolean ink mask (true = dark/glyph pixel) — used only to work
+// Rasterises `text` centred in a `width`×`height` module box, at
+// INK_RASTER_SCALE subpixels per module, returning a boolean ink mask (true
+// = dark/glyph pixel) at that same subpixel resolution — used only to work
 // out which modules the text's ink and border actually reach, never for the
 // visible glyph itself (that's drawn as real, smoothly rendered SVG text
-// using this same font/size/position). Rendered at the font's natural
-// weight (not synthetically bolded), which keeps already-heavy display
-// fonts (Impact and friends) from blobbing strokes together once dilated
-// for the border.
+// using this same font/size/position). Rasterising at full subpixel
+// resolution (rather than one pixel per module) is what lets the computed
+// clip zone actually track the smooth glyph outlines instead of a blocky
+// module-grid approximation of them. Rendered at the font's natural weight
+// (not synthetically bolded), which keeps already-heavy display fonts
+// (Impact and friends) from blobbing strokes together once dilated for the
+// border.
 function rasterInkMask(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -210,20 +249,24 @@ function rasterInkMask(
   width: number,
   height: number,
 ): boolean[][] {
+  const pixelWidth = width * INK_RASTER_SCALE;
+  const pixelHeight = height * INK_RASTER_SCALE;
+  ctx.canvas.width = pixelWidth;
+  ctx.canvas.height = pixelHeight;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, pixelWidth, pixelHeight);
   ctx.fillStyle = '#000000';
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'center';
-  ctx.font = `${fontSize}px "${font}"`;
-  ctx.fillText(text, width / 2, textBaselineY(ctx, text, height));
+  ctx.font = `${fontSize * INK_RASTER_SCALE}px "${font}"`;
+  ctx.fillText(text, pixelWidth / 2, textBaselineY(ctx, text, pixelHeight));
 
-  const { data } = ctx.getImageData(0, 0, width, height);
+  const { data } = ctx.getImageData(0, 0, pixelWidth, pixelHeight);
   const mask: boolean[][] = [];
-  for (let y = 0; y < height; y++) {
+  for (let y = 0; y < pixelHeight; y++) {
     const row: boolean[] = [];
-    for (let x = 0; x < width; x++) {
-      row.push((data[(y * width + x) * 4] ?? 255) < 128);
+    for (let x = 0; x < pixelWidth; x++) {
+      row.push((data[(y * pixelWidth + x) * 4] ?? 255) < 128);
     }
     mask.push(row);
   }
@@ -246,22 +289,25 @@ function textBaselineY(
 }
 
 // True for every module whose square overlaps the text's ink or its
-// half-module border, at full precision (via a 2×-supersampled grid) rather
-// than the ink mask's own module-resolution grid — a module counts as
-// clipped if *any* part of it falls in the zone, not just its centre.
+// border, at the ink mask's own subpixel precision rather than module
+// resolution — a module counts as clipped if *any* of its subcells falls in
+// the (dilated) zone, not just its centre.
 function computeClipZone(ink: readonly (readonly boolean[])[]): boolean[][] {
-  const grown = dilateBy1(upsample2x(ink));
-  const height = ink.length;
-  const width = ink[0]?.length ?? 0;
+  const grown = dilateChebyshev(ink, BORDER_RADIUS_SUBCELLS);
+  const height = Math.round(ink.length / INK_RASTER_SCALE);
+  const width = Math.round((ink[0]?.length ?? 0) / INK_RASTER_SCALE);
   return Array.from({ length: height }, (_, y) =>
-    Array.from(
-      { length: width },
-      (_, x) =>
-        grown[2 * y]?.[2 * x] ||
-        grown[2 * y]?.[2 * x + 1] ||
-        grown[2 * y + 1]?.[2 * x] ||
-        grown[2 * y + 1]?.[2 * x + 1],
-    ),
+    Array.from({ length: width }, (_, x) => {
+      for (let sy = 0; sy < INK_RASTER_SCALE; sy++) {
+        const row = grown[y * INK_RASTER_SCALE + sy];
+        for (let sx = 0; sx < INK_RASTER_SCALE; sx++) {
+          if (row[x * INK_RASTER_SCALE + sx]) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }),
   );
 }
 
@@ -316,24 +362,74 @@ function verifyDecodable(
   return spare >= requiredSpare;
 }
 
+// Applies the text+border clip zone to every candidate mask's own encoding,
+// discards masks that don't leave `requiredSpare` correction capacity once
+// cleared, and of the ones that survive, picks the one that scores best
+// under the format's own mask-quality rule (QrCode.getPenaltyScoreOf) —
+// evaluated against the matrix as it will actually be rendered, clip zone
+// and all, rather than against each mask's unmodified encoding. Decodability
+// is checked first, and only within the surviving set is appearance used as
+// a tiebreak: the modules the clip zone forces light are otherwise arbitrary
+// per mask, so a mask that merely looks best unclipped could easily be one
+// that loses too much of its own data under this particular clip zone, while
+// a less "pretty" mask survives it fine — checking appearance first would
+// pick the failing mask and force a needless version bump instead.
+function selectMask(
+  maskCandidates: readonly QrCode[],
+  clipZone: readonly (readonly boolean[])[],
+  fmap: readonly (readonly ModuleRegion[])[],
+  interiorTop: number,
+  version: number,
+  requiredSpare: number,
+): { qrcode: QrCode; clearedCells: boolean[][] } | null {
+  let best: {
+    qrcode: QrCode;
+    clearedCells: boolean[][];
+    penalty: number;
+  } | null = null;
+  for (const qrcode of maskCandidates) {
+    const clearedCells = withClipZoneForced(
+      qrcode.getModules(),
+      clipZone,
+      fmap,
+      interiorTop,
+    );
+    if (!verifyDecodable(clearedCells, version, qrcode.mask, requiredSpare)) {
+      continue;
+    }
+    const penalty = QrCode.getPenaltyScoreOf(clearedCells);
+    if (!best || penalty < best.penalty) {
+      best = { qrcode, clearedCells, penalty };
+    }
+  }
+  return best;
+}
+
 interface TextFit {
   fontSize: number;
   height: number;
+  qrcode: QrCode;
 }
 
 // Finds the tallest legible text at this exact version that still leaves
 // `requiredSpare` correction capacity, or null if even the minimum legible
-// size doesn't.
+// size doesn't. For each candidate size, every mask pattern is tried with
+// the resulting clip zone forced onto it; the best-looking mask among those
+// that still decode is what this reports back.
 function fitTextAtVersion(
-  qrcode: QrCode,
+  version: number,
+  segments: readonly QrSegment[],
   rasterText: string,
   rasterFont: string,
   ctx: CanvasRenderingContext2D,
   requiredSpare: number,
 ): TextFit | null {
-  const cells = qrcode.getModules();
-  const size = cells.length;
-  const version = qrcode.version;
+  const maskCandidates = buildMaskCandidates(segments, version);
+  if (maskCandidates.length === 0) {
+    return null;
+  }
+
+  const size = version * 4 + 17;
   const fmap = functionModuleMap(version);
 
   const interiorTop = STRUCTURAL_TOP_ROWS;
@@ -345,10 +441,9 @@ function fitTextAtVersion(
     return null;
   }
 
-  ctx.canvas.width = interiorWidth;
-  ctx.canvas.height = interiorHeight;
-
-  const tryHeight = (targetHeight: number): number | null => {
+  const tryHeight = (
+    targetHeight: number,
+  ): { fontSize: number; qrcode: QrCode } | null => {
     const fontSize = fitFontSize(
       ctx,
       rasterText,
@@ -366,10 +461,15 @@ function fitTextAtVersion(
       interiorHeight,
     );
     const clipZone = computeClipZone(ink);
-    const clearedCells = withClipZoneForced(cells, clipZone, fmap, interiorTop);
-    return verifyDecodable(clearedCells, version, qrcode.mask, requiredSpare)
-      ? fontSize
-      : null;
+    const best = selectMask(
+      maskCandidates,
+      clipZone,
+      fmap,
+      interiorTop,
+      version,
+      requiredSpare,
+    );
+    return best ? { fontSize, qrcode: best.qrcode } : null;
   };
 
   // The smallest legible size sets the floor: if even that doesn't leave
@@ -381,7 +481,7 @@ function fitTextAtVersion(
 
   let lo = MIN_TEXT_HEIGHT_MODULES;
   let hi = maxTextHeight;
-  let bestFontSize = minResult;
+  let best = minResult;
   let bestHeight = MIN_TEXT_HEIGHT_MODULES;
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
@@ -390,25 +490,25 @@ function fitTextAtVersion(
       hi = mid - 1;
     } else {
       lo = mid;
-      bestFontSize = candidate;
+      best = candidate;
       bestHeight = mid;
     }
   }
 
-  return { fontSize: bestFontSize, height: bestHeight };
+  return { fontSize: best.fontSize, height: bestHeight, qrcode: best.qrcode };
 }
 
-// Builds the final layout for the winning (version, fontSize): the
+// Builds the final layout for the winning (version, mask, fontSize): the
 // surrounding pattern with the text+border's clip zone left light, and
 // where to draw the real SVG <text> glyph on top of it.
 function buildLayout(
-  qrcode: QrCode,
   segments: readonly QrSegment[],
   fit: TextFit,
   rasterText: string,
   rasterFont: string,
   ctx: CanvasRenderingContext2D,
 ): CutoutLayout {
+  const qrcode = fit.qrcode;
   const cells = qrcode.getModules();
   const size = cells.length;
   const fmap = functionModuleMap(qrcode.version);
@@ -417,8 +517,6 @@ function buildLayout(
   const interiorWidth = size;
   const interiorHeight = size - STRUCTURAL_TOP_ROWS - STRUCTURAL_BOTTOM_ROWS;
 
-  ctx.canvas.width = interiorWidth;
-  ctx.canvas.height = interiorHeight;
   const ink = rasterInkMask(
     ctx,
     rasterText,
@@ -453,10 +551,10 @@ function buildLayout(
 }
 
 // Always encodes at high error correction, then tries successively higher
-// versions (re-encoding the same segments each time) only until the
-// smallest legible text leaves at least LOW_REMAINING_FRACTION of that
-// version's own correction capacity spare — text is otherwise sized as
-// large as it can be within that low remaining margin.
+// versions only until the smallest legible text leaves at least
+// LOW_REMAINING_FRACTION of that version's own correction capacity spare —
+// text is otherwise sized as large as it can be within that low remaining
+// margin.
 function fitCutout(
   segments: readonly QrSegment[],
   rasterText: string,
@@ -472,40 +570,36 @@ function fitCutout(
     return null;
   }
 
-  let qrcode = QrCode.encodeSegments(
+  let version = QrCode.encodeSegments(
     segments,
     LEVEL,
     1,
     QrCode.MAX_VERSION,
     -1,
     false,
-  );
+  ).version;
 
   for (let attempt = 0; attempt < MAX_VERSION_ATTEMPTS; attempt++) {
     const requiredSpare = Math.ceil(
-      totalCorrectableCapacity(qrcode.version, LEVEL) * LOW_REMAINING_FRACTION,
+      totalCorrectableCapacity(version, LEVEL) * LOW_REMAINING_FRACTION,
     );
 
     const fit = fitTextAtVersion(
-      qrcode,
+      version,
+      segments,
       rasterText,
       rasterFont,
       ctx,
       requiredSpare,
     );
     if (fit) {
-      return buildLayout(qrcode, segments, fit, rasterText, rasterFont, ctx);
+      return buildLayout(segments, fit, rasterText, rasterFont, ctx);
     }
 
-    const nextVersion = qrcode.version + 1;
-    if (nextVersion > QrCode.MAX_VERSION) {
+    version += 1;
+    if (version > QrCode.MAX_VERSION) {
       return null;
     }
-    const next = tryEncode(segments, nextVersion);
-    if (!next) {
-      return null;
-    }
-    qrcode = next;
   }
 
   return null;
