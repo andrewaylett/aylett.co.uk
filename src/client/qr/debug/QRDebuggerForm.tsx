@@ -9,7 +9,11 @@ import {
 import dynamic from 'next/dynamic';
 
 function DebuggerError({ error }: ErrorInfo): JSX.Element {
-  return <p role="alert">Error decoding QR code: {error.message}</p>;
+  const message =
+    typeof error === 'object' && error && 'message' in error
+      ? String(error.message)
+      : 'An unknown error occurred';
+  return <p role="alert">Error decoding QR code: {message}</p>;
 }
 
 function Loading(): JSX.Element {

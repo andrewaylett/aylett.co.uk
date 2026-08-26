@@ -119,6 +119,9 @@ export default function nextConfig(
   })({
     ...defaultConfig,
     ...({
+      experimental: {
+        useTypeScriptCli: false,
+      },
       typedRoutes: true,
       reactCompiler: {
         compilationMode: 'infer',
