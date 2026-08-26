@@ -19,10 +19,15 @@ export const QRCodeError: ErrorComponent = ({ error, reset }: ErrorInfo) => {
     updateResetRef(reset);
   }, [reset, updateResetRef]);
 
+  const message =
+    typeof error === 'object' && error && 'message' in error
+      ? String(error.message)
+      : 'An unknown error occurred';
+
   return (
     <div className="w-full">
       <h2 className="text-red-500">Error generating QR code</h2>
-      <p>{error.message}</p>
+      <p>{message}</p>
       <button
         type="button"
         onClick={resetText}
