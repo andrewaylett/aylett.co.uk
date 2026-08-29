@@ -240,10 +240,7 @@ export function QRCodeForm(): JSX.Element {
               startTransition(() => {
                 setQRContent((draft) => {
                   draft.dotStyle = event.target.value as
-                    | 'square'
-                    | 'dot'
-                    | 'text'
-                    | 'cutout';
+                    'square' | 'dot' | 'text' | 'cutout';
                 });
               });
             }}

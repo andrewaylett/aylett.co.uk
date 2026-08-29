@@ -267,13 +267,11 @@ export class QrCode {
     for (let i = 0; i < numAlign; i++) {
       for (let j = 0; j < numAlign; j++) {
         // Don't draw on the three finder corners
-        if (
-          !(
-            (i == 0 && j == 0) ||
-            (i == 0 && j == numAlign - 1) ||
-            (i == numAlign - 1 && j == 0)
-          )
-        ) {
+        if (!(
+          (i == 0 && j == 0) ||
+          (i == 0 && j == numAlign - 1) ||
+          (i == numAlign - 1 && j == 0)
+        )) {
           this.drawAlignmentPattern(alignPatPos[i], alignPatPos[j]);
         }
       }

@@ -51,8 +51,7 @@ declare module 'unified' {
      * {@link https://github.com/syntax-tree/mdast-util-from-markdown#extension | `mdast-util-from-markdown`}.
      */
     fromMarkdownExtensions?: (
-      | FromMarkdownExtension[]
-      | FromMarkdownExtension
+      FromMarkdownExtension[] | FromMarkdownExtension
     )[];
   }
 }

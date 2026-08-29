@@ -39,7 +39,7 @@ export class QrSegment {
       throw new RangeError('String contains non-numeric characters');
     }
     const bb: bit[] = [];
-    for (let i = 0; i < digits.length; ) {
+    for (let i = 0; i < digits.length;) {
       // Consume up to 3 digits per iteration
       const n: int = Math.min(digits.length - i, 3);
       appendBits(
@@ -197,7 +197,7 @@ export class QrSegment {
 
     // Backtrack and build segments.
     const result: QrSegment[] = [];
-    for (let i = m - 1; i > 0; ) {
+    for (let i = m - 1; i > 0;) {
       const j: int = fromIdx[i];
       const mode: Mode = fromMode[i];
       const substr: string = text.slice(bounds[j], bounds[i]);
