@@ -19,6 +19,7 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   watchman: false,
   ...presetConfig,
+  testPathIgnorePatterns: ['/node_modules/', '/.jj/'],
 } satisfies JestConfigWithTsJest;
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
