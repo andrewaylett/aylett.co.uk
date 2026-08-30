@@ -87,7 +87,7 @@ catalog:
   rss: 1.2.2
   server-only: 0.0.1
   tailwindcss: 4.3.3
-  temporal-polyfill: 1.0.2
+  temporal-polyfill: 1.0.4
   to-vfile: 8.0.0
   ts-jest: 29.4.12
   typescript: "npm:@typescript/typescript6@6.0.2"
