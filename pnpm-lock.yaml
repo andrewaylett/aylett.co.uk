@@ -163,8 +163,8 @@ catalogs:
       specifier: 3.9.6
       version: 3.9.6
     react-compiler-marker:
-      specifier: 0.1.0
-      version: 0.1.0
+      specifier: 0.2.0
+      version: 0.2.0
     recharts:
       specifier: 3.10.1
       version: 3.10.1
@@ -491,7 +491,7 @@ importers:
         version: 3.9.6
       react-compiler-marker:
         specifier: 'catalog:'
-        version: 0.1.0
+        version: 0.2.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
@@ -4147,8 +4147,8 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  react-compiler-marker@0.1.0:
-    resolution: {integrity: sha512-7JfjUslAHBHW9Jf/wCt9AyoMzgQwsFNgxYKnB4rS6yuJ8BVnwQ9FwuOckp9iM2bHcVgmrMwXbhtspbwaxNT3xw==}
+  react-compiler-marker@0.2.0:
+    resolution: {integrity: sha512-KHTbcoFWR4/dxAJqjTOSiAbP43cvF97eHAjwv6tdAMoSpkMXaybbzH8O7f99x2v/brpDGTTUTu+tuo+lZM0GTA==}
     hasBin: true
 
   react-dom@19.2.4:
@@ -9114,7 +9114,7 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-compiler-marker@0.1.0: {}
+  react-compiler-marker@0.2.0: {}
 
   react-dom@19.2.4(react@19.2.4):
     dependencies:
