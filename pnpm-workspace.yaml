@@ -12,13 +12,9 @@ overrides:
   next-plausible>next: 'catalog:'
   glob: 'catalog:'
   eslint-import-resolver-typescript: 'catalog:'
-onlyBuiltDependencies:
-- "@swc/core"
-- sharp
-- unrs-resolver
 catalog:
   "@eslint/js": 9.39.5
-  "@jest/globals": 30.4.1
+  "@jest/globals": 30.5.1
   "@next/eslint-plugin-next": 16.3.4
   "@prettier/plugin-xml": 3.4.2
   "@swc/jest": 0.2.39
@@ -50,14 +46,14 @@ catalog:
   eslint-plugin-jest: 29.16.6
   eslint-plugin-react: 7.37.5
   eslint-plugin-react-hooks: 7.0.1
-  expect: 30.4.1
+  expect: 30.5.1
   glob: 13.0.6
   globals: 17.11.0
   html-to-image: 1.11.13
   identity-obj-proxy: 3.0.0
   immer: 11.1.18
-  jest: 30.4.2
-  jest-environment-jsdom: 30.4.1
+  jest: 30.5.1
+  jest-environment-jsdom: 30.5.1
   jiti: 2.7.0
   jsdom: 30.0.1
   mdast-util-from-markdown: 2.0.3
@@ -104,6 +100,7 @@ catalog:
 catalogMode: strict
 cleanupUnusedCatalogs: true
 allowBuilds:
+  '@parcel/watcher': true
   '@swc/core': true
   sharp: true
   unrs-resolver: true
