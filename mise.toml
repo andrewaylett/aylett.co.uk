@@ -2,4 +2,4 @@
 _.path = 'node_modules/.bin'
 
 [tools]
-"npm:pnpm" = "11.25.0"
+"npm:pnpm" = "12.3.0"
