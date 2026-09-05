@@ -60,8 +60,6 @@ function hammingDistance(a: number, b: number): number {
 
 /** Reads the 15-bit format word from copy 0 (top-left area). */
 function readCopy0(m: boolean[][]): number {
-  const size = m.length;
-  void size; // used implicitly via m indexing
   let bits = 0;
   // Mirrors the write loop in drawFormatBits copy 1:
   //   i=0..5 → (x=8, y=i)  = bit i
