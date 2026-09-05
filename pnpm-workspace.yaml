@@ -28,8 +28,8 @@ catalog:
   "@types/mdast": 4.0.4
   "@types/nlcst": 2.0.3
   "@types/node": 24.13.3
-  "@types/react": 19.2.14
-  "@types/react-dom": 19.2.3
+  "@types/react": 19.2.18
+  "@types/react-dom": 19.2.5
   "@types/rss": 0.0.32
   babel-plugin-react-compiler: 1.0.0
   baseline-browser-mapping: 2.11.20
@@ -45,7 +45,7 @@ catalog:
   eslint-plugin-import: 2.32.0
   eslint-plugin-jest: 29.16.6
   eslint-plugin-react: 7.37.5
-  eslint-plugin-react-hooks: 7.0.1
+  eslint-plugin-react-hooks: 7.1.1
   expect: 30.5.1
   glob: 13.0.6
   globals: 17.12.0
@@ -66,10 +66,10 @@ catalog:
   parse-english: 7.0.0
   postcss: 8.5.26
   prettier: 3.9.6
-  react: 19.2.4
-  react-dom: 19.2.4
+  react: 19.2.8
+  react-dom: 19.2.8
   react-compiler-marker: 0.2.0
-  react-is: 19.2.4
+  react-is: 19.2.8
   recharts: 3.10.1
   rehype-format: 5.0.1
   rehype-react: 8.0.0
