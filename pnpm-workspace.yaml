@@ -29,7 +29,7 @@ catalog:
   "@types/nlcst": 2.0.3
   "@types/node": 24.13.3
   "@types/react": 19.2.18
-  "@types/react-dom": 19.2.5
+  "@types/react-dom": 19.2.7
   "@types/rss": 0.0.32
   babel-plugin-react-compiler: 1.0.0
   baseline-browser-mapping: 2.11.20
