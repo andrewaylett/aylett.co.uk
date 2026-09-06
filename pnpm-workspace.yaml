@@ -64,7 +64,7 @@ catalog:
   next-plausible: 4.0.0
   nlcst-to-string: 4.0.0
   parse-english: 7.0.0
-  postcss: 8.5.26
+  postcss: 8.5.27
   prettier: 3.9.6
   react: 19.2.8
   react-dom: 19.2.8
