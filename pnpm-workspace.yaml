@@ -32,7 +32,7 @@ catalog:
   "@types/react-dom": 19.2.7
   "@types/rss": 0.0.32
   babel-plugin-react-compiler: 1.0.0
-  baseline-browser-mapping: 2.11.25
+  baseline-browser-mapping: 2.11.26
   browserslist: 4.28.8
   caniuse-lite: 1.0.30001812
   client-only: 0.0.1
