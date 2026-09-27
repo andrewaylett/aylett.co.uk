@@ -65,7 +65,7 @@ catalog:
   nlcst-to-string: 4.0.0
   parse-english: 7.0.0
   postcss: 8.5.28
-  prettier: 3.9.6
+  prettier: 3.9.9
   react: 19.2.8
   react-dom: 19.2.8
   react-compiler-marker: 0.2.0
