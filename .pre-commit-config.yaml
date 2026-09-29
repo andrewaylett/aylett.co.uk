@@ -53,7 +53,7 @@ repos:
     files: pnpm-lock.yaml
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.38.0
+  rev: 0.38.2
   hooks:
   - id: check-github-workflows
   - id: check-renovate
