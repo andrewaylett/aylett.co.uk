@@ -59,7 +59,7 @@ catalog:
   mdast-util-from-markdown: 2.0.3
   mdast-util-to-markdown: 2.1.2
   mermaid: 11.17.2
-  micromark-util-types: 2.0.2
+  micromark-util-types: 2.0.3
   next: 16.3.6
   next-plausible: 4.0.0
   nlcst-to-string: 4.0.0
