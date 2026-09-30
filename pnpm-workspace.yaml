@@ -95,7 +95,7 @@ catalog:
   unist-util-visit-parents: 6.0.2
   vfile: 6.0.3
   yaml: 2.9.1
-  zod: 4.5.4
+  zod: 4.6.5
   '@swc/helpers': 0.5.23
 catalogMode: strict
 cleanupUnusedCatalogs: true
