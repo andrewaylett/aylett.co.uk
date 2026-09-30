@@ -1,3 +1,6 @@
+// noinspection JSUnusedGlobalSymbols
+/* eslint-disable @typescript-eslint/no-generated-empty-object-type */
+
 /**
  * Unified plugin that converts an nlcst (natural language) tree back to mdast (markdown).
  *
@@ -5,7 +8,6 @@
  * nlcst back into markdown, preserving any micromark/mdast extensions registered
  * on the processor.
  */
-// noinspection JSUnusedGlobalSymbols
 
 import {
   fromMarkdown,
