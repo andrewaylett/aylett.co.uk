@@ -37,7 +37,7 @@ catalog:
   caniuse-lite: 1.0.30001819
   client-only: 0.0.1
   date-fns: 4.4.0
-  encoding: 0.1.13
+  encoding: 0.1.14
   eslint: 9.39.5
   eslint-config-andrewaylett: 7.0.0
   eslint-config-next: 16.4.2
