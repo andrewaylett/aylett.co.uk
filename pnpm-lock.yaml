@@ -243,8 +243,8 @@ catalogs:
       specifier: 4.4.0
       version: 4.4.0
     encoding:
-      specifier: 0.1.13
-      version: 0.1.13
+      specifier: 0.1.14
+      version: 0.1.14
     eslint:
       specifier: 9.39.5
       version: 9.39.5
@@ -592,7 +592,7 @@ importers:
         version: 1.0.30001819
       encoding:
         specifier: 'catalog:'
-        version: 0.1.13
+        version: 0.1.14
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
@@ -2865,8 +2865,9 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  encoding@0.1.13:
-    resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
+  encoding@0.1.14:
+    resolution: {integrity: sha512-pqH+jIxIhwX5U4w+Tnu3jjowTo5QTACbqef2C5Cw2RhApr7COQqgnai53u8VbtqjWRcSoAcTf7uZ62dO5kC8Iw==}
+    engines: {node: '>=20.0.0'}
 
   enhanced-resolve@5.24.3:
     resolution: {integrity: sha512-PwKooW9JUzh5chmYfHM3IQl5OkK2u2Nm011MgeZrss3JmFraUx/fqrf78kk8GUMYoibx/14MdwTl/1WKkG7TpQ==}
@@ -3418,6 +3419,10 @@ packages:
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
+    engines: {node: '>=0.10.0'}
+
+  iconv-lite@0.7.3:
+    resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
     engines: {node: '>=0.10.0'}
 
   identity-obj-proxy@3.0.0:
@@ -7341,9 +7346,9 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  encoding@0.1.13:
+  encoding@0.1.14:
     dependencies:
-      iconv-lite: 0.6.3
+      iconv-lite: 0.7.3
 
   enhanced-resolve@5.24.3:
     dependencies:
@@ -8066,6 +8071,10 @@ snapshots:
   human-signals@2.1.0: {}
 
   iconv-lite@0.6.3:
+    dependencies:
+      safer-buffer: 2.1.2
+
+  iconv-lite@0.7.3:
     dependencies:
       safer-buffer: 2.1.2
 
