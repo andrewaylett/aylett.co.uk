@@ -60,7 +60,7 @@ catalog:
   mdast-util-to-markdown: 2.2.0
   mermaid: 12.2.0
   micromark-util-types: 2.0.3
-  next: 16.4.2
+  next: 16.4.3
   next-plausible: 4.0.0
   nlcst-to-string: 4.0.0
   parse-english: 7.0.0
